@@ -767,19 +767,16 @@ $dec_nic_no = $application['nic_no'];
 
 
                                     <div class="form-row">
-                                        <div class="col-lg-4 col-md-4 col-sm-4">
-                                            <div class="form-group mt-4 mb-0"><input name="submit1" type="button" class="btn btn-primary btn-block btn-update" value="Update Application" />
+                                        <div class="col-lg-6 col-md-6 col-sm-6">
+                                            <div class="form-group mt-4 mb-0"><input name="submit1" type="button" class="btn btn-primary btn-block btn-update" value="Update Application" data-nic="<?php echo htmlspecialchars($dec_nic_no); ?>" />
                                             </div>
                                         </div>
-                                        <div class="col-lg-4 col-md-4 col-sm-4">
-                                            <div class="form-group mt-4 mb-0"><input name="submit2" type="button" class="btn btn-primary btn-block btn-cancel" value="No need to Update" style=" background-color: #e7e7e7;color: black;" />
+                                        <div class="col-lg-6 col-md-6 col-sm-6">
+                                            <div class="form-group mt-4 mb-0">
+                                                <input type="button" class="btn btn-success btn-block btn-checkout" value="Proceed to Checkout" data-nic="<?php echo htmlspecialchars($dec_nic_no); ?>">
                                             </div>
                                         </div>
-                                        <div class="col-lg-4 col-md-4 col-sm-4">
-                                            <div class="form-group mt-4 mb-0"><input name="submit3" type="button" class="btn btn-success btn-block btn-submit" value="Submit Application" />
-                                            </div>
-                                        </div>
-
+                                    </div>
                                 </form>
                             </div>
 

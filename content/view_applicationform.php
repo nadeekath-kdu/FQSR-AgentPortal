@@ -679,12 +679,10 @@ require_once '../pages/load_data_formedit.php';
                                         </div>
                                         <div class="col-lg-6 col-md-6 col-sm-6">
                                             <div class="form-group mt-4 mb-0">
-                                                <button type="button" class="btn btn-success btn-block btn-checkout" onclick="proceedToCheckout('<?php echo htmlspecialchars($dec_nic_no); ?>')">
-                                                    <i class="fa fa-shopping-cart"></i> Proceed to Checkout
-                                                </button>
+                                                <input type="button" class="btn btn-success btn-block btn-checkout" value="Proceed to Checkout" data-nic="<?php echo htmlspecialchars($dec_nic_no); ?>" />
                                             </div>
                                         </div>
-
+                                    </div>
                                 </form>
                             </div>
 

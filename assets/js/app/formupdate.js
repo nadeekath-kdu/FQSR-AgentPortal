@@ -201,11 +201,20 @@ $(document).ready(function () {
 
     });
 
-    $(".btn-cancel").on("click", function (e) {
+    $(".btn-checkout").on("click", function (e) {
         e.preventDefault();
-        console.log('cance, no update');
-        var page = "../content/viewappdatalist.html";
-        $("#content").load(page);
+        console.log('Proceeding to checkout');
+        var nic = $(this).data('nic');
+        if (!nic) {
+            toastr.error("No passport/NIC number found", "Error");
+            return;
+        }
+        // Open the payment/checkout page in a new tab
+        var paymentUrl = 'http://enlistment.kdu.ac.lk/pg_sampath/pgrequest_check_fsr.php?idn=' + nic;
+        window.open(paymentUrl, '_blank');
+        // Open the PDF in the current tab for auto-download
+        var pdfUrl = '../content/application_formpdf.php?nic=' + encodeURIComponent(nic);
+        window.location.href = pdfUrl;
     });
 
     $('.btn-edit').click(function (e) {
@@ -235,6 +244,13 @@ $(document).ready(function () {
                 toastr.error("Error loading form", "");
             }
         });
+    });
+
+    $(".btn-cancel").on("click", function (e) {
+        e.preventDefault();
+        console.log('cance, no update');
+        var page = "../content/viewappdatalist.html";
+        $("#content").load(page);
     });
 
 });
