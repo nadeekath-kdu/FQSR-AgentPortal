@@ -1,0 +1,81 @@
+.card {
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    background-color: #5549be;
+    color: #fff;
+    border-radius: 10px 10px 0 0;
+}
+
+.table {
+    width: 100%;
+    height: 100%;
+    border-collapse: collapse;
+}
+
+/* .table th,
+.table td {
+    padding: 20px; 
+    text-align: left;
+    border: 1px solid #dee2e6;
+}
+
+
+.table th {
+    background-color: #f8f9fa;
+    color: #6c757d;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f2f2f2;
+} */
+
+.btn {
+    border-radius: 5px;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+}
+
+h2.mb-5 {
+    color: #5549be(67, 67, 201);
+}
+
+h5.mb-0 {
+    color: #000c05;
+}
+
+#filterAgent {
+    border-left: none;
+    font-weight: 500;
+}
+
+.input-group-text {
+    border-right: none;
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+}
+
+.input-group .bx {
+    margin-right: 6px;
+    font-size: 1.1rem;
+}

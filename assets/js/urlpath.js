@@ -1,0 +1,1 @@
+$("#content").load("content/homepage.html");

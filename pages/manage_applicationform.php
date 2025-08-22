@@ -1,0 +1,11 @@
+<?php
+    if(isset($_POST['submit1'])){
+        header('Location:formupdate.php');
+    }if(isset($_POST['submit2'])){
+        header('Location:../includes/content/viewapplicationslist.html');
+        //header('Location:intermediate_pg_request.php?idn='.$enc_nic_no.'&lsidn='.$enc_last_id);
+    }if(isset($_POST['submit3'])){
+        header('Location:https://enlistment.kdu.ac.lk/fqsr/formsave.php?idn='.$enc_nic_no);
+        //header('Location:intermediate_pg_request.php?idn='.$enc_nic_no.'&lsidn='.$enc_last_id);
+    }
+?>

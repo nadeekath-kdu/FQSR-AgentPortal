@@ -1,0 +1,97 @@
+.card {
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    background-color: #5549be;
+    color: #fff;
+    border-radius: 10px 10px 0 0;
+
+}
+
+h2.mb-0 {
+    color: #ffffff;
+}
+
+.mb-0 {
+    text-align: center;
+}
+
+.hover-effect:hover {
+    background-color: #f1f1f1;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+}
+
+.navbar-brand i {
+    vertical-align: middle;
+    margin-right: 5px;
+}
+
+.navbar .nav-link i {
+    margin-right: 5px;
+}
+
+.input-group input:focus {
+    box-shadow: none;
+    border-color: #0d6efd;
+}
+
+textarea::placeholder {
+    color: #6c757d;
+    font-style: italic;
+}
+
+label.form-label {
+    font-size: 0.95rem;
+    letter-spacing: 0.3px;
+}
+
+.custom-fro {
+    border-left: 5px solid #5B8DEF;
+    background-color: #EAF2FF;
+}
+
+.custom-dr {
+    border-left: 5px solid #63C27D;
+    background-color: #EFFAF2;
+}
+
+.custom-dvc {
+    border-left: 5px solid #57C7D4;
+    background-color: #E9F7F9;
+}
+
+.custom-vc {
+    border-left: 5px solid #FF7373;
+    background-color: #FFECEC;
+}
+
+.custom-badge-fro {
+    background-color: #5B8DEF;
+    color: white;
+}
+
+.custom-badge-dr {
+    background-color: #63C27D;
+    color: white;
+}
+
+.custom-badge-dvc {
+    background-color: #57C7D4;
+    color: white;
+}
+
+.custom-badge-vc {
+    background-color: #FF7373;
+    color: white;
+}
+
+.remark-box {
+    background-color: #FFF3CD;
+    color: #856404;
+    padding: 10px 12px;
+    border-radius: 6px;
+    margin-top: 6px;
+}

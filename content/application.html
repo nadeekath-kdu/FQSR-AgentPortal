@@ -1,0 +1,924 @@
+<link rel="stylesheet" href="../assets/css/application.css" />
+<div class="col-md-12 col-lg-12 mb-3">
+    <div class="card custom-card  h-100">
+        <div class="card-body">
+            <h5 class="card-title">
+                <center><b>Application for Admission of Students with Foreign Qualifications for the Academic Year
+                        <?php echo $academic_year ?>
+                    </b></center>
+            </h5>
+            <br>
+            <div class="container">
+                <div class="alert alert-info" role="alert">
+                    <i class="fa fa-warning"></i>&nbsp;Fields denoted with <span class="error"
+                        style="color: #FF0000;">*</span> are mandatory
+                </div>
+            </div>
+            <br>
+            <div class="container">
+                <div class="stepwizard  col-md-offset-3">
+                    <div class="stepwizard-row setup-panel">
+                        <div class="stepwizard-step">
+                            <a href="#step-1" type="button" class="btn btn-primary btn-circle step-link"
+                                data-step="1">1</a>
+                            <p>Passport No</p>
+                        </div>
+                        <div class="stepwizard-step">
+                            <a href="#step-2" type="button" class="btn btn-default btn-circle step-link"
+                                disabled="disabled" data-step="2">2</a>
+                            <p>Degree Selection</p>
+                        </div>
+                        <div class="stepwizard-step">
+                            <a href="#step-3" type="button" class="btn btn-default btn-circle step-link"
+                                disabled="disabled" data-step="3">3</a>
+                            <p>Personal Details</p>
+                        </div>
+                        <div class="stepwizard-step">
+                            <a href="#step-4" type="button" class="btn btn-default btn-circle step-link"
+                                disabled="disabled" data-step="4">4</a>
+                            <p>Educational Details</p>
+                        </div>
+                        <div class="stepwizard-step">
+                            <a href="#step-5" type="button" class="btn btn-default btn-circle step-link"
+                                disabled="disabled" data-step="5">5</a>
+                            <p>Other Qualifications</p>
+                        </div>
+                        <div class="stepwizard-step">
+                            <a href="#step-6" type="button" class="btn btn-default btn-circle step-link"
+                                disabled="disabled" data-step="6">6</a>
+                            <p>Parent Details</p>
+                        </div>
+                        <div class="stepwizard-step">
+                            <a href="#step-7" type="button" class="btn btn-default btn-circle step-link"
+                                disabled="disabled" data-step="7">7</a>
+                            <p>Refree Details</p>
+                        </div>
+                        <div class="stepwizard-step">
+                            <a href="#step-8" type="button" class="btn btn-default btn-circle step-link"
+                                disabled="disabled" data-step="8">8</a>
+                            <p>Document Upload</p>
+                        </div>
+                        <div class="stepwizard-step">
+                            <a href="#step-9" type="button" class="btn btn-default btn-circle step-link"
+                                disabled="disabled" data-step="9">9</a>
+                            <p>Submit</p>
+                        </div>
+                    </div>
+                </div>
+                <form id="my-form" name="my-form" method="post" enctype="multipart/form-data">
+                    <!-- action="../pages/formsave.php" -->
+                    <div class="row setup-content" id="step-1">
+                        <div class="col-xs-6 col-md-offset-3">
+                            <div class="row">
+                                <br><br>
+                                <div class="card mb-4">
+                                    <center><b>
+                                            <h5 class="card-header">Student Passport Number<span class="error"
+                                                    style="color: #FF0000; font-size:large;"">*</span></h5></b></center>
+                            <div class=" card-body">
+                                                    <div class="form-floating">
+                                                        <input type="text" class="form-control" name="passportno"
+                                                            id="passportno" placeholder="A1234567"
+                                                            aria-describedby="floatingInputHelp" />
+                                                        <label for="passportno">Passport Number</label>
+                                                        <div id="floatingInputHelp">
+                                                            <small class="text-danger">Note: You can only apply once
+                                                                with your passport number.</small>
+                                                        </div>
+                                                    </div>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary nextBtn btn-lg pull-right" id="passport_check"
+                                type="button">Next</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="divider divider-primary">
+                            <div class="divider-text">Application step (1/9)</div>
+                        </div>
+                    </div>
+            </div>
+            <div class="row setup-content" id="step-2">
+                <div class="col-xs-6 col-md-offset-3">
+                    <div class="col-md-12">
+                        <h5 style="color: #007300; font-size: x-large;">Degree Programme</h5>
+                        <hr style="color: #007300; font-size: x-large;">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <div class="mt-2 mb-3">
+                                        <label for="inputCourse" class="form-label">Choose a course intending to follow
+                                            <span class="error"
+                                                style="color: #FF0000; font-size:large;">*</span></label>
+                                        <select id="inputCourse" name="inputCourse" class="form-select form-select-lg">
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary prevBtn btn-lg  float-start" type="button">Previous</button>
+                        <button class="btn btn-primary nextBtn btn-lg  float-end" type="button">Next</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="divider divider-primary">
+                        <div class="divider-text">Application step (2/9)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row setup-content" id="step-3">
+                <div class="col-xs-6 col-md-offset-3">
+                    <div class="col-md-12">
+                        <h5 style="color: #007300; font-size: x-large;">Personal Details</h5>
+                        <hr style="border-color: #007300;">
+                        <div class="card-body">
+                            <div class="card mb-4">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label class="form-label" for="inputPhoto">Photo <span class="error"
+                                                        style="color: #FF0000; font-size:large;">*</span></label>
+                                                <div class="picture-container">
+                                                    <div class="picture">
+                                                        <img class="picture-src" id="wizardPicturePreview" title="">
+                                                        <input type="file" id="inputPhoto" name="inputPhoto"
+                                                            class="form-control" accept="image/jpeg"
+                                                            placeholder="Choose Image" onchange="previewImage(event)"
+                                                            required>
+                                                    </div>
+                                                </div>
+                                                <label class="small mb-1" for="inputPhoto"
+                                                    style="color: #007300;">Choose Image (JPEG only)</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="mb-3">
+                                                <label class="form-label" for="inputTitle">Title</label>
+                                                <select id="inputTitle" name="inputTitle" class="form-select">
+                                                    <option>Select Title</option>
+                                                    <option value="Mr.">Mr.</option>
+                                                    <option value="MrS.">Mrs.</option>
+                                                    <option value="Miss">Miss</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label" for="inputInitials">Name with initials</label>
+                                                <span class="error" style="color: #FF0000; font-size: large;">*</span>
+                                                <input id="inputInitials" name="inputInitials" class="form-control"
+                                                    type="text" placeholder="Enter Name with Initials">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="inputFullname" class="form-label">Full Name</label>
+                                        <span class="error" style="color: #FF0000; font-size: large;">*</span>
+                                        <input id="inputFullname" name="inputFullname" class="form-control" type="text"
+                                            placeholder="Enter Full Name">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card mb-4">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card-body">
+                                            <div class="mb-3">
+                                                <label for="inputDob" class="form-label">Date of birth</label>
+                                                <span class="error" style="color: #FF0000; font-size:large;">*</span>
+                                                <input id="inputDob" name="inputDob" class="form-control" type="date"
+                                                    placeholder="Enter DOB" />
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="inputGender" class="form-label">Gender</label>
+                                                <span class="error" style="color: #FF0000; font-size:large;">*</span>
+                                                <select id="inputGender" name="inputGender" class="form-select">
+                                                    <option>Select Gender</option>
+                                                    <option value="Male">Male</option>
+                                                    <option value="Female">Female</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card-body">
+                                            <div class="mb-3">
+                                                <label for="inputCivilSts" class="form-label">Civil Status</label>
+                                                <span class="error" style="color: #FF0000; font-size:large;">*</span>
+                                                <select id="inputCivilSts" name="inputCivilSts" class="form-select">
+                                                    <option>Select Civil Status</option>
+                                                    <option value="Single">Single</option>
+                                                    <option value="Married">Married</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label" for="inputEmailAddress">Email address </label>
+                                                <span class="error" style="color: #FF0000; font-size:large;">*</span>
+                                                <input class="form-control" id="inputEmailAddress"
+                                                    name="inputEmailAddress" type="email" aria-describedby="emailHelp"
+                                                    placeholder="Enter email address" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card mb-4">
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label for="addressPermanent">Permanent Address to which correspondence should
+                                            be sent </label>
+                                        <span class="error" style="color: #FF0000; font-size:large;">*</span>
+                                        <textarea class="form-control" id="addressPermanent" name="addressPermanent"
+                                            rows="3"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card mb-4">
+                                        <div class="card-body">
+                                            <div class="mb-3">
+                                                <label for="inputCountryBirth" class="form-label">Country of
+                                                    Birth</label>
+                                                <span class="error" style="color: #FF0000; font-size:large;">*</span>
+                                                <input id="inputCountryBirth" name="inputCountryBirth"
+                                                    class="form-control" type="text"
+                                                    placeholder="Enter Country Birth" />
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="countryAL" class="form-label">What is the country that you
+                                                    have appeared for Advanced Level examination/ High School
+                                                    Diploma</label>
+                                                <input id="countryAL" name="countryAL" class="form-control" type="text"
+                                                    placeholder="" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card mb-4">
+                                        <div class="card-body">
+                                            <div class="mb-3">
+                                                <label for="periodStudy" class="form-label">Period of Study apart from
+                                                    Sri Lanka</label>
+                                                <span class="error" style="color: #FF0000; font-size:large;">*</span>
+                                                <input id="periodStudy" name="periodStudy" class="form-control"
+                                                    type="text"
+                                                    placeholder="Enter period of study apart from Sri Lanka" />
+
+                                            </div>
+                                            <div class="mb-3">
+                                                <span style="color:blue">(Sri Lankan expatriates should have studied
+                                                    abroad for a period of not less than three academic years
+                                                    immediately prior to sitting the qualifying examination)</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card mb-4">
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <label for="citizenship_t" class="form-label">Citizenship</label>
+                                                <span class="error" style="color: #FF0000; font-size:large;">*</span>
+                                                <div class="form-check mt-3">
+                                                    <label for="defaultInput" class="form-label">Sri Lankan Citizenship
+                                                        Only</label>
+                                                    <input class="form-check-input" name="citizenship_type" type="radio"
+                                                        value="Sri Lankan Citizenship Only" id="sriLanakan" />
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label for="defaultInput" class="form-label"></label>
+                                                <div class="form-check mt-3">
+                                                    <label for="defaultInput" class="form-label">Foreign
+                                                        Citizenship</label>
+                                                    <input class="form-check-input" name="citizenship_type" type="radio"
+                                                        value="Foreign Citizenship" id="foreign" />
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label for="defaultInput" class="form-label"></label>
+                                                <div class="form-check mt-3">
+                                                    <label for="defaultInput" class="form-label">Dual
+                                                        Citizenship</label>
+                                                    <input class="form-check-input" name="citizenship_type" type="radio"
+                                                        value="Dual Citizenship" id="dual" />
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label for="defaultInput" class="form-label"></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            &nbsp;
+                            <div class="card mb-4" id="section1" style="display: none;">
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label class="form-label" for="inputCitizenship">Country of Citizenship </label>
+                                        <span class="error" style="color: #FF0000; font-size:large;">*</span>
+                                        <input class="form-control" id="inputCitizenship" name="inputCitizenship"
+                                            type="text" placeholder="Enter your Country of Citizenship">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card mb-4" id="section2" style="display: none;">
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label class="form-label" for="inputCitizenship">Mention Your Country of
+                                            Citizenship 1 </label>
+                                        <span class="error" style="color: #FF0000; font-size:large;">*</span>
+                                        <input class="form-control" id="inputCitizenship1" name="inputCitizenship1"
+                                            type="text" placeholder="Enter your 1st Country">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card mb-4" id="section3" style="display: none;">
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label class="form-label" for="inputCitizenship">Mention Your Country of
+                                            Citizenship 2 </label>
+                                        <span class="error" style="color: #FF0000; font-size:large;">*</span>
+                                        <input class="form-control" id="inputCitizenship2" name="inputCitizenship2"
+                                            type="text" placeholder="Enter your 2nd Country">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary prevBtn btn-lg float-start" type="button">Previous</button>
+                        <button class="btn btn-primary nextBtn btn-lg float-end" type="button">Next</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="divider divider-primary">
+                        <div class="divider-text">Application step (3/9)</div>
+                    </div>
+                </div>
+            </div>
+            <div class="row setup-content" id="step-4">
+                <div class="col-xs-6 col-md-offset-3">
+                    <div class="col-md-12">
+                        <h5 style="color: #007300; font-size: x-large;">Educational Qualifications</h5>
+                        <hr style="color: #007300; font-size: x-large;">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <h6>Examination equivalent to Advanced Level/ High School</h6>
+                                    <div class="form-group">
+                                        <label class="small mb-1" for="examNameAL">Name of Examination</label>
+                                        <input class="form-control" id="examNameAL" name="examNameAL" />
+                                    </div>
+                                    &nbsp;
+                                    <div class="form-row">
+                                        <button type="button" class="btn btn-warning" onClick="addtoEducational();"><i
+                                                class="fa fa-plus"></i></button>
+                                        <button type="button" onClick="remfromEducational();" class="btn btn-danger"><i
+                                                class="fa fa-minus"></i></button>
+                                    </div>
+
+                                    <div class="form-row">
+                                        <div class="col-lg-12 col-md-12 col-sm-12">
+                                            <table class="table" id="edutbl">
+                                                <thead>
+                                                    <tr>
+                                                        <th scope="col">Subject</th>
+                                                        <th scope="col">Grade</th>
+                                                        <th scope="col">Year</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td><input class="form-control" id="subject_AL_1" type="text"
+                                                                name="subject_AL_1" placeholder="Enter Subject" /></td>
+                                                        <td><input class="form-control" id="result_AL_1" type="text"
+                                                                name="result_AL_1" placeholder="Enter Result" /></td>
+                                                        <td><input class="form-control" id="year_AL_1" type="text"
+                                                                name="year_AL_1" placeholder="Enter Year" /></td>
+                                                    </tr>
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <input class="form-control" id="edurowcnt" type="hidden" name="edurowcnt"
+                                        value="1" />
+                                </div>
+                            </div>
+                        </div>
+                        <hr style="color: #007300; font-size: x-large;">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <h6>Examination equivalent to Ordinary Level/ Secondary Education</h6>
+                                    <div class="form-group">
+                                        <label class="small mb-1" for="examNameOL">Name of Examination</label>
+                                        <input class="form-control" id="examNameOL" name="examNameOL" />
+                                    </div>
+                                    &nbsp;
+                                    <div class="form-row">
+                                        <button type="button" class="btn btn-warning"
+                                            onClick="addtoEducational_ol();"><i class="fa fa-plus"></i></button>
+                                        <button type="button" onClick="remfromEducational_ol();"
+                                            class="btn btn-danger"><i class="fa fa-minus"></i></button>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="col-lg-12 col-md-12 col-sm-12">
+                                            <table class="table" id="edutbl2">
+                                                <thead>
+                                                    <tr>
+                                                        <th scope="col">Subject</th>
+                                                        <th scope="col">Grade</th>
+                                                        <th scope="col">Year</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td><input class="form-control" id="subject_OL_1" type="text"
+                                                                name="subject_OL_1" placeholder="Enter Subject" /></td>
+                                                        <td><input class="form-control" id="result_OL_1" type="text"
+                                                                name="result_OL_1" placeholder="Enter Result" /></td>
+                                                        <td><input class="form-control" id="year_OL_1" type="text"
+                                                                name="year_OL_1" placeholder="Enter Year" /></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <input class="form-control py-4" id="edurowcnt2" type="hidden" name="edurowcnt2"
+                                        value="1" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr style="color: #007300; font-size: x-large;">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label" for="elegibleState">State whether you are eligible for the
+                                        admission to a state University in your country </label>
+                                    <span class="error" style="color: #FF0000; font-size:large;">*</span>
+                                    <select id="elegibleState" name="elegibleState" class="form-select">
+                                        <option>Please Select</option>
+                                        <option value="Yes">Yes</option>
+                                        <option value="No">No</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <br><br>
+                        <button class="btn btn-primary prevBtn btn-lg float-start" type="button">Previous</button>
+                        <button class="btn btn-primary nextBtn btn-lg float-end" type="button">Next</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="divider divider-primary">
+                        <div class="divider-text">Application step (4/9)</div>
+                    </div>
+                </div>
+            </div>
+            <div class="row setup-content" id="step-5">
+                <div class="col-xs-6 col-md-offset-3">
+                    <div class="col-md-12">
+                        <h5 style="color: #007300; font-size: x-large;">English Language Proficiency </h5>
+                        <hr style="color: #007300; font-size: x-large;">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <h6>Applicants whose primary language is not English or whose previous education has
+                                        not been in English must provide evidence of proficiency in English (achieve a
+                                        minimum score of 79 on the TOFEL or achieve a minimum score of 6.5 on IELTS)
+                                    </h6>
+                                    <label class="small mb-1" for="el">
+                                        Please list down your English Language Qualifications with results obtained
+                                    </label><br><br>
+                                    <div class="form-row">
+                                        <button type="button" class="btn btn-warning"
+                                            onClick="addtoEnglish_qualification();"><i
+                                                class="fa fa-plus"></i></button>&nbsp;<button type="button"
+                                            onClick="remfromEnglish_qualification();" class="btn btn-danger"><i
+                                                class="fa fa-minus"></i></button>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="col-lg-12 col-md-12 col-sm-12">
+                                            <table class="table" id="ep_tbl">
+                                                <thead>
+                                                    <tr>
+                                                        <th scope="col">English Qualifications </th>
+                                                        <th scope="col">Results/Score</th>
+                                                        <th scope="col">Passing Year</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td><input class="form-control" id="name_EP_1" type="text"
+                                                                name="name_EP_1"
+                                                                placeholder="Enter Qualification Type" /></td>
+                                                        <td><input class="form-control" id="result_EP_1" type="text"
+                                                                name="result_EP_1" placeholder="Enter Result" /></td>
+                                                        <td><input class="form-control" id="year_EP_1" type="text"
+                                                                name="year_EP_1" placeholder="Enter Year" /></td>
+                                                    </tr>
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <input class="form-control py-4" id="edurowcnt3" type="hidden" name="edurowcnt3"
+                                        value="1" />
+                                </div>
+                            </div>
+                        </div>
+                        <hr style="color: #007300; font-size: x-large;">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <h6>
+                                        For Candidates with High School Diploma
+                                    </h6>
+                                    <label class="small mb-1" for="elegi">
+                                        Candidates with High School Diploma should have passed the scholastic Aptitude
+                                        Test (SAT)
+                                    </label><br><br>
+                                    <div class="form-row">
+                                        <div class="col-lg-12 col-md-12 col-sm-12">
+                                            <table class="table" id="edutbl2">
+                                                <thead>
+                                                    <tr>
+                                                        <th scope="col">Score of the Scholastic Aptitude Test</th>
+                                                        <th scope="col">Passing Year </th>
+
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td><input class="form-control" id="sat_result" type="text"
+                                                                name="sat_result" placeholder="Enter Result" /></td>
+                                                        <td><input class="form-control" id="sat_passing_year"
+                                                                type="text" name="sat_passing_year"
+                                                                placeholder="Enter Year" /></td>
+                                                    </tr>
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <br><br>
+                        <h5 style="color: #007300; font-size: x-large;">Other Qualifications (If Any)</h5>
+                        <hr style="color: #007300; font-size: x-large;">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <div class="form-row">
+                                        <div class="col-lg-12 col-md-12 col-sm-12">
+                                            <div class="form-group">
+                                                <label class="small mb-1" for="otherQualifications">Enter any other
+                                                    qualification details in below area</label>
+                                                <textarea class="form-control" id="otherQualifications"
+                                                    name="otherQualifications" rows="4" maxlength="250"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br><br>
+                        <button class="btn btn-primary prevBtn btn-lg float-start" type="button">Previous</button>
+                        <button class="btn btn-primary nextBtn btn-lg float-end" type="button">Next</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="divider divider-primary">
+                        <div class="divider-text">Application step (5/9)</div>
+                    </div>
+                </div>
+            </div>
+            <div class="row setup-content" id="step-6">
+                <div class="col-xs-6 col-md-offset-3">
+                    <div class="col-md-12">
+                        <h5 style="color: #007300; font-size: x-large;">Parent Details </h5>
+                        <hr style="color: #007300; font-size: x-large;">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    Father's Details <span class="error"
+                                        style="color: #FF0000; font-size:large;">*</span>
+                                    <div class="row">
+                                        <div class="col-lg-4 col-md-4 col-sm-12">
+                                            <div class="form-group">
+                                                <label class="small mb-1" for="fatherName">Name</label>
+                                                <input class="form-control" id="fatherName" name="fatherName"
+                                                    type="text" placeholder="Enter Name" />
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 col-md-4 col-sm-12">
+                                            <div class="form-group">
+                                                <label class="small mb-1" for="fatherJob">Occupation</label>
+                                                <input class="form-control" id="fatherJob" name="fatherJob" type="text"
+                                                    placeholder="Enter Occupation" />
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 col-md-4 col-sm-12">
+                                            <div class="form-group">
+                                                <label class="small mb-1" for="father_employer">Employer Address</label>
+                                                <input class="form-control" id="father_employer" name="father_employer"
+                                                    type="text" placeholder="Enter Employer Details" />
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 col-md-4 col-sm-12">
+                                            <div class="form-group">
+                                                <label class="small mb-1" for="fatherEmail">Email</label>
+                                                <input class="form-control" id="fatherEmail" name="fatherEmail"
+                                                    type="text" type="email" aria-describedby="emailHelp"
+                                                    placeholder="Enter Email" />
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 col-md-4 col-sm-12">
+                                            <div class="form-group">
+                                                <label class="small mb-1" for="fatherFixedPhone">Tel.(Local)</label>
+                                                <input class="form-control" id="fatherFixedPhone"
+                                                    name="fatherFixedPhone" type="text" placeholder="Enter Tel.No." />
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 col-md-4 col-sm-12">
+                                            <div class="form-group">
+                                                <label class="small mb-1" for="fatherMobileNo">Mobile No</label>
+                                                <input class="form-control" id="fatherMobileNo" name="fatherMobileNo"
+                                                    type="text" placeholder="Enter Mobile No" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr style="color: #007300; font-size: x-large;">
+                                    Mother's Details <span class="error"
+                                        style="color: #FF0000; font-size:large;">*</span>
+                                    <div class="row">
+                                        <div class="col-lg-4 col-md-4 col-sm-12">
+                                            <div class="form-group">
+                                                <label class="small mb-1" for="motherName">Name</label>
+                                                <input class="form-control" id="motherName" name="motherName"
+                                                    type="text" placeholder="Enter Name" />
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 col-md-4 col-sm-12">
+                                            <div class="form-group">
+                                                <label class="small mb-1" for="motherJob">Occupation</label>
+                                                <input class="form-control" id="motherJob" name="motherJob" type="text"
+                                                    placeholder="Enter Occupation" />
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 col-md-4 col-sm-12">
+                                            <div class="form-group">
+                                                <label class="small mb-1" for="mother_employer">Employer Address</label>
+                                                <input class="form-control" id="mother_employer" name="mother_employer"
+                                                    type="text" placeholder="Enter Employer Details" />
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 col-md-4 col-sm-12">
+                                            <div class="form-group">
+                                                <label class="small mb-1" for="motherEmail">Email</label>
+                                                <input class="form-control" id="motherEmail" name="motherEmail"
+                                                    type="text" type="email" aria-describedby="emailHelp"
+                                                    placeholder="Enter Email" />
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 col-md-4 col-sm-12">
+                                            <div class="form-group">
+                                                <label class="small mb-1" for="motherFixelPhone">Tel.(Local)</label>
+                                                <input class="form-control" id="motherFixelPhone"
+                                                    name="motherFixelPhone" type="text" placeholder="Enter Tel.No" />
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 col-md-4 col-sm-12">
+                                            <div class="form-group">
+                                                <label class="small mb-1" for="motherMobileNo">Mobile No</label>
+                                                <input class="form-control" id="motherMobileNo" name="motherMobileNo"
+                                                    type="text" placeholder="Enter Mobile No" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <hr style="color: #007300; font-size: x-large;">
+                                    Guardian's Details
+                                    <div class="row">
+                                        <div class="col-lg-4 col-md-4 col-sm-12">
+                                            <div class="form-group">
+                                                <label class="small mb-1" for="guardianName">Name</label>
+                                                <input class="form-control" id="guardianName" name="guardianName"
+                                                    type="text" placeholder="Enter Name" />
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 col-md-4 col-sm-12">
+                                            <div class="form-group">
+                                                <label class="small mb-1" for="guardianJob">Occupation</label>
+                                                <input class="form-control" id="guardianJob" name="guardianJob"
+                                                    type="text" placeholder="Enter Occupation" />
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 col-md-4 col-sm-12">
+                                            <div class="form-group">
+                                                <label class="small mb-1" for="guardian_employer">Employer
+                                                    Address</label>
+                                                <input class="form-control" id="guardian_employer"
+                                                    name="guardian_employer" type="text"
+                                                    placeholder="Enter Employer Details" />
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 col-md-4 col-sm-12">
+                                            <div class="form-group">
+                                                <label class="small mb-1" for="guardianEmail">Email</label>
+                                                <input class="form-control" id="guardianEmail" name="guardianEmail"
+                                                    type="text" type="email" aria-describedby="emailHelp"
+                                                    placeholder="Enter Email" />
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 col-md-4 col-sm-12">
+                                            <div class="form-group">
+                                                <label class="small mb-1" for="guardianFixelPhone">Tel.(Local)</label>
+                                                <input class="form-control" id="guardianFixelPhone"
+                                                    name="guardianFixelPhone" type="text" placeholder="Enter Tel.No" />
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 col-md-4 col-sm-12">
+                                            <div class="form-group">
+                                                <label class="small mb-1" for="guardianMobileNo">Mobile No</label>
+                                                <input class="form-control" id="guardianMobileNo"
+                                                    name="guardianMobileNo" type="text" placeholder="Enter Mobile No" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br><br>
+                                    <button class="btn btn-primary prevBtn btn-lg float-start"
+                                        type="button">Previous</button>
+                                    <button class="btn btn-primary nextBtn btn-lg float-end" type="button">Next</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="divider divider-primary">
+                        <div class="divider-text">Application step (6/9)</div>
+                    </div>
+                </div>
+            </div>
+            <div class="row setup-content" id="step-7">
+                <div class="col-xs-6 col-md-offset-3">
+                    <div class="col-md-12">
+                        <h5 style="color: #007300; font-size: x-large;">Non-Related Refrees <span class="error"
+                                style="color: #FF0000; font-size:large;">*</span></h5>
+                        <hr style="color: #007300; font-size: x-large;">
+                        <label class="small mb-1" for="refree1">Give the Name & Address of two non-related persons of
+                            good standing in your own country who could, from their personal knowledge, attest your
+                            character, academic background and capacity to undertake the study</label>
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <div class="row">
+                                        <div class="col-lg-6 col-md-6 col-sm-12">
+                                            <div class="form-group">
+                                                <textarea class="form-control" id="refree1_details"
+                                                    name="refree1_details" rows="3"></textarea>
+                                                <div class="form-row">
+                                                    <label class="small mb-1" for="refree1_phone"> Contact No</label>
+                                                    <input class="form-control" id="refree1_phone" name="refree1_phone"
+                                                        type="text" placeholder="" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6 col-md-6 col-sm-12">
+                                            <div class="form-group">
+                                                <textarea class="form-control" id="refree2_details"
+                                                    name="refree2_details" rows="3"></textarea>
+                                                <div class="form-row">
+                                                    <label class="small mb-1" for="refree2_phone"> Contact No</label>
+                                                    <input class="form-control" id="refree2_phone" name="refree2_phone"
+                                                        type="text" placeholder="" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <div class="row">
+                                        <div class="col-lg-12 col-md-12 col-sm-12">
+                                            <div class="form-group">
+                                                <label class="small mb-1" for="addressOffice">If you are a non-Sri
+                                                    Lankan and know of any Sri Lanakan citizen permanently residing in
+                                                    Sri Lanaka who could act as your refree, Mention the Nama &
+                                                    Address</label>
+                                            </div>
+                                            <div class="form-group">
+                                                <textarea class="form-control" id="refree_sl_details"
+                                                    name="refree_sl_details" rows="3"></textarea>
+                                                <div class="form-row">
+                                                    <label class="small mb-1" for="refree_sl_phone"> Contact No</label>
+                                                    <input class="form-control" id="refree_sl_phone"
+                                                        name="refree_sl_phone" type="text" placeholder="" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <br><br>
+                        <button class="btn btn-primary prevBtn btn-lg  float-start" type="button">Previous</button>
+                        <button class="btn btn-primary nextBtn btn-lg float-end" type="button">Next</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="divider divider-primary">
+                        <div class="divider-text">Application step (7/9)</div>
+                    </div>
+                </div>
+            </div>
+            <div class="row setup-content" id="step-8">
+                <div class="col-xs-6 col-md-offset-3">
+                    <div class="col-md-12">
+                        <h3> Step 8</h3>
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <div class="form-row">
+                                        <div class="col-lg-12 col-md-12 col-sm-12">
+                                            <div class="form-group">
+                                                <label class="small mb-1" for="docupldlink">Copy the link of your
+                                                    uploaded documents <span class="error"
+                                                        style="color: #FF0000; font-size: x-large;">*</span> (Upload
+                                                    scanned copies of your educational,employment certificates to any
+                                                    storage like google drive, dropbox under a folder named by your
+                                                    pasport number.Then get the publicly downloadable link and paste it
+                                                    here.)</label>
+                                                <input class="form-control" id="docupldlink" type="text"
+                                                    name="docupldlink"
+                                                    placeholder="Paste the downloadable link of your uploaded documents folder" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <div class="form-row">
+                                        <div class="col-lg-12 col-md-12 col-sm-12">
+                                            <div class="form-group">
+                                                <label class="small mb-1" for="fund">Specify how much fund would be
+                                                    available to you whilst in Sri Lanaka, and the sourse of such
+                                                    funds.</label>
+                                                <input class="form-control" id="fund" type="text" name="fund" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary prevBtn btn-lg float-start" type="button">Previous</button>
+                        <button class="btn btn-primary nextBtn btn-lg float-end" type="button">Next</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="divider divider-primary">
+                        <div class="divider-text">Application step (8/9)</div>
+                    </div>
+                </div>
+            </div>
+            <div class="row setup-content" id="step-9">
+                <div class="col-xs-6 col-md-offset-3">
+                    <div class="col-md-12">
+                        <h3> Step 9</h3>
+                        <button class="btn btn-primary prevBtn btn-lg float-start" type="button">Previous</button>
+                        <button class="btn btn-success btn-lg float-end btn-save" name="save"
+                            type="submit">Save</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="divider divider-primary">
+                        <div class="divider-text">Application step (9/9)</div>
+                    </div>
+                </div>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+<script src="../assets/js/app/application.js"></script>
+<script src="../assets/js/app/managerows.js"></script>
