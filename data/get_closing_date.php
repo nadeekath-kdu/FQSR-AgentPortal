@@ -4,18 +4,18 @@ if (!isset($_SESSION)) {
 }
 
 try {
-    include '../../config/dbcon.php'; 
-    include '../../config/global.php'; 
+    include '../config/dbcon.php';
+    include '../config/global.php';
     $closing_date = $application_closing_date;
 
-    
+
     if (!isset($closing_date)) {
         throw new Exception('Application closing date is not set.');
     }
-  
+
     $dateTime = new DateTime($closing_date);
     $closing_date = $dateTime->format('Y-m-d');
-    
+
     /* $day = $dateTime->format('j'); 
     $month = $dateTime->format('M'); 
     $year = $dateTime->format('Y'); 
@@ -30,7 +30,7 @@ try {
         $daySuffix = 'th';
     }
  */
-   
+
     //$closing_date = $day . '<sup>' . htmlspecialchars($daySuffix) . '</sup> ' . $month . ' ' . $year;
 
 
@@ -47,4 +47,3 @@ try {
 
     echo json_encode($errorJson);
 }
-?>

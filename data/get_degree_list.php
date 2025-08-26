@@ -3,7 +3,7 @@ include '../config/dbcon.php';
 
 $sql_degree_list = "SELECT degree_code,degree_name FROM mst_degree_courses WHERE active_status = 'Y' ";
 
-$result = $con->query($sql_degree_list);
+$result = $con_fqsr->query($sql_degree_list);
 
 $options = array();
 

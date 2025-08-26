@@ -5,7 +5,7 @@ require_once '../config/mystore_func.php'; //local
 require_once('fpdf/fpdf.php');
 
 
-$conn =  $con;
+$conn =  $con_fqsr;
 $enc_nic_no = $_GET['nic'];
 
 

@@ -13,7 +13,7 @@ require_once '../config/dbcon.php';
 require_once '../config/global.php';
 
 
-$db_connection = $con;
+$db_connection = $con_fqsr;
 if (!$db_connection) {
     echo json_encode(array(
         'status' => 'error',
@@ -23,7 +23,7 @@ if (!$db_connection) {
 }
 
 $form_action = 'save';
-$formStatus = 'UNSUBMITTED';
+$formStatus = '';
 $domain = $url;
 $passportno = "";
 $enc_nic_no = "";
@@ -40,11 +40,15 @@ date_default_timezone_set('Asia/Colombo');
 //if( (isset($_POST['passportno'])) && ($_POST['passportno'] != NULL) && ($_POST['passportno'] != "") && ($_POST['passportno'] != " ") ){
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
     // sanitize inputs with default values for missing fields
     // Sanitize and trim all inputs
     $dec_nic_no = isset($_POST['passportno']) ? trim($_POST['passportno']) : '';
     $apply_course_code = isset($_POST['inputCourse']) ? trim($_POST['inputCourse']) : '';
+    $agent_code = isset($_POST['agent_code']) ? trim($_POST['agent_code']) : '';
+    
+    // Set eduAgent value based on agent_code
+    $eduAgent = !empty($agent_code) ? 'Yes' : 'No';
+    
     $intake_yr = $intake;
     $stu_title = isset($_POST['inputTitle']) ? trim($_POST['inputTitle']) : '';
     $stu_fullname = isset($_POST['inputFullname']) ? trim($_POST['inputFullname']) : '';
@@ -67,8 +71,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $citizenship2 = isset($_POST['inputCitizenship2']) ? trim($_POST['inputCitizenship2']) : '';
     $country_AL = isset($_POST['countryAL']) ? trim($_POST['countryAL']) : '';
 
-    $eduAgent = "Yes";
-    $nameEduAgent = ""; //trim($ag_code);
+
+    // Handle agent and non-agent applications
+    $agent_code = isset($_POST['agent_code']) ? trim($_POST['agent_code']) : null;
+    if ($agent_code) {
+        $eduAgent = "Yes";
+        $nameEduAgent = $agent_code;
+    } else {
+        $eduAgent = "No";
+        $nameEduAgent = "";
+    }
 
     $Photo = '';
     if (isset($_FILES["inputPhoto"]) && $_FILES["inputPhoto"]["error"] == 0) {

@@ -3,8 +3,8 @@ require_once '../config/iv_key.php';
 //require_once '../config/mystore_func.php';
 require_once '../config/global.php';
 require_once '../config/dbcon.php';
-$db_connection = $con;
-if (isset($_POST['submit'])) {
+$db_connection = $con_fqsr;
+/* if (isset($_POST['submit'])) {
     $db_connection = $con;
     //$db_connection = $$con_fqsr;
     $form_action = 'submit';
@@ -13,7 +13,7 @@ if (isset($_POST['submit'])) {
     $db_connection = $con;
     $form_action = 'save';
     $formStatus = 'UNSUBMITTED';
-}
+} */
 date_default_timezone_set('Asia/Colombo');
 
 $enc_nic_no = "";

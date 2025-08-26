@@ -16,7 +16,7 @@ if (!$enc_nic_no) {
 
 // Get application data
 $sql = "SELECT * FROM mst_personal_details WHERE nic_no = ?";
-$stmt = $con->prepare($sql);
+$stmt = $con_fqsr->prepare($sql);
 $stmt->bind_param("s", $enc_nic_no);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -773,7 +773,7 @@ $dec_nic_no = $application['nic_no'];
                                         </div>
                                         <div class="col-lg-6 col-md-6 col-sm-6">
                                             <div class="form-group mt-4 mb-0">
-                                                <input type="button" class="btn btn-success btn-block btn-checkout" value="Proceed to Checkout" data-nic="<?php echo htmlspecialchars($dec_nic_no); ?>">
+                                                <input type="button" class="btn btn-success btn-block btn-checkout" value="No Need to Update, Proceed to Checkout" data-nic="<?php echo htmlspecialchars($dec_nic_no); ?>">
                                             </div>
                                         </div>
                                     </div>

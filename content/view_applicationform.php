@@ -674,12 +674,12 @@ require_once '../pages/load_data_formedit.php';
 
                                     <div class="form-row">
                                         <div class="col-lg-6 col-md-6 col-sm-6">
-                                            <div class="form-group mt-4 mb-0"><input name="submit1" type="button" class="btn btn-primary btn-block btn-edit" value="Update Application" data-nic="<?php echo htmlspecialchars($dec_nic_no); ?>" />
+                                            <div class="form-group mt-4 mb-0"><input name="submit1" type="button" class="btn btn-primary btn-block btn-edit" value="Need to Edit Details" data-nic="<?php echo htmlspecialchars($dec_nic_no); ?>" />
                                             </div>
                                         </div>
                                         <div class="col-lg-6 col-md-6 col-sm-6">
                                             <div class="form-group mt-4 mb-0">
-                                                <input type="button" class="btn btn-success btn-block btn-checkout" value="Proceed to Checkout" data-nic="<?php echo htmlspecialchars($dec_nic_no); ?>" />
+                                                <input type="button" class="btn btn-success btn-block btn-checkout" value="Details are Correct, Proceed to Checkout" data-nic="<?php echo htmlspecialchars($dec_nic_no); ?>" />
                                             </div>
                                         </div>
                                     </div>

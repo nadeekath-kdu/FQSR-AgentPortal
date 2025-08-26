@@ -182,11 +182,11 @@ $(document).ready(function () {
 
     });
 
-    $('.btn-submit').click(function (e) {
+    $('.btn-submit').click(function (e) { // not use
         e.preventDefault();
         var formData = $('#my-form').serialize();
         $.ajax({
-            url: 'https://enlistment.kdu.ac.lk/fqsr/formsave.php?idn='.$enc_nic_no,
+            url: '////https://enlistment.kdu.ac.lk/fqsr/formsave.php?idn='.$enc_nic_no,
             type: 'POST',
             data: formData,
             success: function (response) {

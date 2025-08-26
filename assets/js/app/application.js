@@ -2,7 +2,14 @@ $(document).ready(function () {
     console.log('application.js loaded');
     var serverUrl;
     var adminUrl;
-    //getUrls();
+    
+    // Handle URL parameters for agent code
+    const urlParams = new URLSearchParams(window.location.search);
+    const agentCode = urlParams.get('agent_code');
+    if (agentCode) {
+        $('#agent_code').val(agentCode);
+    }
+    
     var navListItems = $('div.setup-panel div a'),
         allWells = $('.setup-content'),
         allNextBtn = $('.nextBtn'),
@@ -152,8 +159,12 @@ $(document).ready(function () {
 
         const form = $(this)[0];
         const formData = new FormData(form);
-
-        $.ajax({
+        
+        // Ensure agent_code is included in form submission
+        const agentCode = $('#agent_code').val();
+        if (agentCode) {
+            formData.append('agent_code', agentCode);
+        } $.ajax({
             url: '../pages/formsave.php',
             method: 'POST',
             data: formData,
