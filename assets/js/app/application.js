@@ -1,15 +1,29 @@
+// Add loading indicator styles
+$('<style>')
+    .text(`
+        .loading {
+            background-image: url('assets/img/loading.gif') !important;
+            background-repeat: no-repeat !important;
+            background-position: right 10px center !important;
+            background-size: 20px !important;
+        }
+    `)
+    .appendTo('head');
+
 $(document).ready(function () {
     console.log('application.js loaded');
     var serverUrl;
     var adminUrl;
-    
+
     // Handle URL parameters for agent code
     const urlParams = new URLSearchParams(window.location.search);
     const agentCode = urlParams.get('agent_code');
     if (agentCode) {
         $('#agent_code').val(agentCode);
     }
-    
+
+
+
     var navListItems = $('div.setup-panel div a'),
         allWells = $('.setup-content'),
         allNextBtn = $('.nextBtn'),
@@ -32,8 +46,8 @@ $(document).ready(function () {
             currentStep = parseInt($item.data('step')),
             previousStep = currentStep - 1;
         isValid = true;
-        console.log('Current step:', currentStep); // Debugging line to verify current step
-        console.log('Previous step:', previousStep);
+        //console.log('Current step:', currentStep); // Debugging line to verify current step
+        //console.log('Previous step:', previousStep);
 
         // Validate previous step before proceeding
         for (var i = 1; i < currentStep; i++) {
@@ -94,7 +108,7 @@ $(document).ready(function () {
         type: 'GET',
         dataType: 'json',
         success: function (data) {
-            console.log('data:', data);
+            //console.log('data:', data);
             var dropdown = $('#inputCourse');
             $.each(data, function (key, value) {
                 dropdown.append($('<option></option>').attr('value', value.degree_code).text(value.degree_name));
@@ -138,8 +152,8 @@ $(document).ready(function () {
             method: 'GET',
             dataType: 'json',
             success: function (response) {
-                console.log('Server URL:', response.server_url);
-                console.log('Admin URL:', response.url_admin);
+                //console.log('Server URL:', response.server_url);
+                //console.log('Admin URL:', response.url_admin);
                 serverUrl = response.server_url;
                 adminUrl = response.url_admin;
             },
@@ -159,7 +173,7 @@ $(document).ready(function () {
 
         const form = $(this)[0];
         const formData = new FormData(form);
-        
+
         // Ensure agent_code is included in form submission
         const agentCode = $('#agent_code').val();
         if (agentCode) {
@@ -171,12 +185,12 @@ $(document).ready(function () {
             processData: false,
             contentType: false,
             success: function (response) {
-                console.log('Raw AJAX response:', response);
+                //console.log('Raw AJAX response:', response);
                 var res = response;
                 if (typeof response === "string") {
                     try {
                         res = JSON.parse(response);
-                        console.log('Parsed response:', res);
+                        //console.log('Parsed response:', res);
                     } catch (e) {
                         console.error('JSON parse error:', e);
                         res = {};
@@ -185,7 +199,7 @@ $(document).ready(function () {
                 if (res.status === "success") {
                     toastr.success("Saved successfully", "");
                     if (res.passport_no) {
-                        console.log('Loading view page with passport:', res.passport_no);
+                        //console.log('Loading view page with passport:', res.passport_no);
                         var page = "../content/view_applicationform.php?nic=" + res.passport_no;
                         $("#content").load(page, function (response, status, xhr) {
                             if (status == "error") {
@@ -247,7 +261,7 @@ $('#inputEmailAddress').on('blur', function () {
 
 function validateStep(step) {
     var isValid = true;
-    console.log(step);
+    //console.log(step);
 
     if (step === 1) {
         if (!$('#passportno').val().trim()) {
@@ -264,11 +278,12 @@ function validateStep(step) {
                 async: false,
                 data: { passportno: passportno },
                 success: function (response) {
-                    console.log(response[0]);
+                    //console.log(response[0]);
                     if (response[0] === 'exist') {
                         toastr.error("Passport number already exists.", '', { timeOut: 1000, });
                         isValid = false;
-                        //header('Location:applicationstatus.php?idn='.$enc_nic_no);
+                        // Redirect to application status
+                        window.location.href = '../content/applicationstatus.php?idn=' + encodeURIComponent(passportno);
                         return;
                     } else {
                         isValid = true;
@@ -616,3 +631,4 @@ function validateForm1() {
     console.log('age > 25: ' + bday > date25);
 
 }
+

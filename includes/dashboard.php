@@ -47,48 +47,39 @@ ini_set('display_errors', 1);
 </head>
 
 <body>
-  <!-- Layout wrapper -->
-  <div class="layout-wrapper layout-content-navbar">
-    <div class="layout-container">
-      <!-- Layout container -->
-      <div class="layout-page  background-image">
-        <!-- Content wrapper -->
-        <div class="content-wrapper">
-          <!-- Content -->
-
-          <div class="container-xxl flex-grow-1 container-p-y" id="content">
-
-
-          </div>
-          <!-- / Content -->
-
-          <!-- Footer -->
-          <footer class="content-footer footer bg-footer-theme">
-            <div class="container-xxl d-flex flex-wrap justify-content-between py-2 flex-md-row flex-column">
-              <div class="mb-2 mb-md-0">
-                ©
-                <script>
-                  document.write(new Date().getFullYear());
-                </script>
-                , made by
-                <a href="https://kdu.ac.lk" target="_blank" class="footer-link fw-bolder">CITS & DS - KDU</a>
-              </div>
-
+  <!-- Main Content -->
+  <div class="main-content background-image min-vh-100 d-flex flex-column">
+    <div class="container py-4">
+      <div class="row justify-content-center">
+        <div class="col-12 col-lg-10">
+          <!-- Content Area -->
+          <div class="card shadow-sm">
+            <div class="card-header bg-transparent border-0 pt-4">
+              <img src="../assets/img/kdu/logo.jpg" alt="KDU Logo" class="d-block mx-auto mb-3" style="max-height: 80px;">
+              <h4 class="text-center mb-0">Foreign Student Registration Portal</h4>
             </div>
-          </footer>
-          <!-- / Footer -->
-
-          <div class="content-backdrop fade"></div>
+            <div class="card-body" id="content">
+              <!-- Dynamic content will be loaded here -->
+            </div>
+          </div>
         </div>
-        <!-- Content wrapper -->
       </div>
-      <!-- / Layout page -->
-    </div>
 
-    <!-- Overlay -->
-    <div class="layout-overlay layout-menu-toggle"></div>
+      <!-- Footer -->
+      <footer class="footer bg-transparent mt-auto">
+        <div class="text-center py-3">
+          <div class="mb-2">
+            <a href="https://www.kdu.ac.lk" target="_blank" class="footer-link fw-bolder">Kotelawala Defence University</a>
+          </div>
+          <div class="text-muted">
+            © <?php echo date('Y'); ?> Foreign Student Registration Portal
+          </div>
+        </div>
+      </footer>
+      <!-- / Footer -->
+    </div>
   </div>
-  <!-- / Layout wrapper -->
+  <!-- / Main Content -->
 
 
   <!-- Core JS -->

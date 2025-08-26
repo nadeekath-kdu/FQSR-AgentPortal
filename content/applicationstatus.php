@@ -1,0 +1,173 @@
+<?php
+require_once '../config/dbcon.php';
+require_once '../config/global.php';
+?>
+
+<html lang="en" class="light-style" dir="ltr" data-theme="theme-default">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+    <title>KDU-FSR Application Status</title>
+
+    <meta name="description" content="KDU Foreign Student Registration Application Status" />
+    <link rel="icon" type="image/x-icon" href="../assets/img/favicon/Kdufav.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet" />
+
+    <!-- Core CSS -->
+    <link rel="stylesheet" href="../assets/vendor/css/core.css" class="template-customizer-core-css" />
+    <link rel="stylesheet" href="../assets/vendor/css/theme-default.css" class="template-customizer-theme-css" />
+    <link rel="stylesheet" href="../assets/css/demo.css" />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../assets/css/applicationstatus.css">
+    <script src="../assets/js/applicationstatus.js" defer></script>
+</head>
+
+<body class="bg-light">
+
+    <?php
+    // Initialize variables with default values
+    $status_class = 'danger';
+    $display_msg = 'No passport number provided';
+    $app_status = 'NOT_FOUND';
+    $is_submitted = 'N';
+
+    if (isset($_GET['idn'])) {
+        $enc_nic_no = $_GET['idn'];
+        $dec_nic_no = $enc_nic_no; // Use your decryption method if needed
+
+        // Check if application exists
+        $sql = "SELECT pd.*
+    FROM mst_personal_details pd
+    WHERE pd.nic_no = ?";
+
+        if ($stmt = mysqli_prepare($con_fqsr, $sql)) {
+            mysqli_stmt_bind_param($stmt, "s", $dec_nic_no);
+
+            if (mysqli_stmt_execute($stmt)) {
+                $result = mysqli_stmt_get_result($stmt);
+
+                if ($result && mysqli_num_rows($result) > 0) {
+                    $row = mysqli_fetch_assoc($result);
+                    $is_submitted = isset($row['application_confirm_status']) ? $row['application_confirm_status'] : 'N';
+
+                    if ($is_submitted == 'Y') {
+                        $status_class = 'success';
+                        $display_msg = 'Your application has been submitted successfully!';
+                        $app_status = 'SUBMITTED';
+                    } else {
+                        $status_class = 'warning';
+                        $display_msg = 'Your application is saved but not yet submitted.';
+                        $app_status = 'DRAFT';
+                    }
+                } else {
+                    $display_msg = 'No application found with the provided passport number.';
+                }
+            } else {
+                $display_msg = 'Error executing query: ' . mysqli_error($con_fqsr);
+            }
+            mysqli_stmt_close($stmt);
+        } else {
+            $display_msg = 'Error preparing query: ' . mysqli_error($con_fqsr);
+        }
+    }
+    ?>
+    <div class="col-md-12 col-lg-12 mb-3">
+        <div class="card custom-card h-100">
+            <img class="card-img-top" src="../assets/img/kdu/logo.jpg" alt="KDU Logo" />
+            <div class="card-body">
+                <h5 class="card-title">
+                    <center><b>Application Status - Foreign Student Registration</b></center>
+                </h5>
+                <div class="card-text">
+                    <div class="alert alert-<?php echo $status_class; ?> text-center mb-4">
+                        <?php echo $display_msg; ?>
+                    </div>
+
+                    <?php if ($app_status != 'NOT_FOUND' && isset($dec_nic_no)): ?>
+                        <div class="row g-4">
+                            <!-- <div class="col-md-6">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title fw-bold mb-4">Application Details</h5>
+                                    <div class="mb-3">
+                                        <label class="text-muted">Passport Number</label>
+                                        <div class="fw-bold"><?php echo htmlspecialchars($dec_nic_no); ?></div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="text-muted">Status</label>
+                                        <div><span class="badge bg-<?php echo htmlspecialchars($status_class); ?>"><?php echo htmlspecialchars($app_status); ?></span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> -->
+
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title fw-bold mb-4">Available Actions</h5>
+                                        <div class="row g-3">
+                                            <?php if ($is_submitted == 'N'): ?>
+                                                <!-- For draft applications -->
+                                                <!-- <div class="col-md-6">
+                                                <a href="applicationform.php?idn=<?php echo urlencode($enc_nic_no); ?>"
+                                                    class="btn btn-primary w-100">
+                                                    <i class="fas fa-pencil-alt me-2"></i>Edit Form
+                                                </a>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <a href="submit_application.php?idn=<?php echo urlencode($enc_nic_no); ?>"
+                                                    class="btn btn-success w-100">
+                                                    <i class="fas fa-check-circle me-2"></i>Submit
+                                                </a>
+                                            </div> -->
+                                            <?php else: ?>
+                                                <!-- For submitted applications -->
+                                                <div class="col-md-6">
+                                                    <a href="application_formpdf.php?nic=<?php echo urlencode($enc_nic_no); ?>"
+                                                        class="btn btn-info w-100" target="_blank">
+                                                        <i class="fas fa-download me-2"></i>Download PDF
+                                                    </a>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <a href="../pg_sampath/pgrequest_check_fsr.php?idn=<?php echo urlencode($enc_nic_no); ?>"
+                                                        class="btn btn-success w-100">
+                                                        <i class="fas fa-credit-card me-2"></i>Make Payment
+                                                    </a>
+                                                </div>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+        <!-- Footer -->
+        <footer class="content-footer footer bg-footer-theme">
+            <div class="container-fluid text-center py-4">
+                <div class="mb-2">
+                    <a href="https://www.kdu.ac.lk" target="_blank" class="footer-link fw-bolder">Kotelawala Defence University</a>
+                </div>
+                <div class="text-muted">
+                    © <?php echo date('Y'); ?> Foreign Student Registration Portal
+                </div>
+            </div>
+        </footer>
+
+        <!-- Core JS -->
+        <script src="../assets/vendor/libs/jquery/jquery.js"></script>
+        <script src="../assets/vendor/libs/popper/popper.js"></script>
+        <script src="../assets/vendor/js/bootstrap.js"></script>
+        <script src="../assets/vendor/js/menu.js"></script>
+
+        <!-- Main JS -->
+        <script src="../assets/js/main.js"></script>
+</body>
+
+</html>
