@@ -41,12 +41,12 @@ $dec_nic_no = $application['nic_no'];
                 <div class="row justify-content-center">
                     <div class="col-lg-12 col-md-12 col-sm-12">
                         <div class="card shadow-lg border-0 rounded-lg mt-5">
-                            <div class="card-header">
+                            <!-- <div class="card-header">
                                 <center><img border="0" src="../assets/img/kdu/logo.jpg"></center>
                                 <h4 class="text-center font-weight-light my-4">
                                     <b>Application for Admission of Students with Foreign Qualification for the Academic Year <?php echo $academic_year ?></b>
                                 </h4>
-                            </div>
+                            </div> -->
                             <div class="card-body">
                                 <?php
                                 if ($err_code == 1 || $err_code == 2 || $err_code == 4 || $err_code == 5 || $err_code == 6 || $err_code == 7 || $err_code == 8) {
@@ -791,3 +791,4 @@ $dec_nic_no = $application['nic_no'];
 
 <script src="../assets/js/app/managerows.js"></script>
 <script src="../assets/js/app/formupdate.js"></script>
+<script src="../assets/js/app/resultsvalidation.js"></script>

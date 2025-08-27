@@ -51,18 +51,20 @@ ini_set('display_errors', 1);
   <div class="main-content background-image min-vh-100 d-flex flex-column">
     <div class="container py-4">
       <div class="row justify-content-center">
-        <div class="col-12 col-lg-10">
-          <!-- Content Area -->
-          <div class="card shadow-sm">
-            <div class="card-header bg-transparent border-0 pt-4">
-              <img src="../assets/img/kdu/logo.jpg" alt="KDU Logo" class="d-block mx-auto mb-3" style="max-height: 80px;">
-              <h4 class="text-center mb-0">Foreign Student Registration Portal</h4>
-            </div>
-            <div class="card-body" id="content">
-              <!-- Dynamic content will be loaded here -->
-            </div>
+        <!-- <div class="col-12"> --> <!-- Removed col-lg-10 to allow full width -->
+        <!-- Content Area -->
+        <div class="card shadow-sm">
+          <div class="card-header bg-transparent border-0 pt-4">
+            <img src="../assets/img/kdu/logo.jpg" alt="KDU Logo" class="d-block mx-auto mb-3" style="max-height: 80px;">
+            <h4 class="text-center mb-0">Application for Admission of Students with Foreign Qualifications for the Academic Year
+              <span id="academicYear"></span>
+            </h4>
+          </div>
+          <div class="card-body p-0" id="content"> <!-- Added p-0 to remove padding -->
+            <!-- Dynamic content will be loaded here -->
           </div>
         </div>
+        <!--  </div> -->
       </div>
 
       <!-- Footer -->

@@ -1,6 +1,98 @@
-.background-image {
-    
-    /* background-image: url('https://enlistment.kdu.ac.lk/agent_portal/assets/img/kdu/new1.webp');
-    background-size: cover;
-    opacity: 0.5;  */
+/* Full width container styles */
+.container-fluid {
+    width: 100%;
+    padding-right: 2rem;
+    padding-left: 2rem;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+/* Card and form styles for better width usage */
+.card {
+    width: 100%;
+    margin-bottom: 2rem;
+}
+
+.card-body {
+    padding: 2rem;
+}
+
+/* Form layout improvements */
+.form-row {
+    margin-right: -1rem;
+    margin-left: -1rem;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+    width: 100%;
+}
+
+
+@media (min-width: 992px) {
+    .container {
+        max-width: 960px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .container {
+        max-width: 1140px;
+    }
+}
+
+@media (min-width: 1400px) {
+    .container {
+        max-width: 1320px;
+    }
+}
+
+/* Content area styles */
+#content {
+    width: 100%;
+    margin: 0 auto;
+}
+
+/* Form specific styles */
+#content form {
+    width: 100%;
+    max-width: 100%;
+    padding: 20px;
+}
+
+/* Card styles for content */
+#content .card {
+    border: none;
+    box-shadow: none;
+}
+
+/* Responsive table container */
+.table-responsive {
+    width: 100%;
+    margin-bottom: 1rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Form group spacing */
+.form-group {
+    margin-bottom: 1rem;
+}
+
+/* Input field width */
+.form-control {
+    width: 100%;
+}
+
+/* Grid system improvements */
+.row {
+    margin-right: -15px;
+    margin-left: -15px;
+}
+
+[class*="col-"] {
+    padding-right: 15px;
+    padding-left: 15px;
 }

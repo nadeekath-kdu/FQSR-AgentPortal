@@ -4,16 +4,95 @@ $('<style>')
         .loading {
             background-image: url('assets/img/loading.gif') !important;
             background-repeat: no-repeat !important;
-            background-position: right 10px center !important;
+            background-position: right center !important;
             background-size: 20px !important;
         }
     `)
     .appendTo('head');
 
+var closingDateLoaded = false;
+
+function validateAge() {
+    const dob = new Date($('#inputDob').val());
+    const today = new Date();
+    let age = today.getFullYear() - dob.getFullYear();
+    const m = today.getMonth() - dob.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+        age--;
+    }
+
+    const degreeCode = $('#inputCourse').val();
+
+    // Check if medicine program (MED)
+    if (degreeCode === 'MED') {
+        if (age < 16 || age > 29) {
+            toastr.error("For medicine programs, age must be between 16 and 29 years", '', { timeOut: 2000 });
+            return false;
+        }
+    } else {
+        if (age < 16 || age > 25) {
+            toastr.error("Age must be between 16 and 25 years", '', { timeOut: 2000 });
+            return false;
+        }
+    }
+
+    return true;
+}
+
+function validateEmailField() {
+    var email = $('#inputEmailAddress').val().trim();
+    var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email) {
+        toastr.error("Please enter an Email address", '', { timeOut: 1000 });
+        return false;
+    } else if (!emailPattern.test(email)) {
+        toastr.error("Please enter a valid Email address", '', { timeOut: 1000 });
+        return false;
+    }
+    return true;
+}
+
 $(document).ready(function () {
-    console.log('application.js loaded');
+    //console.log('application.js loaded');
     var serverUrl;
     var adminUrl;
+
+    // Get academic year
+    $.ajax({
+        url: '../data/get_academic_year.php',
+        type: 'GET',
+        dataType: 'json',
+        success: function (response) {
+            if (response.academic_year) {
+                $('#academicYear').text(response.academic_year);
+            } else {
+                console.error('No academic year received');
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error('Error fetching academic year:', error);
+        }
+    });
+
+    // Get application closing date
+    $.ajax({
+        url: '../data/get_closing_date.php',
+        type: 'GET',
+        dataType: 'json',
+        success: function (response) {
+            if (response.closing_date) {
+                $('#closingDate').val(response.closing_date);
+                closingDateLoaded = true;
+            } else {
+                //console.error('No closing date received from server');
+                toastr.error("Error: Could not get application closing date", '', { timeOut: 2000 });
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error('Error fetching closing date:', error);
+            toastr.error("Error: Could not get application closing date", '', { timeOut: 2000 });
+        }
+    });
 
     // Handle URL parameters for agent code
     const urlParams = new URLSearchParams(window.location.search);
@@ -163,13 +242,13 @@ $(document).ready(function () {
         });
     }
     $('#my-form2').submit(function (event) {
-        console.log('Form submit handler triggered');
+        //console.log('Form submit handler triggered');
         event.preventDefault();
         // ...existing code...
     });
     $('#my-form').submit(function (event) {
         event.preventDefault();
-        console.log('Form submitted');
+        //console.log('Form submitted');
 
         const form = $(this)[0];
         const formData = new FormData(form);
@@ -203,14 +282,14 @@ $(document).ready(function () {
                         var page = "../content/view_applicationform.php?nic=" + res.passport_no;
                         $("#content").load(page, function (response, status, xhr) {
                             if (status == "error") {
-                                console.error("Error loading view page:", xhr.status, xhr.statusText);
+                                //console.error("Error loading view page:", xhr.status, xhr.statusText);
                                 toastr.error("Error loading view page: " + xhr.statusText, "", { timeOut: 1000 });
                             } else {
                                 console.log('View page loaded successfully');
                             }
                         });
                     } else {
-                        console.error('No passport number in response');
+                        //console.error('No passport number in response');
                         toastr.error("Error loading application view", "", { timeOut: 1000 });
                     }
                 } else {
@@ -241,6 +320,37 @@ function previewImage(event) {
     reader.readAsDataURL(input.files[0]);
 }
 
+function validateAge() {
+    if (!closingDateLoaded) {
+        toastr.error("Please wait, loading application closing date...", '', { timeOut: 2000 });
+        return false;
+    }
+    const dob = new Date($('#inputDob').val());
+    const closingDate = new Date($('#closingDate').val());
+    let age = closingDate.getFullYear() - dob.getFullYear();
+    const m = closingDate.getMonth() - dob.getMonth();
+    if (m < 0 || (m === 0 && closingDate.getDate() < dob.getDate())) {
+        age--;
+    }
+
+    const degreeCode = $('#inputCourse').val();
+
+    // Check if medicine program (MED)
+    if (degreeCode === 'MED') {
+        if (age < 16 || age > 29) {
+            toastr.error("For medicine programs, age must be between 16 and 29 years", '', { timeOut: 2000 });
+            return false;
+        }
+    } else {
+        if (age < 16 || age > 25) {
+            toastr.error("For non-medicine programs, age must be between 16 and 25 years", '', { timeOut: 2000 });
+            return false;
+        }
+    }
+
+    return true;
+}
+
 function validateEmailField() {
     var email = $('#inputEmailAddress').val().trim();
     var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -257,6 +367,11 @@ function validateEmailField() {
 // Call on blur
 $('#inputEmailAddress').on('blur', function () {
     validateEmailField();
+});
+
+// Validate age on date of birth change
+$('#inputDob').on('change', function () {
+    validateAge();
 });
 
 function validateStep(step) {
@@ -312,6 +427,23 @@ function validateStep(step) {
             return;
         }
 
+        // Validate photo size and type
+        const file = photoInput.files[0];
+        const fileSize = file.size / 1024 / 1024; // in MB
+        const allowedTypes = ['image/jpeg', 'image/png'];
+
+        if (fileSize > 2) {
+            toastr.error("Photo size should not exceed 2MB", '', { timeOut: 2000 });
+            isValid = false;
+            return;
+        }
+
+        if (!allowedTypes.includes(file.type)) {
+            toastr.error("Photo must be in JPG or PNG format", '', { timeOut: 2000 });
+            isValid = false;
+            return;
+        }
+
         if (!$('#inputInitials').val().trim()) {
             toastr.error("Please enter Name with Initial", '', { timeOut: 1000, });
             isValid = false;
@@ -324,6 +456,10 @@ function validateStep(step) {
         }
         if (!$('#inputDob').val().trim()) {
             toastr.error("Please enter Date of Birth", '', { timeOut: 1000, });
+            isValid = false;
+            return;
+        }
+        if (!validateAge()) {
             isValid = false;
             return;
         }
@@ -404,6 +540,13 @@ function validateStep(step) {
         if ($('#elegibleState').val() === "Please Select") {
             toastr.error("Please select eligibility", '', { timeOut: 1000, });
             isValid = false;
+            return;
+        }
+
+        // Validate educational results
+        isValid = validateEducationalResults();
+        if (!isValid) {
+            return false;
         }
     } else if (step === 6) {
         if (!$('#fatherName').val().trim()) {
@@ -470,7 +613,7 @@ function showToastMessage(message) {
 }
 
 
-function validateForm1() {
+function validateForm111() {
 
     if (document.forms["my-form"]["inputCourse"].value == "") {
         Swal.fire({

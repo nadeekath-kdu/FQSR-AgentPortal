@@ -2,11 +2,11 @@
 <div class="col-md-12 col-lg-12 mb-3">
     <div class="card custom-card  h-100">
         <div class="card-body">
-            <!-- <h5 class="card-title">
+            <h5 class="card-title">
                 <center><b>Application for Admission of Students with Foreign Qualifications for the Academic Year
-                        <span id="academicYear"></span>
+                        <?php echo $academic_year ?>
                     </b></center>
-            </h5> -->
+            </h5>
             <br>
             <div class="container">
                 <div class="alert alert-info" role="alert">
@@ -67,7 +67,6 @@
                 </div>
                 <form id="my-form" name="my-form" method="post" enctype="multipart/form-data">
                     <input type="hidden" id="agent_code" name="agent_code" value="">
-                    <input type="hidden" id="closingDate" name="closingDate" value="">
                     <!-- action="../pages/formsave.php" -->
                     <div class="row setup-content" id="step-1">
                         <div class="col-xs-6 col-md-offset-3">
@@ -941,4 +940,3 @@
 </div>
 <script src="../assets/js/app/application.js"></script>
 <script src="../assets/js/app/managerows.js"></script>
-<script src="../assets/js/app/resultsvalidation.js"></script>

@@ -1,0 +1,117 @@
+/* Form Layout Improvements */
+.container-fluid {
+    width: 100%;
+    padding-right: 2rem;
+    padding-left: 2rem;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+/* Card improvements */
+.card {
+    border: none;
+    margin-bottom: 2rem;
+    width: 100%;
+}
+
+.card-body {
+    padding: 2rem;
+}
+
+/* Form improvements */
+.form-row {
+    margin: 0 -1rem;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.form-row > [class*='col-'] {
+    padding: 0 1rem;
+}
+
+/* Table improvements */
+.table-responsive {
+    width: 100%;
+    margin-bottom: 1.5rem;
+}
+
+/* Form groups and inputs */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-control {
+    width: 100%;
+}
+
+/* Picture container improvements */
+.picture-container {
+    max-width: 150px;
+    margin: 0 auto;
+}
+
+/* Specific form improvements */
+form {
+    padding: 2rem;
+}
+
+form .form-row:not(:last-child) {
+    margin-bottom: 1.5rem;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .container-fluid {
+        padding-right: 1rem;
+        padding-left: 1rem;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+    
+    form {
+        padding: 1rem;
+    }
+}
+
+/* Form section improvements */
+.form-section {
+    margin-bottom: 2.5rem;
+}
+
+.form-section h5 {
+    color: #007300;
+    margin-bottom: 1rem;
+}
+
+/* Table cell improvements */
+td .form-control {
+    min-width: 120px;
+}
+
+/* Form validation and error states */
+.error {
+    color: #FF0000;
+    font-size: 0.875rem;
+}
+
+/* Radio button groups */
+.radio-group {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 1rem;
+}
+
+/* Button spacing */
+.btn-group {
+    display: flex;
+    gap: 1rem;
+    margin: 2rem 0;
+}
+
+/* Form dividers */
+hr {
+    margin: 2rem 0;
+    border-color: #e0e0e0;
+}
