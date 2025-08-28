@@ -1,6 +1,9 @@
 <?php
 require_once '../pages/load_data_formedit.php';
+require_once '../includes/document_functions.php';
 
+// Get uploaded documents
+$uploadedDocuments = getUploadedDocuments($dec_nic_no);
 ?>
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -658,14 +661,14 @@ require_once '../pages/load_data_formedit.php';
                                 </div>
                             </div>
 
-                            <div class="form-row">
+                            <!-- <div class="form-row">
                                 <div class="col-lg-12 col-md-12 col-sm-12">
                                     <div class="form-group">
                                         <label class="small mb-1" for="docupldlink">Copy the link of your uploaded documents <span class="error" style="color: #FF0000;">*</span> (Upload scanned copies of your educational,employment certificates to any storage like google drive, dropbox under a folder named by your pasport number.Then get the publicly downloadable link and paste it here.)</label>
                                         <input class="form-control" id="docupldlink" type="text" name="docupldlink" required value="<?php echo $row_get_personal['doc_upload_link']; ?>" readonly />
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
 
                             <hr>
 

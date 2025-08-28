@@ -45,10 +45,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $dec_nic_no = isset($_POST['passportno']) ? trim($_POST['passportno']) : '';
     $apply_course_code = isset($_POST['inputCourse']) ? trim($_POST['inputCourse']) : '';
     $agent_code = isset($_POST['agent_code']) ? trim($_POST['agent_code']) : '';
-    
+
     // Set eduAgent value based on agent_code
     $eduAgent = !empty($agent_code) ? 'Yes' : 'No';
-    
+
     $intake_yr = $intake;
     $stu_title = isset($_POST['inputTitle']) ? trim($_POST['inputTitle']) : '';
     $stu_fullname = isset($_POST['inputFullname']) ? trim($_POST['inputFullname']) : '';
@@ -61,7 +61,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stu_permenant_addr = isset($_POST['addressPermanent']) ? trim($_POST['addressPermanent']) : '';
     $stu_email = isset($_POST['inputEmailAddress']) ? trim($_POST['inputEmailAddress']) : '';
     $media_source_name = "";
-    $doc_upld_link = isset($_POST['docupldlink']) ? trim($_POST['docupldlink']) : '';
     $period_study_abroad = isset($_POST['periodStudy']) ? trim($_POST['periodStudy']) : '';
     $eligibility_uni_admision = isset($_POST['elegibleState']) ? trim($_POST['elegibleState']) : '';
     $other_qualification = isset($_POST['otherQualifications']) ? trim($_POST['otherQualifications']) : '';
@@ -100,6 +99,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
+    // Handle document uploads
+    $uploadedDocuments = array();
+    if (isset($_FILES['documents'])) {
+        $baseDir = "../uploads/documents/";
+        
+        // Create base directory if it doesn't exist
+        if (!file_exists($baseDir)) {
+            mkdir($baseDir, 0777, true);
+        }
+        
+        // Create applicant-specific directory using NIC/passport number
+        $applicantDir = $baseDir . $dec_nic_no . '/';
+        if (!file_exists($applicantDir)) {
+            mkdir($applicantDir, 0777, true);
+        }
+
+        // Handle multiple document uploads
+        $files = $_FILES['documents'];
+        $fileCount = is_array($files['name']) ? count($files['name']) : 0;
+
+        for ($i = 0; $i < $fileCount; $i++) {
+            if ($files['error'][$i] === 0) {
+                $fileName = $files['name'][$i];
+                $fileExt = pathinfo($fileName, PATHINFO_EXTENSION);
+                $safeFileName = 'doc_' . ($i + 1) . '.' . $fileExt;
+                $targetPath = $applicantDir . $safeFileName;
+
+                if (move_uploaded_file($files['tmp_name'][$i], $targetPath)) {
+                    $uploadedDocuments[] = $dec_nic_no . '/' . $safeFileName;
+                }
+            }
+        }
+    }
+
+
     move_uploaded_file($_FILES["inputPhoto"]["tmp_name"], $targetFilePath);
 
     $sql_cousr_name = "SELECT degree_name FROM mst_degree_courses WHERE degree_code = '$apply_course_code' ";
@@ -116,7 +150,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     /* if (isset($_POST['submit'])) {
         $sql_personal_data = "INSERT INTO mst_personal_details (nic_no,course_name,course_code,intake,stu_title,stu_fullname,stu_name_initials,stu_dob,stu_gender,stu_citizenship,civil_status,stu_permenant_address,stu_email,application_submit_dt,media_source_name,doc_upload_link,birth_country,period_study_abroad,eligibility_uni_admision,other_qualification,fund,citizenship_type,citizenship_1,citizenship_2,AL_sitting_country,photo,isEduAgent,nameEduAgent,application_status)VALUES ('$dec_nic_no','$apply_course','$apply_course_code','$intake_yr','$stu_title','$stu_fullname','$stu_initialname','$stu_dob','$stu_gender','$stu_citizenship','$stu_civilstats','$stu_permenant_addr','$stu_email','$cur_dt','$media_source_name','$doc_upld_link','$stu_birth_country','$period_study_abroad','$eligibility_uni_admision','$other_qualification','$fund','$citizenship_type','$citizenship1','$citizenship2','$country_AL','$Photo','$eduAgent','$nameEduAgent','$formStatus')";
     } else { */
-    $sql_personal_data = "INSERT INTO mst_personal_details (nic_no,course_name,course_code,intake,stu_title,stu_fullname,stu_name_initials,stu_dob,stu_gender,stu_citizenship,civil_status,stu_permenant_address,stu_email,application_submit_dt,media_source_name,doc_upload_link,birth_country,period_study_abroad,eligibility_uni_admision,other_qualification,fund,citizenship_type,citizenship_1,citizenship_2,AL_sitting_country,photo,isEduAgent,nameEduAgent,formStatus)VALUES ('$dec_nic_no','$apply_course','$apply_course_code','$intake_yr','$stu_title','$stu_fullname','$stu_initialname','$stu_dob','$stu_gender','$stu_citizenship','$stu_civilstats','$stu_permenant_addr','$stu_email','$cur_dt','$media_source_name','$doc_upld_link','$stu_birth_country','$period_study_abroad','$eligibility_uni_admision','$other_qualification','$fund','$citizenship_type','$citizenship1','$citizenship2','$country_AL','$Photo','$eduAgent','$nameEduAgent','$formStatus')";
+    $sql_personal_data = "INSERT INTO mst_personal_details (nic_no,course_name,course_code,intake,stu_title,stu_fullname,stu_name_initials,stu_dob,stu_gender,stu_citizenship,civil_status,stu_permenant_address,stu_email,application_submit_dt,media_source_name,birth_country,period_study_abroad,eligibility_uni_admision,other_qualification,fund,citizenship_type,citizenship_1,citizenship_2,AL_sitting_country,photo,isEduAgent,nameEduAgent,formStatus)VALUES ('$dec_nic_no','$apply_course','$apply_course_code','$intake_yr','$stu_title','$stu_fullname','$stu_initialname','$stu_dob','$stu_gender','$stu_citizenship','$stu_civilstats','$stu_permenant_addr','$stu_email','$cur_dt','$media_source_name','$stu_birth_country','$period_study_abroad','$eligibility_uni_admision','$other_qualification','$fund','$citizenship_type','$citizenship1','$citizenship2','$country_AL','$Photo','$eduAgent','$nameEduAgent','$formStatus')";
     //}
     $res_personal_data = mysqli_query($db_connection, $sql_personal_data);
 

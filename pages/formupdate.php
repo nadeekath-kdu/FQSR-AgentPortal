@@ -18,6 +18,7 @@ require_once '../config/global.php';
 
 $conn = $con_fqsr;
 if (!$conn) {
+    http_response_code(500);
     echo json_encode(array(
         'status' => 'error',
         'message' => 'Database connection failed'
@@ -26,7 +27,11 @@ if (!$conn) {
 }
 
 $formStatus = '';
-$response = array();
+$response = array(
+    'status' => 'error',
+    'message' => 'Unknown error occurred',
+    'nic' => ''
+);
 
 // Get form data
 $enc_nic_no = isset($_POST['inputNic']) ? $_POST['inputNic'] : '';
@@ -245,7 +250,7 @@ if ((isset($_POST['inputNic'])) && ($_POST['inputNic'] != NULL) && ($_POST['inpu
             // ---------------------
             $cur_dt = date('Y-m-d H:i:s');
             /* 2022-07-20 */
-            $sql_personal_data = "UPDATE mst_personal_details SET course_name= '$apply_course',course_code= '$apply_course_code',intake = '$intake_yr',stu_title = '$stu_title',stu_fullname = '$stu_fullname',stu_name_initials = '$stu_initialname',stu_dob = '$stu_dob',stu_gender = '$stu_gender',stu_citizenship = '$stu_citizenship',civil_status = '$stu_civilstats',stu_permenant_address = '$stu_permenant_addr',stu_email = '$stu_email',application_submit_dt = '$cur_dt',media_source_name = '$media_source_name',doc_upload_link = '$doc_upld_link',birth_country = '$stu_birth_country',period_study_abroad = '$period_study_abroad',eligibility_uni_admision = '$eligibility_uni_admision',other_qualification = '$other_qualification',fund = '$fund',citizenship_type = '$citizenship_type',citizenship_1 = '$citizenship1',citizenship_2 = '$citizenship2',AL_sitting_country = '$country_AL',photo = '$Photo' WHERE nic_no = '$dec_nic_no'";
+            $sql_personal_data = "UPDATE mst_personal_details SET course_name= '$apply_course',course_code= '$apply_course_code',intake = '$intake_yr',stu_title = '$stu_title',stu_fullname = '$stu_fullname',stu_name_initials = '$stu_initialname',stu_dob = '$stu_dob',stu_gender = '$stu_gender',stu_citizenship = '$stu_citizenship',civil_status = '$stu_civilstats',stu_permenant_address = '$stu_permenant_addr',stu_email = '$stu_email',application_submit_dt = '$cur_dt',media_source_name = '$media_source_name',birth_country = '$stu_birth_country',period_study_abroad = '$period_study_abroad',eligibility_uni_admision = '$eligibility_uni_admision',other_qualification = '$other_qualification',fund = '$fund',citizenship_type = '$citizenship_type',citizenship_1 = '$citizenship1',citizenship_2 = '$citizenship2',AL_sitting_country = '$country_AL',photo = '$Photo' WHERE nic_no = '$dec_nic_no'";
             //$sql_personal_data = "UPDATE mst_personal_details SET course_name= '$apply_course',course_code= '$apply_course_code',intake = '$intake_yr',stu_title = '$stu_title',stu_fullname = '$stu_fullname',stu_name_initials = '$stu_initialname',stu_dob = '$stu_dob',stu_gender = '$stu_gender',stu_citizenship = '$stu_citizenship',civil_status = '$stu_civilstats',stu_permenant_address = '$stu_permenant_addr',stu_email = '$stu_email',application_submit_dt = '$cur_dt',media_source_name = '$media_source_name',doc_upload_link = '$doc_upld_link',birth_country = '$stu_birth_country',period_study_abroad = '$period_study_abroad',eligibility_uni_admision = '$eligibility_uni_admision',other_qualification = '$other_qualification',fund = '$fund',citizenship_type = '$citizenship_type',citizenship_1 = '$citizenship1',citizenship_2 = '$citizenship2',AL_sitting_country = '$country_AL',nameEduAgent = '$nameEduAgent',isEduAgent = '$eduAgent',photo = '$Photo' WHERE nic_no = '$dec_nic_no'";
             $res_personal_data = mysqli_query($conn, $sql_personal_data);
 

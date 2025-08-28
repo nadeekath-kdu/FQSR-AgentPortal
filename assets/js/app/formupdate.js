@@ -174,7 +174,7 @@ function validateForm() {
         { name: 'refree2_details', label: "Second Referee Name" },
         { name: 'refree2_phone', label: "Second Referee Contact" },
         //{ name: 'referee2Contact', label: "Second Referee Contact" },
-        { name: 'docupldlink', label: 'Documents Upload Link' }
+        //{ name: 'docupldlink', label: 'Documents Upload Link' }
     ];
 
     // Check required fields
@@ -272,7 +272,7 @@ function validateForm() {
 
 $(document).ready(function () {
     // Add trim on blur for referee fields
-    $('#refree1_details, #refree2_details, #refree1_phone, #refree2_phone').on('blur', function() {
+    $('#refree1_details, #refree2_details, #refree1_phone, #refree2_phone').on('blur', function () {
         let trimmedValue = $(this).val().trim();
         $(this).val(trimmedValue);
     });
@@ -282,7 +282,7 @@ $(document).ready(function () {
         if (!validateForm()) return;
 
         // Trim all text inputs before creating FormData
-        $('#my-form input[type="text"], #my-form textarea').each(function() {
+        $('#my-form input[type="text"], #my-form textarea').each(function () {
             $(this).val($(this).val().trim());
         });
 

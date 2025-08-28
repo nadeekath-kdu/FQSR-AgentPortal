@@ -4,6 +4,30 @@ require_once '../config/dbcon.php';
 require_once '../config/iv_key.php';
 require_once '../config/mystore_func.php';
 require_once '../config/global.php';
+require_once '../includes/document_functions.php';
+
+// Get uploaded documents
+$uploadedDocuments = getUploadedDocuments($dec_nic_no);
+require_once '../includes/document_functions.php';
+
+// Handle document deletion if requested
+if (isset($_POST['delete_document'])) {
+    $document = $_POST['document_name'];
+    $documentsDir = "../uploads/documents/" . $dec_nic_no . "/";
+    $filePath = $documentsDir . $document;
+
+    if (file_exists($filePath) && unlink($filePath)) {
+        $successMessage = "Document deleted successfully.";
+    } else {
+        $errorMessage = "Failed to delete document.";
+    }
+}
+
+// Get uploaded documents
+$uploadedDocuments = getUploadedDocuments($dec_nic_no);
+
+// Include upload area styles
+// File upload styles are now in edit_application.css
 
 
 // Get the NIC/Passport number from the URL
@@ -48,6 +72,7 @@ $dec_nic_no = $application['nic_no'];
                                 </h4>
                             </div> -->
                             <div class="card-body">
+
                                 <?php
                                 if ($err_code == 1 || $err_code == 2 || $err_code == 4 || $err_code == 5 || $err_code == 6 || $err_code == 7 || $err_code == 8) {
                                 ?>
@@ -754,14 +779,65 @@ $dec_nic_no = $application['nic_no'];
                                         </div>
                                     </div>
 
-                                    <div class="form-row">
-                                        <div class="col-lg-12 col-md-12 col-sm-12">
-                                            <div class="form-group">
-                                                <label class="small mb-1" for="docupldlink">Copy the link of your uploaded documents <span class="error" style="color: #FF0000;">*</span> (Upload scanned copies of your educational,employment certificates to any storage like google drive, dropbox under a folder named by your pasport number.Then get the publicly downloadable link and paste it here.)</label>
-                                                <input class="form-control py-4" id="docupldlink" type="text" name="docupldlink" required value="<?php echo $row_get_personal['doc_upload_link']; ?>" placeholder="Paste the downloadable link of your uploaded documents folder" />
+                                    <!-- Document Management Section -->
+                                    <div class="file-upload-section">
+                                        <h4>Document Management</h4>
+                                        <div id="fileUploadArea">
+                                            <i class="fa fa-cloud-upload"></i>
+                                            <div class="drop-zone-text">
+                                                Drag and drop your documents here<br>
+                                                <span style="font-size: 0.9rem; color: #94a3b8;">or click to browse files</span>
+                                                <p style="font-size: 0.8rem; margin-top: 0.5rem; color: #64748b;">
+                                                    Supported formats: PDF, DOCX, JPG, GIF, PNG (Max 5MB each)
+                                                </p>
                                             </div>
+                                            <input type="file" id="fileInput" name="documents[]" multiple style="display: none;">
+                                        </div>
+
+                                        <div class="uploaded-files">
+                                            <?php if (!empty($uploadedDocuments)): ?>
+                                                <?php foreach ($uploadedDocuments as $doc): ?>
+                                                    <div class="file-item">
+                                                        <div class="file-info">
+                                                            <div class="file-icon">
+                                                                <?php echo getFileIcon($doc['type']); ?>
+                                                            </div>
+                                                            <div class="file-details">
+                                                                <span class="file-name"><?php echo htmlspecialchars($doc['name']); ?></span>
+                                                                <span class="file-size">
+                                                                    <?php echo formatFileSize($doc['size']); ?> -
+                                                                    <?php echo strtoupper($doc['type']); ?>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="file-actions">
+                                                            <a href="<?php echo htmlspecialchars($doc['path']); ?>"
+                                                                class="btn btn-sm btn-primary"
+                                                                style="margin-right: 0.5rem;"
+                                                                target="_blank">
+                                                                <i class="fa fa-eye"></i> View
+                                                            </a>
+                                                            <form method="post" style="display: inline;">
+                                                                <input type="hidden" name="document_name"
+                                                                    value="<?php echo htmlspecialchars($doc['name']); ?>">
+                                                                <button type="submit" name="delete_document"
+                                                                    class="remove-file-btn"
+                                                                    onclick="return confirm('Are you sure you want to delete this document?')">
+                                                                    <i class="fa fa-trash"></i> Remove
+                                                                </button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                <?php endforeach; ?>
+                                            <?php else: ?>
+                                                <p style="text-align: center; padding: 2rem; color: #64748b;">
+                                                    <i class="fa fa-file-o" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+                                                    No documents uploaded yet
+                                                </p>
+                                            <?php endif; ?>
                                         </div>
                                     </div>
+                                    <!-- End Document Management Section -->
 
                                     <hr>
 
@@ -792,3 +868,4 @@ $dec_nic_no = $application['nic_no'];
 <script src="../assets/js/app/managerows.js"></script>
 <script src="../assets/js/app/formupdate.js"></script>
 <script src="../assets/js/app/resultsvalidation.js"></script>
+<script src="../assets/js/app/formupdate-new.js"></script>
