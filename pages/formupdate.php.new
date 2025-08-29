@@ -1,0 +1,209 @@
+<?php
+// Prevent any output before headers
+ob_start();
+
+// Error reporting
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
+// Function to send JSON response and exit
+function sendJsonResponse($status, $message, $data = null) {
+    $response = [
+        'status' => $status,
+        'message' => $message
+    ];
+    if ($data !== null) {
+        $response = array_merge($response, $data);
+    }
+    header('Content-Type: application/json');
+    echo json_encode($response);
+    ob_end_flush();
+    exit;
+}
+
+// Error handler to catch any PHP errors
+function handleError($errno, $errstr, $errfile, $errline) {
+    error_log("PHP Error [$errno]: $errstr in $errfile on line $errline");
+    $errorMessage = "PHP Error: " . strip_tags($errstr);
+    sendJsonResponse('error', $errorMessage, [
+        'file' => basename($errfile),
+        'line' => $errline,
+        'errorCode' => $errno
+    ]);
+}
+
+// Exception handler
+function handleException($e) {
+    error_log("Uncaught Exception: " . $e->getMessage());
+    sendJsonResponse('error', 'Server Error: ' . $e->getMessage(), [
+        'file' => basename($e->getFile()),
+        'line' => $e->getLine()
+    ]);
+}
+
+// Set error and exception handlers
+set_error_handler('handleError');
+set_exception_handler('handleException');
+
+// Start session if not already started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Set headers
+header('Content-Type: application/json');
+
+try {
+    // Include required files
+    require_once '../config/dbcon.php';
+    require_once '../config/iv_key.php';
+    require_once '../config/mystore_func.php';
+    require_once '../config/global.php';
+    
+    // Check database connection
+    $conn = $con_fqsr;
+    if (!$conn) {
+        throw new Exception('Database connection failed: ' . mysqli_connect_error());
+    }
+    
+    // Get form data
+    $enc_nic_no = isset($_POST['inputNic']) ? trim($_POST['inputNic']) : '';
+    $dec_nic_no = $enc_nic_no; // If encryption is needed, use decryptStr()
+    
+    if (empty($dec_nic_no)) {
+        sendJsonResponse('error', 'NIC/Passport number is required');
+    }
+    
+    // Handle document uploads
+    $uploadedFiles = [];
+    $uploadErrors = [];
+    $deletedFiles = [];
+    
+    try {
+        if (isset($_FILES['documents'])) {
+            $documentsDir = "../uploads/documents/" . $dec_nic_no . "/";
+            
+            // Create directory if it doesn't exist
+            if (!file_exists($documentsDir)) {
+                if (!mkdir($documentsDir, 0777, true)) {
+                    throw new Exception("Failed to create documents directory");
+                }
+            }
+            
+            // First, clear existing documents
+            require_once '../includes/document_functions.php';
+            $existingDocs = getUploadedDocuments($dec_nic_no);
+            
+            // Delete all existing files and record their names
+            foreach ($existingDocs as $doc) {
+                if (file_exists($doc['path'])) {
+                    if (unlink($doc['path'])) {
+                        $deletedFiles[] = $doc['name'];
+                    } else {
+                        $uploadErrors[] = "Could not delete existing file: " . $doc['name'];
+                    }
+                }
+            }
+            
+            // Clear database records of old files
+            $sql_delete = "DELETE FROM uploaded_documents WHERE stu_nic = ?";
+            $stmt_delete = $conn->prepare($sql_delete);
+            $stmt_delete->bind_param("s", $dec_nic_no);
+            $stmt_delete->execute();
+            
+            // Process new uploads if any files were attached
+            if (!empty($_FILES['documents']['name'][0])) {
+                $allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'image/jpeg', 'image/png', 'image/gif'];
+                $maxSize = 5 * 1024 * 1024; // 5MB
+                
+                foreach ($_FILES['documents']['name'] as $key => $filename) {
+                    if ($_FILES['documents']['error'][$key] === UPLOAD_ERR_OK) {
+                        $tmpName = $_FILES['documents']['tmp_name'][$key];
+                        $fileType = $_FILES['documents']['type'][$key];
+                        $fileSize = $_FILES['documents']['size'][$key];
+                        
+                        // Validate file type
+                        if (!in_array($fileType, $allowedTypes)) {
+                            $uploadErrors[] = "File '$filename' is not an allowed type. Allowed types are PDF, DOCX, JPG, PNG, and GIF.";
+                            continue;
+                        }
+                        
+                        // Validate file size
+                        if ($fileSize > $maxSize) {
+                            $uploadErrors[] = "File '$filename' exceeds the maximum size limit of 5MB.";
+                            continue;
+                        }
+                        
+                        // Generate unique filename
+                        $extension = pathinfo($filename, PATHINFO_EXTENSION);
+                        $safeFilename = date('Y-m-d-H-i-s') . '-' . uniqid() . '.' . $extension;
+                        $destination = $documentsDir . $safeFilename;
+                        
+                        // Move new file
+                        if (move_uploaded_file($tmpName, $destination)) {
+                            $uploadedFiles[] = [
+                                'original_name' => $filename,
+                                'saved_name' => $safeFilename,
+                                'path' => $destination
+                            ];
+                            
+                            // Insert new record
+                            $sql_doc = "INSERT INTO uploaded_documents 
+                                       (stu_nic, original_name, saved_name, file_path, upload_date) 
+                                       VALUES (?, ?, ?, ?, NOW())";
+                            $stmt_doc = $conn->prepare($sql_doc);
+                            $stmt_doc->bind_param("ssss", $dec_nic_no, $filename, $safeFilename, $destination);
+                            $stmt_doc->execute();
+                        } else {
+                            $uploadErrors[] = "Failed to upload file '$filename'.";
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Update application status
+        $sql_updt = "UPDATE mst_personal_details SET application_confirm_status = 'Y', payment_status = 'PENDING' WHERE nic_no = ?";
+        $stmt = $conn->prepare($sql_updt);
+        $stmt->bind_param("s", $dec_nic_no);
+        
+        if ($stmt->execute()) {
+            $message = 'Data updated successfully!';
+            
+            // Add document management details to message
+            if (!empty($deletedFiles)) {
+                $message .= sprintf(' Removed %d existing document(s).', count($deletedFiles));
+            }
+            if (!empty($uploadedFiles)) {
+                $message .= sprintf(' Added %d new document(s).', count($uploadedFiles));
+            }
+            
+            $response = [
+                'status' => 'success',
+                'message' => $message,
+                'passport_no' => $dec_nic_no
+            ];
+            
+            // Add upload results to response
+            if (!empty($deletedFiles)) {
+                $response['deleted_files'] = $deletedFiles;
+            }
+            if (!empty($uploadedFiles)) {
+                $response['uploaded_files'] = $uploadedFiles;
+            }
+            if (!empty($uploadErrors)) {
+                $response['upload_errors'] = $uploadErrors;
+            }
+            
+            sendJsonResponse('success', $message, $response);
+        } else {
+            throw new Exception('Failed to update application status: ' . $stmt->error);
+        }
+        
+    } catch (Exception $e) {
+        sendJsonResponse('error', 'Error processing files: ' . $e->getMessage());
+    }
+    
+} catch (Exception $e) {
+    sendJsonResponse('error', 'Server Error: ' . $e->getMessage());
+}

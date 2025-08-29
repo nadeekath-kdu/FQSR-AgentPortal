@@ -29,17 +29,7 @@ if ((isset($_GET['nic'])) && ($_GET['nic'] != NULL) && ($_GET['nic'] != "") && (
     //$dec_nic_no = decryptStr($enc_nic_no, ENCRYPT_METHOD, WSECRET_KEY, WSECRET_IV); //local
     $dec_nic_no = $enc_nic_no; //local
 }
-if (isset($_POST['submit1'])) {
-    header('Location:formupdate.php?idn=' . $enc_nic_no);
-}
-if (isset($_POST['submit2'])) {
-    header('Location:../unsubmitted_list.php');
-    //header('Location:intermediate_pg_request.php?idn='.$enc_nic_no.'&lsidn='.$enc_last_id);
-}
-if (isset($_POST['submit3'])) {
-    header('Location:https://enlistment.kdu.ac.lk/fqsr/formsave.php?idn=' . $enc_nic_no);
-    //header('Location:intermediate_pg_request.php?idn='.$enc_nic_no.'&lsidn='.$enc_last_id);
-}
+
 
 //get personal details
 $sql_get_personal = "SELECT * FROM mst_personal_details WHERE nic_no ='$dec_nic_no'    ";

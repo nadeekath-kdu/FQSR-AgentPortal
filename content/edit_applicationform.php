@@ -782,7 +782,27 @@ $dec_nic_no = $application['nic_no'];
                                     <!-- Document Management Section -->
                                     <div class="file-upload-section">
                                         <h4>Document Management</h4>
-                                        <div id="fileUploadArea">
+                                        <div class="mb-4">
+                                            <label class="form-label">Upload Documents</label>
+                                            <div id="fileUploadArea" class="upload-area">
+                                                <input type="file" id="fileInput" multiple style="display: none">
+                                                <div class="upload-message">
+                                                    <i class="bx bx-cloud-upload"></i>
+                                                    <p>Drag & drop files here or click to select files</p>
+                                                    <small>Supported formats: PDF, DOCX, JPG, PNG, GIF (Max 5MB each)</small>
+                                                </div>
+                                            </div>
+
+                                            <!-- Selected files will be shown here -->
+                                            <div id="selectedFiles" style="display: none">
+                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                    <h6 class="mb-0">Selected Files</h6>
+                                                    <button type="button" id="clearAllBtn" class="btn btn-sm btn-outline-danger">Clear All</button>
+                                                </div>
+                                                <div id="filesList"></div>
+                                            </div>
+                                        </div>
+                                        <!-- <div id="fileUploadArea">
                                             <i class="fa fa-cloud-upload"></i>
                                             <div class="drop-zone-text">
                                                 Drag and drop your documents here<br>
@@ -792,7 +812,7 @@ $dec_nic_no = $application['nic_no'];
                                                 </p>
                                             </div>
                                             <input type="file" id="fileInput" name="documents[]" multiple style="display: none;">
-                                        </div>
+                                        </div> -->
 
                                         <div class="uploaded-files">
                                             <?php if (!empty($uploadedDocuments)): ?>
@@ -812,8 +832,8 @@ $dec_nic_no = $application['nic_no'];
                                                         </div>
                                                         <div class="file-actions">
                                                             <a href="<?php echo htmlspecialchars($doc['path']); ?>"
-                                                                class="btn btn-sm btn-primary"
-                                                                style="margin-right: 0.5rem;"
+                                                                class="btn btn-view"
+                                                                style="margin-right: 0.3rem;"
                                                                 target="_blank">
                                                                 <i class="fa fa-eye"></i> View
                                                             </a>
@@ -868,4 +888,3 @@ $dec_nic_no = $application['nic_no'];
 <script src="../assets/js/app/managerows.js"></script>
 <script src="../assets/js/app/formupdate.js"></script>
 <script src="../assets/js/app/resultsvalidation.js"></script>
-<script src="../assets/js/app/formupdate-new.js"></script>
