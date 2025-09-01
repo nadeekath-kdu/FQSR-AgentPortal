@@ -4,30 +4,6 @@ require_once '../config/dbcon.php';
 require_once '../config/iv_key.php';
 require_once '../config/mystore_func.php';
 require_once '../config/global.php';
-require_once '../includes/document_functions.php';
-
-// Get uploaded documents
-$uploadedDocuments = getUploadedDocuments($dec_nic_no);
-require_once '../includes/document_functions.php';
-
-// Handle document deletion if requested
-if (isset($_POST['delete_document'])) {
-    $document = $_POST['document_name'];
-    $documentsDir = "../uploads/documents/" . $dec_nic_no . "/";
-    $filePath = $documentsDir . $document;
-
-    if (file_exists($filePath) && unlink($filePath)) {
-        $successMessage = "Document deleted successfully.";
-    } else {
-        $errorMessage = "Failed to delete document.";
-    }
-}
-
-// Get uploaded documents
-$uploadedDocuments = getUploadedDocuments($dec_nic_no);
-
-// Include upload area styles
-// File upload styles are now in edit_application.css
 
 
 // Get the NIC/Passport number from the URL
@@ -779,85 +755,6 @@ $dec_nic_no = $application['nic_no'];
                                         </div>
                                     </div>
 
-                                    <!-- Document Management Section -->
-                                    <div class="file-upload-section">
-                                        <h4>Document Management</h4>
-                                        <div class="mb-4">
-                                            <label class="form-label">Upload Documents</label>
-                                            <div id="fileUploadArea" class="upload-area">
-                                                <input type="file" id="fileInput" multiple style="display: none">
-                                                <div class="upload-message">
-                                                    <i class="bx bx-cloud-upload"></i>
-                                                    <p>Drag & drop files here or click to select files</p>
-                                                    <small>Supported formats: PDF, DOCX, JPG, PNG, GIF (Max 5MB each)</small>
-                                                </div>
-                                            </div>
-
-                                            <!-- Selected files will be shown here -->
-                                            <div id="selectedFiles" style="display: none">
-                                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                                    <h6 class="mb-0">Selected Files</h6>
-                                                    <button type="button" id="clearAllBtn" class="btn btn-sm btn-outline-danger">Clear All</button>
-                                                </div>
-                                                <div id="filesList"></div>
-                                            </div>
-                                        </div>
-                                        <!-- <div id="fileUploadArea">
-                                            <i class="fa fa-cloud-upload"></i>
-                                            <div class="drop-zone-text">
-                                                Drag and drop your documents here<br>
-                                                <span style="font-size: 0.9rem; color: #94a3b8;">or click to browse files</span>
-                                                <p style="font-size: 0.8rem; margin-top: 0.5rem; color: #64748b;">
-                                                    Supported formats: PDF, DOCX, JPG, GIF, PNG (Max 5MB each)
-                                                </p>
-                                            </div>
-                                            <input type="file" id="fileInput" name="documents[]" multiple style="display: none;">
-                                        </div> -->
-
-                                        <div class="uploaded-files">
-                                            <?php if (!empty($uploadedDocuments)): ?>
-                                                <?php foreach ($uploadedDocuments as $doc): ?>
-                                                    <div class="file-item">
-                                                        <div class="file-info">
-                                                            <div class="file-icon">
-                                                                <?php echo getFileIcon($doc['type']); ?>
-                                                            </div>
-                                                            <div class="file-details">
-                                                                <span class="file-name"><?php echo htmlspecialchars($doc['name']); ?></span>
-                                                                <span class="file-size">
-                                                                    <?php echo formatFileSize($doc['size']); ?> -
-                                                                    <?php echo strtoupper($doc['type']); ?>
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                        <div class="file-actions">
-                                                            <a href="<?php echo htmlspecialchars($doc['path']); ?>"
-                                                                class="btn btn-view"
-                                                                style="margin-right: 0.3rem;"
-                                                                target="_blank">
-                                                                <i class="fa fa-eye"></i> View
-                                                            </a>
-                                                            <form method="post" style="display: inline;">
-                                                                <input type="hidden" name="document_name"
-                                                                    value="<?php echo htmlspecialchars($doc['name']); ?>">
-                                                                <button type="submit" name="delete_document"
-                                                                    class="remove-file-btn"
-                                                                    onclick="return confirm('Are you sure you want to delete this document?')">
-                                                                    <i class="fa fa-trash"></i> Remove
-                                                                </button>
-                                                            </form>
-                                                        </div>
-                                                    </div>
-                                                <?php endforeach; ?>
-                                            <?php else: ?>
-                                                <p style="text-align: center; padding: 2rem; color: #64748b;">
-                                                    <i class="fa fa-file-o" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
-                                                    No documents uploaded yet
-                                                </p>
-                                            <?php endif; ?>
-                                        </div>
-                                    </div>
-                                    <!-- End Document Management Section -->
 
                                     <hr>
 
