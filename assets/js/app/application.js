@@ -56,17 +56,185 @@ function validateEmailField() {
 let selectedFilesArray = [];
 let fileUploadArea, fileInput, selectedFiles, filesList, clearAllBtn;
 
+// File handling functions
+function handleFiles(files) {
+    let validFileCount = 0;
+    let totalSize = 0;
+
+    // Calculate current total size
+    selectedFilesArray.forEach(file => {
+        totalSize += file.size;
+    });
+
+    files.forEach(file => {
+        // Check if file already exists
+        const exists = selectedFilesArray.some(f => f.name === file.name && f.size === file.size);
+        if (exists) {
+            toastr.warning(`File "${file.name}" is already selected.`);
+            return;
+        }
+
+        // Validate file type
+        const allowedExtensions = ["pdf", "docx", "jpg", "gif", "png"];
+        const fileExtension = file.name.split(".").pop().toLowerCase();
+        if (!allowedExtensions.includes(fileExtension)) {
+            toastr.error(`Invalid file type: ${file.name}. Allowed formats: PDF, DOCX, JPG, GIF, PNG.`);
+            return;
+        }
+
+        // Validate file size (individual file max 5MB)
+        const maxFileSize = 5 * 1024 * 1024; // 5MB
+        if (file.size > maxFileSize) {
+            toastr.error(`File "${file.name}" is too large. Maximum size is 5MB.`);
+            return;
+        }
+
+        // Check total size (max 10MB total)
+        const maxTotalSize = 10 * 1024 * 1024; // 10MB total
+        if (totalSize + file.size > maxTotalSize) {
+            toastr.error(`Total file size would exceed 10MB limit. Current: ${formatFileSize(totalSize)}, Adding: ${formatFileSize(file.size)}`);
+            return;
+        }
+
+        // File is valid, add it
+        selectedFilesArray.push(file);
+        totalSize += file.size;
+        validFileCount++;
+    });
+
+    updateFileInput();
+    updateDisplay();
+}
+
+function updateFileInput() {
+    const dt = new DataTransfer();
+    selectedFilesArray.forEach(file => {
+        dt.items.add(file);
+    });
+    fileInput.files = dt.files;
+}
+
+function updateDisplay() {
+    if (selectedFilesArray.length === 0) {
+        selectedFiles.style.display = 'none';
+        return;
+    }
+
+    selectedFiles.style.display = 'block';
+    filesList.innerHTML = '';
+
+    selectedFilesArray.forEach((file, index) => {
+        const fileItem = document.createElement('div');
+        fileItem.className = 'file-item';
+        const fileExtension = file.name.split('.').pop().toLowerCase();
+        fileItem.innerHTML = `
+            <div class="file-info">
+                <div class="file-icon ${fileExtension}">
+                    ${getFileIcon(fileExtension)}
+                </div>
+                <div class="file-details">
+                    <div class="file-name">${file.name}</div>
+                    <div class="file-size">${formatFileSize(file.size)}</div>
+                </div>
+            </div>
+            <button type="button" class="remove-file-btn" data-index="${index}">Remove</button>
+        `;
+        filesList.appendChild(fileItem);
+    });
+
+    // Add remove functionality
+    document.querySelectorAll('.remove-file-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const index = parseInt(this.dataset.index);
+            removeFile(index);
+        });
+    });
+}
+
+function removeFile(index) {
+    const fileName = selectedFilesArray[index].name;
+    selectedFilesArray.splice(index, 1);
+    updateFileInput();
+    updateDisplay();
+    toastr.info(`File "${fileName}" removed successfully.`);
+}
+
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+function getFileIcon(extension) {
+    const icons = {
+        pdf: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/></svg>',
+        docx: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/></svg>',
+        jpg: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8.5,13.5L11,16.5L14.5,12L19,18H5M21,19V5C21,3.89 20.1,3 19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19Z"/></svg>',
+        gif: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8.5,13.5L11,16.5L14.5,12L19,18H5M21,19V5C21,3.89 20.1,3 19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19Z"/></svg>',
+        png: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8.5,13.5L11,16.5L14.5,12L19,18H5M21,19V5C21,3.89 20.1,3 19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19Z"/></svg>',
+        default: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/></svg>'
+    };
+    return icons[extension] || icons.default;
+}
+
 $(document).ready(function () {
     //console.log('application.js loaded');
     var serverUrl;
     var adminUrl;
 
-    // Initialize file upload elements
-    fileUploadArea = document.getElementById('fileUploadArea');
-    fileInput = document.getElementById('document');
-    selectedFiles = document.getElementById('selectedFiles');
-    filesList = document.getElementById('filesList');
-    clearAllBtn = document.getElementById('clearAllBtn');
+    // Initialize file upload elements only if we're on the file upload step
+    function initializeFileUpload() {
+        fileUploadArea = document.getElementById('fileUploadArea');
+        fileInput = document.getElementById('document');
+        selectedFiles = document.getElementById('selectedFiles');
+        filesList = document.getElementById('filesList');
+        clearAllBtn = document.getElementById('clearAllBtn');
+
+        // Only add event listeners if elements exist
+        if (fileUploadArea && fileInput) {
+            setupFileUploadHandlers();
+        }
+    }
+
+    // Setup file upload event handlers
+    function setupFileUploadHandlers() {
+        // Click to upload
+        fileUploadArea.addEventListener('click', function () {
+            fileInput.click();
+        });
+
+        // Drag and drop functionality
+        fileUploadArea.addEventListener('dragover', function (e) {
+            e.preventDefault();
+            fileUploadArea.classList.add('drag-over');
+        });
+
+        fileUploadArea.addEventListener('dragleave', function (e) {
+            e.preventDefault();
+            fileUploadArea.classList.remove('drag-over');
+        });
+
+        fileUploadArea.addEventListener('drop', function (e) {
+            e.preventDefault();
+            fileUploadArea.classList.remove('drag-over');
+
+            const files = Array.from(e.dataTransfer.files);
+            handleFiles(files);
+        });
+
+        // File input change
+        fileInput.addEventListener('change', function (e) {
+            const files = Array.from(e.target.files);
+            handleFiles(files);
+        });
+    }
+
+    // Initialize file upload when navigating to step-8 (document upload step)
+    $(document).on('click', 'a[href="#step-8"]', function () {
+        setTimeout(initializeFileUpload, 100); // Short delay to ensure DOM is ready
+    });
 
     // Get academic year
     $.ajax({
@@ -193,19 +361,254 @@ $(document).ready(function () {
 
 
 
+    // Degree selection functionality
+    function initializeDegreeSelection() {
+        const degreeChoices = document.getElementById('degreeChoices');
+        const addDegreeBtn = document.getElementById('addDegreeChoice');
+
+        if (!degreeChoices || !addDegreeBtn) {
+            return; // Elements not found, skip initialization
+        }
+
+        // Event handler for adding new degree choice
+        addDegreeBtn.addEventListener('click', function () {
+            const choicesCount = degreeChoices.querySelectorAll('.degree-choice-item').length;
+            const newChoice = document.createElement('div');
+            newChoice.className = 'degree-choice-item mb-3';
+            newChoice.innerHTML = `
+                <div class="d-flex align-items-center gap-2">
+                    <span class="preference-number">${choicesCount + 1}</span>
+                    <select name="courses[]" class="form-select form-select-lg degree-select">
+                        <option value="">Select a course</option>
+                    </select>
+                    <button type="button" class="btn btn-danger remove-degree" ${choicesCount === 0 ? 'style="display: none;"' : ''}>
+                        <i class="fa fa-times"></i>
+                    </button>
+                </div>
+            `;
+            degreeChoices.appendChild(newChoice);
+
+            // Update the new select with available degrees
+            const newSelect = newChoice.querySelector('select');
+            populateSelect(newSelect);
+        });
+
+        // Event delegation for remove buttons
+        degreeChoices.addEventListener('click', function (e) {
+            if (e.target.closest('.remove-degree')) {
+                const choiceItem = e.target.closest('.degree-choice-item');
+                choiceItem.remove();
+                updatePreferenceNumbers();
+                updateRemoveButtons();
+            }
+        });
+
+        // Update preference numbers
+        function updatePreferenceNumbers() {
+            const items = degreeChoices.querySelectorAll('.degree-choice-item');
+            items.forEach((item, index) => {
+                const numberSpan = item.querySelector('.preference-number');
+                if (numberSpan) {
+                    numberSpan.textContent = index + 1;
+                }
+            });
+        }
+
+        // Update visibility of remove buttons
+        function updateRemoveButtons() {
+            const items = degreeChoices.querySelectorAll('.degree-choice-item');
+            items.forEach(item => {
+                const removeBtn = item.querySelector('.remove-degree');
+                if (removeBtn) {
+                    removeBtn.style.display = items.length > 1 ? '' : 'none';
+                }
+            });
+        }
+
+        // Populate select with available degrees
+        function populateSelect(select) {
+            if (!select) return;
+
+            const currentValue = select.value;
+            select.innerHTML = '<option value="">Select a course</option>';
+
+            if (window.availableDegrees && window.availableDegrees.length) {
+                window.availableDegrees.forEach(degree => {
+                    const option = document.createElement('option');
+                    option.value = degree.id;
+                    option.textContent = degree.name;
+                    if (degree.id === currentValue) {
+                        option.selected = true;
+                    }
+                    select.appendChild(option);
+                });
+            }
+        }
+    }
+
+    // Call initialization function
+    initializeDegreeSelection();
+
+    // Initialize Sortable for drag and drop reordering
+    if (typeof Sortable !== 'undefined') {
+        new Sortable(degreeChoices, {
+            animation: 150,
+            handle: '.preference-number',
+            draggable: '.degree-choice-item',
+            onEnd: updatePreferenceNumbers
+        });
+    }
+
+    // Add new degree choice
+    /* addDegreeBtn.addEventListener('click', () => {
+        const choicesCount = degreeChoices.children.length;
+        const newChoice = document.createElement('div');
+        newChoice.className = 'degree-choice-item mb-3';
+        newChoice.innerHTML = `
+            <div class="d-flex align-items-center gap-2">
+                <span class="preference-number">${choicesCount + 1}</span>
+                <select name="courses[]" class="form-select form-select-lg degree-select">
+                    <option value="">Select a course</option>
+                    ${getAvailableOptionsHtml()}
+                </select>
+                <button type="button" class="btn btn-danger remove-degree">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+        `;
+
+        degreeChoices.appendChild(newChoice);
+        updateRemoveButtons();
+    }); */
+
+    // Handle degree removal
+    degreeChoices.addEventListener('click', (e) => {
+        if (e.target.closest('.remove-degree')) {
+            const choiceItem = e.target.closest('.degree-choice-item');
+            choiceItem.remove();
+            updatePreferenceNumbers();
+            updateRemoveButtons();
+            updateAvailableDegrees();
+        }
+    });
+
+    // Handle degree selection changes
+    degreeChoices.addEventListener('change', (e) => {
+        if (e.target.classList.contains('degree-select')) {
+            updateAvailableDegrees();
+        }
+    });
+
+    // Update the numbers showing preference order
+    function updatePreferenceNumbers() {
+        const choices = degreeChoices.querySelectorAll('.degree-choice-item');
+        choices.forEach((choice, index) => {
+            const number = choice.querySelector('.preference-number');
+            number.textContent = index + 1;
+        });
+    }
+
+    // Update visibility of remove buttons
+    function updateRemoveButtons() {
+        const choices = degreeChoices.querySelectorAll('.degree-choice-item');
+        choices.forEach((choice, index) => {
+            const removeBtn = choice.querySelector('.remove-degree');
+            removeBtn.style.display = choices.length > 1 ? 'block' : 'none';
+        });
+        addDegreeBtn.style.display = choices.length < availableDegrees.length ? 'block' : 'none';
+    }
+
+    // Get HTML for available degree options
+    function getAvailableOptionsHtml() {
+        return availableDegrees.map(degree =>
+            `<option value="${degree.degree_code}">${degree.degree_name}</option>`
+        ).join('');
+    }
+
+    // Update available degrees in each dropdown
+    function updateAvailableDegrees() {
+        const selects = degreeChoices.querySelectorAll('.degree-select');
+        const selectedValues = Array.from(selects).map(select => select.value).filter(Boolean);
+
+        selects.forEach(select => {
+            const currentValue = select.value;
+            const options = availableDegrees.filter(degree =>
+                degree.degree_code === currentValue || !selectedValues.includes(degree.degree_code)
+            );
+
+            const currentSelection = select.value;
+            select.innerHTML = '<option value="">Select a course</option>' +
+                options.map(degree =>
+                    `<option value="${degree.degree_code}" ${degree.degree_code === currentSelection ? 'selected' : ''}>${degree.degree_name}</option>`
+                ).join('');
+        });
+    }
+
+    // Override the validateStep function for step 2
+    const originalValidateStep = window.validateStep || function () { return true; };
+    window.validateStep = function (step) {
+        if (step === 2) {
+            const selects = document.querySelectorAll('#degreeChoices .degree-select');
+            if (!selects[0].value) {
+                toastr.error('Please select at least one degree choice');
+                return false;
+            }
+            return true;
+        }
+        return originalValidateStep(step);
+    };
+
+    // Load degree list
     $.ajax({
         url: '../data/get_degree_list.php',
         type: 'GET',
         dataType: 'json',
         success: function (data) {
-            //console.log('data:', data);
-            var dropdown = $('#inputCourse');
-            $.each(data, function (key, value) {
-                dropdown.append($('<option></option>').attr('value', value.degree_code).text(value.degree_name));
+            console.log('Degree data received:', data); // Debug log
+            window.availableDegrees = data;
+
+            // Initialize existing selects with the degrees
+            const degreeChoices = document.getElementById('degreeChoices');
+            if (degreeChoices && degreeChoices.children.length === 0) {
+                // Add initial degree choice if none exists
+                const initialChoice = document.createElement('div');
+                initialChoice.className = 'degree-choice-item mb-3';
+                initialChoice.innerHTML = `
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="preference-number">1</span>
+                        <select name="courses[]" class="form-select form-select-lg degree-select">
+                            <option value="">Select a course</option>
+                            ${data.map(degree => `<option value="${degree.degree_code}">${degree.degree_name}</option>`).join('')}
+                        </select>
+                        <button type="button" class="btn btn-danger remove-degree" style="display: none;">
+                            <i class="fa fa-times"></i>
+                        </button>
+                    </div>
+                `;
+                degreeChoices.appendChild(initialChoice);
+            }
+
+            // Update all existing selects with the degrees
+            const degreeSelects = document.querySelectorAll('.degree-select');
+            degreeSelects.forEach(select => {
+                const currentValue = select.value;
+                if (select.options.length <= 1) { // Only update if not already populated
+                    select.innerHTML = '<option value="">Select a course</option>';
+                    data.forEach(degree => {
+                        const option = document.createElement('option');
+                        option.value = degree.degree_code;
+                        option.textContent = degree.degree_name;
+                        if (degree.degree_code === currentValue) {
+                            option.selected = true;
+                        }
+                        select.appendChild(option);
+                    });
+                }
             });
         },
         error: function (xhr, status, error) {
-            console.error('Error fetching options:', error);
+            console.error('Error fetching degree options:', error);
+            toastr.error('Failed to load degree options. Please try again.');
         }
     });
 
@@ -270,6 +673,16 @@ $(document).ready(function () {
             formData.append('agent_code', agentCode);
         }
 
+        // Collect all selected degrees and their preference order
+        const degreeSelects = document.querySelectorAll('#degreeChoices .degree-select');
+        const selectedDegrees = Array.from(degreeSelects).map((select, index) => ({
+            degree_code: select.value,
+            preference_order: index + 1
+        })).filter(deg => deg.degree_code); // Filter out empty selections
+
+        // Add degrees to form data
+        formData.append('selected_degrees', JSON.stringify(selectedDegrees));
+
         // Add files from the custom file upload area
         if (selectedFilesArray && selectedFilesArray.length > 0) {
             selectedFilesArray.forEach((file, index) => {
@@ -328,37 +741,7 @@ $(document).ready(function () {
 
     // File Upload Handler (initialize event listeners)
     if (fileUploadArea && fileInput) {
-        // Click to upload
-        fileUploadArea.addEventListener('click', function () {
-            fileInput.click();
-        });
 
-        // Drag and drop functionality
-        fileUploadArea.addEventListener('dragover', function (e) {
-            e.preventDefault();
-            fileUploadArea.classList.add('drag-over');
-        });
-
-        fileUploadArea.addEventListener('dragleave', function (e) {
-            e.preventDefault();
-            fileUploadArea.classList.remove('drag-over');
-        });
-
-        fileUploadArea.addEventListener('drop', function (e) {
-            e.preventDefault();
-            fileUploadArea.classList.remove('drag-over');
-
-            const files = Array.from(e.dataTransfer.files);
-            handleFiles(files);
-        });
-
-        // File input change
-        fileInput.addEventListener('change', function (e) {
-            const files = Array.from(e.target.files);
-            handleFiles(files);
-        });
-
-        // Clear all files
         clearAllBtn.addEventListener('click', function () {
             if (selectedFilesArray.length > 0) {
                 const fileCount = selectedFilesArray.length;
@@ -371,136 +754,7 @@ $(document).ready(function () {
             }
         });
 
-        function handleFiles(files) {
-            let validFileCount = 0;
-            let totalSize = 0;
-
-            // Calculate current total size
-            selectedFilesArray.forEach(file => {
-                totalSize += file.size;
-            });
-
-            files.forEach(file => {
-                // Check if file already exists
-                const exists = selectedFilesArray.some(f => f.name === file.name && f.size === file.size);
-                if (exists) {
-                    toastr.warning(`File "${file.name}" is already selected.`);
-                    return;
-                }
-
-                // Validate file type
-                const allowedExtensions = ["pdf", "docx", "jpg", "gif", "png"];
-                const fileExtension = file.name.split(".").pop().toLowerCase();
-                if (!allowedExtensions.includes(fileExtension)) {
-                    toastr.error(`Invalid file type: ${file.name}. Allowed formats: PDF, DOCX, JPG, GIF, PNG.`);
-                    return;
-                }
-
-                // Validate file size (individual file max 5MB)
-                const maxFileSize = 5 * 1024 * 1024; // 5MB
-                if (file.size > maxFileSize) {
-                    toastr.error(`File "${file.name}" is too large. Maximum size is 5MB.`);
-                    return;
-                }
-
-                // Check total size (max 10MB total)
-                const maxTotalSize = 10 * 1024 * 1024; // 10MB total
-                if (totalSize + file.size > maxTotalSize) {
-                    toastr.error(`Total file size would exceed 10MB limit. Current: ${formatFileSize(totalSize)}, Adding: ${formatFileSize(file.size)}`);
-                    return;
-                }
-
-                // File is valid, add it
-                selectedFilesArray.push(file);
-                totalSize += file.size;
-                validFileCount++;
-            });
-
-            /* if (validFileCount > 0) {
-                toastr.success(`${validFileCount} file(s) added successfully.`);
-            } */
-
-            updateFileInput();
-            updateDisplay();
-        }
-
-        function updateFileInput() {
-            const dt = new DataTransfer();
-            selectedFilesArray.forEach(file => {
-                dt.items.add(file);
-            });
-            fileInput.files = dt.files;
-        }
-
-        function updateDisplay() {
-            if (selectedFilesArray.length === 0) {
-                selectedFiles.style.display = 'none';
-                return;
-            }
-
-            selectedFiles.style.display = 'block';
-            filesList.innerHTML = '';
-
-            selectedFilesArray.forEach((file, index) => {
-                const fileItem = document.createElement('div');
-                fileItem.className = 'file-item';
-
-                const fileExtension = file.name.split('.').pop().toLowerCase();
-
-                fileItem.innerHTML = `
-                <div class="file-info">
-                    <div class="file-icon ${fileExtension}">
-                        ${getFileIcon(fileExtension)}
-                    </div>
-                    <div class="file-details">
-                        <div class="file-name">${file.name}</div>
-                        <div class="file-size">${formatFileSize(file.size)}</div>
-                    </div>
-                </div>
-                <button type="button" class="remove-file-btn" data-index="${index}">Remove</button>
-            `;
-
-                filesList.appendChild(fileItem);
-            });
-
-            // Add remove functionality
-            document.querySelectorAll('.remove-file-btn').forEach(btn => {
-                btn.addEventListener('click', function () {
-                    const index = parseInt(this.dataset.index);
-                    removeFile(index);
-                });
-            });
-        }
-
-        function removeFile(index) {
-            const fileName = selectedFilesArray[index].name;
-            selectedFilesArray.splice(index, 1);
-            updateFileInput();
-            updateDisplay();
-            toastr.info(`File "${fileName}" removed successfully.`);
-        }
-
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
-
-        function getFileIcon(extension) {
-            const icons = {
-                pdf: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/></svg>',
-                docx: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/></svg>',
-                jpg: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8.5,13.5L11,16.5L14.5,12L19,18H5M21,19V5C21,3.89 20.1,3 19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19Z"/></svg>',
-                gif: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8.5,13.5L11,16.5L14.5,12L19,18H5M21,19V5C21,3.89 20.1,3 19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19Z"/></svg>',
-                png: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8.5,13.5L11,16.5L14.5,12L19,18H5M21,19V5C21,3.89 20.1,3 19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19Z"/></svg>',
-                default: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/></svg>'
-            };
-            return icons[extension] || icons.default;
-        }
-
-        // Make functions globally available for form reset
+        // Make clearAttachedFiles available globally
         window.clearAttachedFiles = function () {
             selectedFilesArray = [];
             updateFileInput();

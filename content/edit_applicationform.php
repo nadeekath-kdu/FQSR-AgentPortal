@@ -63,10 +63,46 @@ $dec_nic_no = $application['nic_no'];
                                 }
                                 ?>
                                 <!-- onsubmit="return validateForm()"  -->
+                                                            <div class="card-body">
+                                <script>
+                                    // Initialize selected degrees data
+                                    window.selectedDegrees = <?php echo json_encode($selected_degrees); ?>;
+                                    console.log('Selected degrees initialized:', window.selectedDegrees);
+                                </script>
                                 <form name="my-form" id="my-form" method="post" enctype="multipart/form-data">
                                     <input type="hidden" name="application_id" value="<?php echo htmlspecialchars($dec_nic_no); ?>">
 
                                     <div class="form-row">
+                                        <div class="col-lg-12 col-md-12 mb-4">
+                                            <h5>Selected Degree Preferences</h5>
+                                            <div id="degreeChoices" class="mb-3">
+                                                <?php
+                                                // Display only the structure, let JavaScript handle the content
+                                                foreach ($selected_degrees as $index => $degree) {
+                                                ?>
+                                                    <div class="degree-choice-item mb-3">
+                                                        <div class="d-flex align-items-center gap-2">
+                                                            <span class="preference-number"><?php echo $index + 1; ?></span>
+                                                            <select name="courses[]" class="form-select form-select-lg degree-select" required>
+                                                                <option value="">Select a course</option>
+                                                                <!-- Options will be populated by JavaScript -->
+                                                            </select>
+                                                            <?php if ($index > 0): ?>
+                                                                <button type="button" class="btn btn-danger remove-degree">
+                                                                    <i class="fa fa-times"></i>
+                                                                </button>
+                                                            <?php endif; ?>
+                                                        </div>
+                                                    </div>
+                                                <?php
+                                                }
+                                                ?>
+                                            </div>
+                                            <button type="button" id="addDegreeChoice" class="btn btn-primary">
+                                                <i class="fa fa-plus"></i> Add Another Degree Choice
+                                            </button>
+                                        </div>
+
                                         <div class="col-lg- col-md-8 col-sm-12">
                                             <h5>Applicant Passport No : <?php echo htmlspecialchars($dec_nic_no); ?></h5>
                                         </div>
@@ -123,36 +159,31 @@ $dec_nic_no = $application['nic_no'];
                                         </div>
                                     </div>
                                     <hr>
-                                    <div class="form-row">
-                                        <div class="col-lg- col-md-6 col-sm-12">
-                                            <div class="form-group">
-                                                <label class="small mb-1" for="inputCourse">Choose a course intending to follow</label>
-                                                <select class="form-control" name="inputCourse" id="inputCourse">
-                                                    <option value="<?php echo $row_get_personal['course_code']; ?>"><?php echo $row_get_personal['course_name']; ?></option>
-                                                    <?php
-                                                    if ($degree_list_cnt > 0) {
-                                                        while ($row_degree = mysqli_fetch_array($res_degree_list)) {
-                                                    ?>
-                                                            <option value="<?php echo $row_degree['degree_code']; ?>"><?php echo $row_degree['degree_name']; ?></option>
-                                                    <?php
+                                    <div class="form-row" style="display: none;">
+                                        <div class="form-group">
+                                            <label class="small mb-1" for="inputCourse">Choose a course intending to follow</label>
+                                            <select class="form-control" name="inputCourse" id="inputCourse">
+                                                <option value="<?php echo $row_get_personal['course_code']; ?>"><?php echo $row_get_personal['course_name']; ?></option>
+                                                <?php
+                                                if ($degree_list_cnt > 0) {
+                                                    while ($row_degree = mysqli_fetch_array($res_degree_list)) {
+                                                ?>
+                                                        <option value="<?php echo $row_degree['degree_code']; ?>"><?php echo $row_degree['degree_name']; ?></option>
+                                                <?php
 
-                                                        }
                                                     }
-                                                    ?>
-                                                </select>
-                                            </div>
+                                                }
+                                                ?>
+                                            </select>
                                         </div>
-                                        <div class="col-lg-3 col-md-3 col-sm-12">
-                                        </div>
-                                        <div class="col-lg-3 col-md-3 col-sm-12">
-                                            <div class="form-group" style="display: none;">
-                                                <label class="small mb-1" for="inputIntakeYr">Intake year</label>
-                                                <input class="form-control py-4" id="inputAcademicYear" name="inputAcademicYear" type="text" value="<?php echo $academic_year; ?>" />
-                                                <input class="form-control py-4" id="inputIntakeYr" name="inputIntakeYr" type="text" value="<?php echo $intake; ?>" />
-                                                <input class="form-control py-4" id="inputNic" name="inputNic" type="hidden" required value="<?php echo $enc_nic_no; ?>" />
-                                                <input type="hidden" id="closingDate" name="closingDate" value="<?php echo $application_closing_date; ?>">
-                                            </div>
-                                        </div>
+                                    </div>
+
+                                    <div class="form-group" style="display: none;">
+                                        <label class="small mb-1" for="inputIntakeYr">Intake year</label>
+                                        <input class="form-control py-4" id="inputAcademicYear" name="inputAcademicYear" type="text" value="<?php echo $academic_year; ?>" />
+                                        <input class="form-control py-4" id="inputIntakeYr" name="inputIntakeYr" type="text" value="<?php echo $intake; ?>" />
+                                        <input class="form-control py-4" id="inputNic" name="inputNic" type="hidden" required value="<?php echo $enc_nic_no; ?>" />
+                                        <input type="hidden" id="closingDate" name="closingDate" value="<?php echo $application_closing_date; ?>">
                                     </div>
 
                                     <h5>Personal Details</h5>
@@ -759,6 +790,7 @@ $dec_nic_no = $application['nic_no'];
                                     <hr>
 
 
+
                                     <div class="form-row">
                                         <div class="col-lg-6 col-md-6 col-sm-6">
                                             <div class="form-group mt-4 mb-0"><input name="submit1" type="button" class="btn btn-primary btn-block btn-update" value="Update Application" data-nic="<?php echo htmlspecialchars($dec_nic_no); ?>" />
@@ -783,5 +815,5 @@ $dec_nic_no = $application['nic_no'];
 </div>
 
 <script src="../assets/js/app/managerows.js"></script>
-<script src="../assets/js/app/formupdate.js"></script>
+<script src="../assets/js/app/formupdate.js?v=1.3"></script>
 <script src="../assets/js/app/resultsvalidation.js"></script>

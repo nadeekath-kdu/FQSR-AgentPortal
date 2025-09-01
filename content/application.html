@@ -126,15 +126,39 @@
                             <div class="card-body">
                                 <div class="form-group">
                                     <div class="mt-2 mb-3">
-                                        <label for="inputCourse" class="form-label">Choose a course intending to follow
-                                            <span class="error"
-                                                style="color: #FF0000; font-size:large;">*</span></label>
-                                        <select id="inputCourse" name="inputCourse" class="form-select form-select-lg">
-                                        </select>
+                                        <label class="form-label">Select your preferred courses
+                                            <span class="error" style="color: #FF0000; font-size:large;">*</span>
+                                            <small class="text-muted ms-2">(Add multiple choices and arrange by
+                                                preference)</small>
+                                        </label>
+
+                                        <div id="degreeChoices" class="degree-choices-container">
+                                            <div class="degree-choice-item mb-3">
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <span class="preference-number">1</span>
+                                                    <select name="courses[]"
+                                                        class="form-select form-select-lg degree-select">
+                                                        <option value="">Select a course</option>
+                                                    </select>
+                                                    <button type="button" class="btn btn-danger remove-degree"
+                                                        style="display: none;">
+                                                        <i class="fa fa-times"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="mt-3">
+                                            <button type="button" id="addDegreeChoice" class="btn btn-success">
+                                                <i class="fa fa-plus"></i> Add Another Choice
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
+
                         <button class="btn btn-primary prevBtn btn-lg  float-start" type="button">Previous</button>
                         <button class="btn btn-primary nextBtn btn-lg  float-end" type="button">Next</button>
                     </div>
@@ -1016,8 +1040,8 @@
     </div>
 </div>
 </div>
-<script src="../assets/js/app/application.js"></script>
-<script src="../assets/js/app/managerows.js"></script>
-<link href="../agent_portal/assets/css/upload-area.css" rel="stylesheet" />
+<script src="../assets/js/app/application.js?v=1.12"></script>
+<script src="../assets/js/app/managerows.js?v=1.0"></script>
+<link href="../agent_portal/assets/css/upload-area.css?v=1.0" rel="stylesheet" />
 
-<script src="../assets/js/app/resultsvalidation.js"></script>
+<script src="../assets/js/app/resultsvalidation.js?v=1.0"></script>

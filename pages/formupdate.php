@@ -176,6 +176,7 @@ try {
         $oldphoto = $result_applicant['Photo'];
         if ($applicant_cnt > 0) {
             // insert data personal data
+            // Initialize variables
             $apply_course_code = "";
             $apply_course = "";
             $intake_yr = "-";
@@ -194,157 +195,245 @@ try {
             $stu_home_tel = "";
             $stu_country_birth = "";
             $stu_email = "";
-            //$doc_upld_link = "";
             $period_study_abroad = "";
             $eligibility_uni_admision = $_POST['elegibleState'];
-            $citizenship_type = "";
-            $stu_citizenship = "";
-            $citizenship1 = "";
-            $citizenship2 = "";
-            $country_AL = "";
-            $eduAgent = ""; /* 2022-07-20 */
-            $nameEduAgent = "";/* 2022-07-20 */
-            $Photo = "";
 
-            $apply_course_code = $_POST['inputCourse'];
-            $stu_fullname = $_POST['inputFullname'];
-            $stu_initialname = $_POST['inputNameInitials'];
-            $stu_gender = $_POST['inputGender'];
-            $citizenship_type = $_POST['citizenship_type'];
-            $stu_civilstats = $_POST['inputCivilSts'];
-            $stu_birth_country = $_POST['inputCountryBirth'];
-            $stu_permenant_addr = $_POST['addressPermanent'];
-            $stu_email = $_POST['inputEmailAddress'];
-            //$media_source_name = $_POST['inputMediaSource'];
-            //$doc_upld_link = $_POST['docupldlink'];
-            $period_study_abroad = $_POST['periodStudy'];
+            // Get first selected course for personal details
+            if (isset($_POST['courses']) && is_array($_POST['courses']) && !empty($_POST['courses'][0])) {
+                $first_degree_code = $_POST['courses'][0];
+                $sql_get_degree = "SELECT degree_name FROM mst_degree_courses WHERE degree_code = '$first_degree_code'";
+                $degree_result = mysqli_query($conn, $sql_get_degree);
+                if ($row = mysqli_fetch_assoc($degree_result)) {
+                    $apply_course = $row['degree_name'];
+                    $apply_course_code = $first_degree_code;
+                }
+                mysqli_free_result($degree_result);
+            }
+
+            // Get the first preference degree for the main record
+            if (!empty($_POST['courses'][0])) {
+                $first_degree_code = $_POST['courses'][0];
+                $sql_get_degree = "SELECT degree_name FROM mst_degree_courses WHERE degree_code = ?";
+                $stmt_degree = $conn->prepare($sql_get_degree);
+                $stmt_degree->bind_param("s", $first_degree_code);
+                $stmt_degree->execute();
+                $degree_result = $stmt_degree->get_result();
+                if ($row = $degree_result->fetch_assoc()) {
+                    $apply_course = $row['degree_name'];
+                    $apply_course_code = $first_degree_code;
+                }
+            }
+        }
+        $citizenship_type = "";
+        $stu_citizenship = "";
+        $citizenship1 = "";
+        $citizenship2 = "";
+        $country_AL = "";
+        $eduAgent = ""; /* 2022-07-20 */
+        $nameEduAgent = "";/* 2022-07-20 */
+        $Photo = "";
+
+        $stu_fullname = $_POST['inputFullname'];
+        $stu_initialname = $_POST['inputNameInitials'];
+        $stu_gender = $_POST['inputGender'];
+        $citizenship_type = $_POST['citizenship_type'];
+        $stu_civilstats = $_POST['inputCivilSts'];
+        $stu_birth_country = $_POST['inputCountryBirth'];
+        $stu_permenant_addr = $_POST['addressPermanent'];
+        $stu_email = $_POST['inputEmailAddress'];
+        //$media_source_name = $_POST['inputMediaSource'];
+        //$doc_upld_link = $_POST['docupldlink'];
+        $period_study_abroad = $_POST['periodStudy'];
 
 
-            if ($err_code == 1) {
-                // redirect back to application form
-                header('Location:applicationform.php?errcode=1');
-            } else {
-                // sanitize inputs
-                $stu_dob = $_POST['inputDob'];
-                $apply_course_code = mysqli_real_escape_string($conn, $apply_course_code);
-                //$AcademicYear = trim($_POST['inputAcademicYear']);
-                $intake_yr = trim($_POST['inputIntakeYr']);
-                $intake_yr = mysqli_real_escape_string($conn, $intake_yr);
-                $stu_title = trim($_POST['inputTitle']);
-                $stu_title = mysqli_real_escape_string($conn, $stu_title);
-                $stu_fullname = mysqli_real_escape_string($conn, $stu_fullname);
-                $stu_birth_country = mysqli_real_escape_string($conn, $stu_birth_country);
-                $stu_initialname = mysqli_real_escape_string($conn, $stu_initialname);
-                $stu_dob = mysqli_real_escape_string($conn, $stu_dob);
-                $stu_gender = mysqli_real_escape_string($conn, $stu_gender);
-                $citizenship_type = mysqli_real_escape_string($conn, $citizenship_type);
-                $stu_civilstats = mysqli_real_escape_string($conn, $stu_civilstats);
-                $stu_permenant_addr = mysqli_real_escape_string($conn, $stu_permenant_addr);
-                $stu_email = mysqli_real_escape_string($conn, $stu_email);
-                $media_source_name = ""; //mysqli_real_escape_string($conn,$media_source_name);
-                //$doc_upld_link = mysqli_real_escape_string($conn, $doc_upld_link);
-                $period_study_abroad = mysqli_real_escape_string($conn, $period_study_abroad);
-                $eligibility_uni_admision = mysqli_real_escape_string($conn, $eligibility_uni_admision);
-                $other_qualification = trim($_POST['otherQualifications']);
-                $other_qualification = mysqli_real_escape_string($conn, $other_qualification);
-                $fund = trim($_POST['fund']);
-                $fund = mysqli_real_escape_string($conn, $fund);
-                $stu_citizenship = trim($_POST['inputCitizenship']);
-                $stu_citizenship = mysqli_real_escape_string($conn, $stu_citizenship);
-                $citizenship1 = trim($_POST['inputCitizenship1']);
-                $citizenship1 = mysqli_real_escape_string($conn, $citizenship1);
-                $citizenship2 = trim($_POST['inputCitizenship2']);
-                $citizenship2 = mysqli_real_escape_string($conn, $citizenship2);
-                $country_AL = trim($_POST['inputCountryAL']);
-                $country_AL = mysqli_real_escape_string($conn, $country_AL);
-                $eduAgent = trim($_POST['eduAgent']); /* 2022-07-20 */
-                $eduAgent = mysqli_real_escape_string($conn, $eduAgent);
-                $nameEduAgent = trim($_POST['nameEduAgent']);
-                $nameEduAgent = mysqli_real_escape_string($conn, $nameEduAgent); /* end 2022-07-20 */
-                //$Photo=$_FILES["Photo"]["name"]; 
+        if ($err_code == 1) {
+            // redirect back to application form
+            header('Location:applicationform.php?errcode=1');
+        } else {
+            // sanitize inputs
+            $stu_dob = $_POST['inputDob'];
+            $apply_course_code = mysqli_real_escape_string($conn, $apply_course_code);
+            //$AcademicYear = trim($_POST['inputAcademicYear']);
+            $intake_yr = trim($_POST['inputIntakeYr']);
+            $intake_yr = mysqli_real_escape_string($conn, $intake_yr);
+            $stu_title = trim($_POST['inputTitle']);
+            $stu_title = mysqli_real_escape_string($conn, $stu_title);
+            $stu_fullname = mysqli_real_escape_string($conn, $stu_fullname);
+            $stu_birth_country = mysqli_real_escape_string($conn, $stu_birth_country);
+            $stu_initialname = mysqli_real_escape_string($conn, $stu_initialname);
+            $stu_dob = mysqli_real_escape_string($conn, $stu_dob);
+            $stu_gender = mysqli_real_escape_string($conn, $stu_gender);
+            $citizenship_type = mysqli_real_escape_string($conn, $citizenship_type);
+            $stu_civilstats = mysqli_real_escape_string($conn, $stu_civilstats);
+            $stu_permenant_addr = mysqli_real_escape_string($conn, $stu_permenant_addr);
+            $stu_email = mysqli_real_escape_string($conn, $stu_email);
+            $media_source_name = ""; //mysqli_real_escape_string($conn,$media_source_name);
+            //$doc_upld_link = mysqli_real_escape_string($conn, $doc_upld_link);
+            $period_study_abroad = mysqli_real_escape_string($conn, $period_study_abroad);
+            $eligibility_uni_admision = mysqli_real_escape_string($conn, $eligibility_uni_admision);
+            $other_qualification = trim($_POST['otherQualifications']);
+            $other_qualification = mysqli_real_escape_string($conn, $other_qualification);
+            $fund = trim($_POST['fund']);
+            $fund = mysqli_real_escape_string($conn, $fund);
+            $stu_citizenship = trim($_POST['inputCitizenship']);
+            $stu_citizenship = mysqli_real_escape_string($conn, $stu_citizenship);
+            $citizenship1 = trim($_POST['inputCitizenship1']);
+            $citizenship1 = mysqli_real_escape_string($conn, $citizenship1);
+            $citizenship2 = trim($_POST['inputCitizenship2']);
+            $citizenship2 = mysqli_real_escape_string($conn, $citizenship2);
+            $country_AL = trim($_POST['inputCountryAL']);
+            $country_AL = mysqli_real_escape_string($conn, $country_AL);
+            $eduAgent = trim($_POST['eduAgent']); /* 2022-07-20 */
+            $eduAgent = mysqli_real_escape_string($conn, $eduAgent);
+            $nameEduAgent = trim($_POST['nameEduAgent']);
+            $nameEduAgent = mysqli_real_escape_string($conn, $nameEduAgent); /* end 2022-07-20 */
+            //$Photo=$_FILES["Photo"]["name"]; 
 
-                // Save profile picture
-                $uploaddir = dirname(__FILE__) . "/../profile/";
-                if (!file_exists($uploaddir)) {
-                    mkdir($uploaddir, 0777, true);
+            // Save profile picture
+            $uploaddir = dirname(__FILE__) . "/../profile/";
+            if (!file_exists($uploaddir)) {
+                mkdir($uploaddir, 0777, true);
+            }
+
+            // Initialize photo variable
+            $Photo = $oldphoto; // Default to existing photo
+
+            // Check if a new photo was uploaded
+            if (isset($_FILES["Photo"]) && !empty($_FILES["Photo"]["name"])) {
+                // Validate file type
+                $allowed_types = array('image/jpeg', 'image/png', 'image/jpg');
+                $file_type = $_FILES["Photo"]["type"];
+
+                if (!in_array($file_type, $allowed_types)) {
+                    error_log("Invalid file type uploaded. Only JPG and PNG are allowed.");
+                    $response = array(
+                        'status' => 'error',
+                        'message' => 'Invalid file type. Only JPG and PNG images are allowed.'
+                    );
+                    echo json_encode($response);
+                    exit;
                 }
 
-                // Initialize photo variable
-                $Photo = $oldphoto; // Default to existing photo
+                // Validate file size (max 2MB)
+                if ($_FILES["Photo"]["size"] > 2 * 1024 * 1024) {
+                    error_log("File too large. Maximum size is 2MB.");
+                    $response = array(
+                        'status' => 'error',
+                        'message' => 'File too large. Maximum size is 2MB.'
+                    );
+                    echo json_encode($response);
+                    exit;
+                }
 
-                // Check if a new photo was uploaded
-                if (isset($_FILES["Photo"]) && !empty($_FILES["Photo"]["name"])) {
-                    // Validate file type
-                    $allowed_types = array('image/jpeg', 'image/png', 'image/jpg');
-                    $file_type = $_FILES["Photo"]["type"];
+                $extension = strtolower(pathinfo($_FILES["Photo"]["name"], PATHINFO_EXTENSION));
+                $new_filename = $dec_nic_no . '.' . $extension;
+                $uploadfile = $uploaddir . $new_filename;
 
-                    if (!in_array($file_type, $allowed_types)) {
-                        error_log("Invalid file type uploaded. Only JPG and PNG are allowed.");
-                        $response = array(
-                            'status' => 'error',
-                            'message' => 'Invalid file type. Only JPG and PNG images are allowed.'
-                        );
-                        echo json_encode($response);
-                        exit;
-                    }
+                // Delete old file if it exists and is different
+                if ($oldphoto && $oldphoto != $new_filename && file_exists($uploaddir . $oldphoto)) {
+                    unlink($uploaddir . $oldphoto);
+                }
 
-                    // Validate file size (max 2MB)
-                    if ($_FILES["Photo"]["size"] > 2 * 1024 * 1024) {
-                        error_log("File too large. Maximum size is 2MB.");
-                        $response = array(
-                            'status' => 'error',
-                            'message' => 'File too large. Maximum size is 2MB.'
-                        );
-                        echo json_encode($response);
-                        exit;
-                    }
+                // Try to upload the new file
+                if (move_uploaded_file($_FILES["Photo"]["tmp_name"], $uploadfile)) {
+                    error_log("File uploaded successfully to: " . $uploadfile);
+                    $Photo = $new_filename;
+                } else {
+                    error_log("Failed to move uploaded file. Error: " . $_FILES["Photo"]["error"]);
+                    error_log("Attempted to move to: " . $uploadfile);
+                    $response = array(
+                        'status' => 'error',
+                        'message' => 'Failed to upload photo. Please try again.'
+                    );
+                    echo json_encode($response);
+                    exit;
+                }
+            } // end photo upload check
+            // get apply course name
+            $sql_cousr_name = "SELECT degree_name FROM mst_degree_courses WHERE degree_code = '$apply_course_code' ";
+            $res_course_name = mysqli_query($conn, $sql_cousr_name);
 
-                    $extension = strtolower(pathinfo($_FILES["Photo"]["name"], PATHINFO_EXTENSION));
-                    $new_filename = $dec_nic_no . '.' . $extension;
-                    $uploadfile = $uploaddir . $new_filename;
+            $course_name_cnt = mysqli_num_rows($res_course_name);
+            if ($course_name_cnt > 0) {
+                while ($row_course_name = mysqli_fetch_array($res_course_name)) {
+                    $apply_course = $row_course_name['degree_name'];
+                }
+            }
+            // ---------------------
+            $cur_dt = date('Y-m-d H:i:s');
+            /* 2022-07-20 */
+            $sql_personal_data = "UPDATE mst_personal_details SET course_name= '$apply_course',course_code= '$apply_course_code',intake = '$intake_yr',stu_title = '$stu_title',stu_fullname = '$stu_fullname',stu_name_initials = '$stu_initialname',stu_dob = '$stu_dob',stu_gender = '$stu_gender',stu_citizenship = '$stu_citizenship',civil_status = '$stu_civilstats',stu_permenant_address = '$stu_permenant_addr',stu_email = '$stu_email',application_submit_dt = '$cur_dt',media_source_name = '$media_source_name',birth_country = '$stu_birth_country',period_study_abroad = '$period_study_abroad',eligibility_uni_admision = '$eligibility_uni_admision',other_qualification = '$other_qualification',fund = '$fund',citizenship_type = '$citizenship_type',citizenship_1 = '$citizenship1',citizenship_2 = '$citizenship2',AL_sitting_country = '$country_AL',photo = '$Photo' WHERE nic_no = '$dec_nic_no'";
+            $res_personal_data = mysqli_query($conn, $sql_personal_data);
 
-                    // Delete old file if it exists and is different
-                    if ($oldphoto && $oldphoto != $new_filename && file_exists($uploaddir . $oldphoto)) {
-                        unlink($uploaddir . $oldphoto);
-                    }
+            if ($res_personal_data) {
+                // Get the applicant ID from the updated record
+                $sql_get_id = "SELECT applicant_id FROM mst_personal_details WHERE nic_no = '$dec_nic_no'";
+                $id_result = mysqli_query($conn, $sql_get_id);
+                if (!$id_result) {
+                    error_log("Failed to get applicant ID: " . mysqli_error($conn));
+                    throw new Exception("Failed to get applicant ID");
+                }
 
-                    // Try to upload the new file
-                    if (move_uploaded_file($_FILES["Photo"]["tmp_name"], $uploadfile)) {
-                        error_log("File uploaded successfully to: " . $uploadfile);
-                        $Photo = $new_filename;
-                    } else {
-                        error_log("Failed to move uploaded file. Error: " . $_FILES["Photo"]["error"]);
-                        error_log("Attempted to move to: " . $uploadfile);
-                        $response = array(
-                            'status' => 'error',
-                            'message' => 'Failed to upload photo. Please try again.'
-                        );
-                        echo json_encode($response);
-                        exit;
-                    }
-                } // end photo upload check
-                // get apply course name
-                $sql_cousr_name = "SELECT degree_name FROM mst_degree_courses WHERE degree_code = '$apply_course_code' ";
-                $res_course_name = mysqli_query($conn, $sql_cousr_name);
+                $id_row = mysqli_fetch_assoc($id_result);
+                if (!$id_row) {
+                    error_log("No student record found for NIC: " . $dec_nic_no);
+                    throw new Exception("Student record not found");
+                }
 
-                $course_name_cnt = mysqli_num_rows($res_course_name);
-                if ($course_name_cnt > 0) {
-                    while ($row_course_name = mysqli_fetch_array($res_course_name)) {
-                        $apply_course = $row_course_name['degree_name'];
+                $last_id = $id_row['applicant_id'];
+                mysqli_free_result($id_result);                // Handle degree preferences after personal details update
+                if (isset($_POST['courses']) && is_array($_POST['courses'])) {
+                    // Delete existing degree preferences
+                    $sql_delete_degrees = "DELETE FROM appliedDegrees WHERE nic = '$dec_nic_no'";
+                    mysqli_query($conn, $sql_delete_degrees);
+
+                    // Insert new degree preferences
+                    foreach ($_POST['courses'] as $index => $degree_code) {
+                        if (!empty($degree_code)) {
+                            $preference_order = $index + 1;
+                            $sql_insert_degree = "INSERT INTO appliedDegrees (nic, appliedDegreeCode, preference_order, studentId) 
+                                                    VALUES ('$dec_nic_no', '$degree_code', $preference_order, $last_id)";
+                            mysqli_query($conn, $sql_insert_degree);
+                        }
                     }
                 }
-                // ---------------------
-                $cur_dt = date('Y-m-d H:i:s');
-                /* 2022-07-20 */
-                $sql_personal_data = "UPDATE mst_personal_details SET course_name= '$apply_course',course_code= '$apply_course_code',intake = '$intake_yr',stu_title = '$stu_title',stu_fullname = '$stu_fullname',stu_name_initials = '$stu_initialname',stu_dob = '$stu_dob',stu_gender = '$stu_gender',stu_citizenship = '$stu_citizenship',civil_status = '$stu_civilstats',stu_permenant_address = '$stu_permenant_addr',stu_email = '$stu_email',application_submit_dt = '$cur_dt',media_source_name = '$media_source_name',birth_country = '$stu_birth_country',period_study_abroad = '$period_study_abroad',eligibility_uni_admision = '$eligibility_uni_admision',other_qualification = '$other_qualification',fund = '$fund',citizenship_type = '$citizenship_type',citizenship_1 = '$citizenship1',citizenship_2 = '$citizenship2',AL_sitting_country = '$country_AL',photo = '$Photo' WHERE nic_no = '$dec_nic_no'";
                 //$sql_personal_data = "UPDATE mst_personal_details SET course_name= '$apply_course',course_code= '$apply_course_code',intake = '$intake_yr',stu_title = '$stu_title',stu_fullname = '$stu_fullname',stu_name_initials = '$stu_initialname',stu_dob = '$stu_dob',stu_gender = '$stu_gender',stu_citizenship = '$stu_citizenship',civil_status = '$stu_civilstats',stu_permenant_address = '$stu_permenant_addr',stu_email = '$stu_email',application_submit_dt = '$cur_dt',media_source_name = '$media_source_name',doc_upload_link = '$doc_upld_link',birth_country = '$stu_birth_country',period_study_abroad = '$period_study_abroad',eligibility_uni_admision = '$eligibility_uni_admision',other_qualification = '$other_qualification',fund = '$fund',citizenship_type = '$citizenship_type',citizenship_1 = '$citizenship1',citizenship_2 = '$citizenship2',AL_sitting_country = '$country_AL',nameEduAgent = '$nameEduAgent',isEduAgent = '$eduAgent',photo = '$Photo' WHERE nic_no = '$dec_nic_no'";
                 $res_personal_data = mysqli_query($conn, $sql_personal_data);
 
                 $test_var = "";
 
                 if ($res_personal_data) {
-                    //$last_id = mysqli_insert_id($conn);
-                    //$enc_last_id = encryptStoreStr($last_id,ENCRYPT_METHOD,WSECRET_KEY,WSECRET_IV);
+                    // Get the applicant ID after update
+                    $sql_get_student = "SELECT applicant_id FROM mst_personal_details WHERE nic_no = '$dec_nic_no'";
+                    $result = mysqli_query($conn, $sql_get_student);
+                    if ($row = mysqli_fetch_assoc($result)) {
+                        $last_id = $row['applicant_id'];
+                    }
+                    mysqli_free_result($result);
+
+                    // Handle degree preferences
+                    if (isset($_POST['courses']) && is_array($_POST['courses'])) {
+                        // Delete existing degree preferences
+                        $sql_delete_degrees = "DELETE FROM appliedDegrees WHERE nic = '$dec_nic_no'";
+                        if (!mysqli_query($conn, $sql_delete_degrees)) {
+                            error_log("Failed to delete existing degrees: " . mysqli_error($conn));
+                            throw new Exception('Database error occurred');
+                        }
+
+                        // Insert new degree preferences with student ID
+                        foreach ($_POST['courses'] as $index => $degree_code) {
+                            if (!empty($degree_code)) {
+                                $preference_order = $index + 1;
+                                $sql_insert_degree = "INSERT INTO appliedDegrees (nic, appliedDegreeCode, preference_order, student_id) 
+                                                   VALUES ('$dec_nic_no', '$degree_code', $preference_order, $last_id)";
+                                if (!mysqli_query($conn, $sql_insert_degree)) {
+                                    error_log("Failed to insert degree preference: " . mysqli_error($conn));
+                                    throw new Exception('Failed to save degree preference');
+                                }
+                            }
+                        }
+                    }
+
                     $enc_last_id = $last_id;
                     $edu_counter = $_POST['edurowcnt'];
                     $edu_counter2 = $_POST['edurowcnt2'];

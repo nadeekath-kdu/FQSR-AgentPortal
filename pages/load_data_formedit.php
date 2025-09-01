@@ -36,6 +36,23 @@ $sql_get_personal = "SELECT * FROM mst_personal_details WHERE nic_no ='$dec_nic_
 $res_get_personal = mysqli_query($db_connection, $sql_get_personal) or die(mysqli_error($db_connection));
 $row_get_personal = mysqli_fetch_array($res_get_personal);
 
+//get selected degrees with preferences
+$sql_selected_degrees = "SELECT ad.preference_order, dc.degree_name, dc.degree_code 
+                        FROM appliedDegrees ad 
+                        JOIN mst_degree_courses dc ON ad.appliedDegreeCode = dc.degree_code 
+                        WHERE ad.nic = ? 
+                        ORDER BY ad.preference_order";
+$selected_degrees = array();
+if ($stmt = mysqli_prepare($db_connection, $sql_selected_degrees)) {
+    mysqli_stmt_bind_param($stmt, "s", $dec_nic_no);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    while ($degree = mysqli_fetch_assoc($result)) {
+        $selected_degrees[] = $degree;
+    }
+    mysqli_stmt_close($stmt);
+}
+
 // ---------------
 $sql_eng_prof_sat = "SELECT * FROM mst_english_proficiency WHERE stu_passport_id = '$dec_nic_no' AND qualification_type = 'SAT'";
 $res_eng_prof_sat = mysqli_query($db_connection, $sql_eng_prof_sat) or die(mysqli_error($db_connection));

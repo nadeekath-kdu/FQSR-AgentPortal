@@ -1,5 +1,9 @@
 <?php
 require_once '../pages/load_data_formedit.php';
+require_once '../includes/document_functions.php';
+
+// Get uploaded documents
+$uploadedDocuments = getUploadedDocuments($dec_nic_no);
 ?>
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -62,23 +66,35 @@ require_once '../pages/load_data_formedit.php';
                             </div>
                             <hr>
                             <div class="form-row">
-                                <div class="col-lg- col-md-6 col-sm-12">
-                                    <div class="form-group">
-                                        <label class="small mb-1" for="inputCourse">Choose a course intending to follow</label>
-                                        <input class="form-control" id="inputCourse" name="inputCourse" type="text" value="<?php echo $row_get_personal['course_name']; ?>" readonly />
+                                <div class="form-group">
+                                    <label class="small mb-1">Selected Degree Preferences</label>
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Preference</th>
+                                                    <th>Degree Program</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php foreach ($selected_degrees as $degree): ?>
+                                                    <tr>
+                                                        <td><?php echo htmlspecialchars($degree['preference_order']); ?></td>
+                                                        <td><?php echo htmlspecialchars($degree['degree_name']); ?></td>
+                                                    </tr>
+                                                <?php endforeach; ?>
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
-                                <div class="col-lg-3 col-md-3 col-sm-12">
-                                </div>
-                                <div class="col-lg-3 col-md-3 col-sm-12">
-                                    <div class="form-group" style="display: none;">
-                                        <label class="small mb-1" for="inputIntakeYr">Intake year</label>
-                                        <input class="form-control" id="inputAcademicYear" name="inputAcademicYear" type="text" value="<?php echo $academic_year; ?>" />
-                                        <input class="form-control" id="inputIntakeYr" name="inputIntakeYr" type="text" value="<?php echo $intake; ?>" />
-                                        <input class="form-control" id="inputNic" name="inputNic" type="hidden" required value="<?php echo $enc_nic_no; ?>" />
-                                        <input type="hidden" id="closingDate" name="closingDate" value="<?php echo $application_closing_date; ?>">
-                                    </div>
-                                </div>
+                            </div>
+
+                            <div class="form-group" style="display: none;">
+                                <label class="small mb-1" for="inputIntakeYr">Intake year</label>
+                                <input class="form-control" id="inputAcademicYear" name="inputAcademicYear" type="text" value="<?php echo $academic_year; ?>" />
+                                <input class="form-control" id="inputIntakeYr" name="inputIntakeYr" type="text" value="<?php echo $intake; ?>" />
+                                <input class="form-control" id="inputNic" name="inputNic" type="hidden" required value="<?php echo $enc_nic_no; ?>" />
+                                <input type="hidden" id="closingDate" name="closingDate" value="<?php echo $application_closing_date; ?>">
                             </div>
 
                             <h5>Personal Details</h5>
