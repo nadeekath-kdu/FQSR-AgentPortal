@@ -4,6 +4,7 @@ require_once '../config/dbcon.php';
 require_once '../config/iv_key.php';
 require_once '../config/mystore_func.php';
 require_once '../config/global.php';
+require_once '../includes/document_functions.php';
 
 
 // Get the NIC/Passport number from the URL
@@ -789,7 +790,42 @@ $dec_nic_no = $application['nic_no'];
 
                                     <hr>
 
+                                    <!-- Documents Section -->
+                                    <div class="card mb-4">
+                                        <div class="card-header">
+                                            <i class="fas fa-file-alt me-1"></i>
+                                            Documents
+                                        </div>
+                                        <div class="card-body">
+                                            <!-- Document Upload Area -->
+                                            <div class="file-upload-area" id="fileUploadArea">
+                                                <div class="file-upload-text">
+                                                    <i class="fa fa-cloud-upload"></i>
+                                                    <p>Drag & Drop files here or click to browse</p>
+                                                </div>
+                                                <input type="file" id="document" name="document[]" multiple class="file-input" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                                            </div>
 
+                                            <!-- Selected Files List -->
+                                            <div class="selected-files mt-3">
+                                                <h6>Selected Files:</h6>
+                                                <ul id="filesList" class="list-group">
+                                                    <?php
+                                                    $documents = getUploadedDocuments($dec_nic_no);
+                                                    foreach ($documents as $doc) {
+                                                        echo '<li class="list-group-item d-flex justify-content-between align-items-center existing-file">';
+                                                        echo '<span>' . htmlspecialchars($doc['file_name']) . '</span>';
+                                                        echo '<div class="btn-group">';
+                                                        echo '<a href="' . htmlspecialchars($doc['file_path']) . '" class="btn btn-sm btn-primary" target="_blank">View</a>';
+                                                        echo '<button type="button" class="btn btn-sm btn-danger remove-file" data-file="' . htmlspecialchars($doc['file_path']) . '">Remove</button>';
+                                                        echo '</div>';
+                                                        echo '</li>';
+                                                    }
+                                                    ?>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
 
                                     <div class="form-row">
                                         <div class="col-lg-6 col-md-6 col-sm-6">
@@ -816,4 +852,254 @@ $dec_nic_no = $application['nic_no'];
 
 <script src="../assets/js/app/managerows.js"></script>
 <script src="../assets/js/app/formupdate.js?v=1.3"></script>
+<script>
+$(document).ready(function() {
+    let fileUploadArea = document.getElementById('fileUploadArea');
+    let fileInput = document.getElementById('document');
+    let filesList = document.getElementById('filesList');
+    let selectedFiles = new Set();
+
+    // Drag and drop functionality
+    if (fileUploadArea && fileInput) {
+        fileUploadArea.addEventListener('click', function() {
+            fileInput.click();
+        });
+
+        fileUploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            fileUploadArea.classList.add('drag-over');
+        });
+
+        fileUploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            fileUploadArea.classList.remove('drag-over');
+        });
+
+        fileUploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            fileUploadArea.classList.remove('drag-over');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        fileInput.addEventListener('change', function() {
+            handleFiles(this.files);
+        });
+    }
+
+    // Handle files selection
+    function handleFiles(files) {
+        Array.from(files).forEach(file => {
+            addFileToList(file);
+        });
+    }
+
+    function addFileToList(file) {
+        const li = document.createElement('li');
+        li.className = 'list-group-item d-flex justify-content-between align-items-center new-file';
+        li.innerHTML = `
+            <span>${file.name}</span>
+            <button type="button" class="btn btn-sm btn-danger remove-file">Remove</button>
+        `;
+        
+        const removeBtn = li.querySelector('.remove-file');
+        removeBtn.addEventListener('click', function() {
+            li.remove();
+            selectedFiles.delete(file);
+        });
+
+        filesList.appendChild(li);
+        selectedFiles.add(file);
+    }
+
+    // Handle removal of existing files
+    $('.remove-file').click(function(e) {
+        e.preventDefault();
+        const item = $(this).closest('li');
+        const filePath = $(this).data('file');
+
+        if (item.hasClass('existing-file') && filePath) {
+            $.ajax({
+                url: '../data/remove_document.php',
+                type: 'POST',
+                data: {
+                    passportNo: '<?php echo htmlspecialchars($dec_nic_no); ?>',
+                    filePath: filePath
+                },
+                success: function(response) {
+                    if (response.success) {
+                        item.remove();
+                    } else {
+                        alert('Failed to remove file');
+                    }
+                },
+                error: function() {
+                    alert('Error occurred while removing file');
+                }
+            });
+        } else {
+            item.remove();
+        }
+    });
+
+    // Intercept form submission to handle files
+    $('.btn-update').click(function(e) {
+        e.preventDefault();
+        const formData = new FormData($('form')[0]);
+        
+        // Add each selected file to formData
+        selectedFiles.forEach(file => {
+            formData.append('documents[]', file);
+        });
+
+        $.ajax({
+            url: '../pages/formupdate.php',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                if (response.success) {
+                    window.location.href = response.redirect || 'view_applicationform.php?nic=' + response.nic;
+                } else {
+                    alert(response.message || 'Update failed');
+                }
+            },
+            error: function() {
+                alert('Error occurred while updating');
+            }
+        });
+    });
+});
+</script>
+<style>
+.file-upload-area {
+    border: 2px dashed #ccc;
+    border-radius: 4px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+.file-upload-area:hover, .file-upload-area.drag-over {
+    border-color: #666;
+    background-color: #f9f9f9;
+}
+
+.file-upload-text {
+    color: #666;
+}
+
+.file-upload-text i {
+    font-size: 48px;
+    margin-bottom: 10px;
+}
+
+.file-input {
+    display: none;
+}
+
+.selected-files {
+    margin-top: 20px;
+}
+
+.selected-files ul {
+    list-style: none;
+    padding: 0;
+}
+
+.btn-group .btn {
+    margin: 0 2px;
+}
+</style>
+<script>
+$(document).ready(function() {
+    // Handle document upload
+    $('.btn-upload-document').click(function() {
+        var formData = new FormData();
+        var fileInput = $('#documentFile')[0];
+        var documentType = $('#documentType').val();
+        
+        if (fileInput.files.length === 0) {
+            alert('Please select a file to upload');
+            return;
+        }
+
+        formData.append('file', fileInput.files[0]);
+        formData.append('documentType', documentType);
+        formData.append('passportNo', '<?php echo htmlspecialchars($dec_nic_no); ?>');
+
+        $.ajax({
+            url: '../data/upload_document.php',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                if (response.success) {
+                    location.reload(); // Reload to show updated document list
+                } else {
+                    alert(response.message || 'Upload failed');
+                }
+            },
+            error: function() {
+                alert('Upload failed. Please try again.');
+            }
+        });
+    });
+
+    // Handle document removal
+    $('.btn-remove-document').click(function() {
+        if (!confirm('Are you sure you want to remove this document?')) {
+            return;
+        }
+
+        var documentPath = $(this).data('document');
+        
+        $.ajax({
+            url: '../data/remove_document.php',
+            type: 'POST',
+            data: {
+                passportNo: '<?php echo htmlspecialchars($dec_nic_no); ?>',
+                documentPath: documentPath
+            },
+            success: function(response) {
+                if (response.success) {
+                    location.reload(); // Reload to update document list
+                } else {
+                    alert(response.message || 'Removal failed');
+                }
+            },
+            error: function() {
+                alert('Removal failed. Please try again.');
+            }
+        });
+    });
+
+    // Update existing form submit handler to handle documents
+    var originalUpdateHandler = $('.btn-update').click;
+    $('.btn-update').click(function(e) {
+        // Clear any existing click handlers
+        $(this).off('click');
+        
+        // First clear the documents folder
+        $.ajax({
+            url: '../data/clear_documents.php',
+            type: 'POST',
+            data: {
+                passportNo: '<?php echo htmlspecialchars($dec_nic_no); ?>'
+            },
+            success: function() {
+                // After clearing documents, proceed with the original update
+                if (originalUpdateHandler) {
+                    originalUpdateHandler.call(this, e);
+                }
+            },
+            error: function() {
+                alert('Failed to clear documents. Please try again.');
+            }
+        });
+    });
+});
+</script>
 <script src="../assets/js/app/resultsvalidation.js"></script>

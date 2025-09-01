@@ -48,6 +48,38 @@ function handleException($e)
 set_error_handler('handleError');
 set_exception_handler('handleException');
 
+require_once '../includes/document_functions.php';
+
+// Handle document uploads
+function handleDocumentUploads($passportNo) {
+    if (!isset($_FILES['documents'])) {
+        return true; // No documents to handle
+    }
+
+    // Recreate document folder
+    recreateDocumentFolder($passportNo);
+    
+    $uploadDir = "../uploads/documents/" . $passportNo . "/";
+    $files = $_FILES['documents'];
+    $uploadedFiles = array();
+
+    // Handle multiple file uploads
+    if (is_array($files['name'])) {
+        for ($i = 0; $i < count($files['name']); $i++) {
+            if ($files['error'][$i] === UPLOAD_ERR_OK) {
+                $fileName = basename($files['name'][$i]);
+                $targetPath = $uploadDir . $fileName;
+
+                if (move_uploaded_file($files['tmp_name'][$i], $targetPath)) {
+                    $uploadedFiles[] = $fileName;
+                }
+            }
+        }
+    }
+
+    return !empty($uploadedFiles);
+}
+
 // Start session if not already started
 if (!isset($_SESSION)) {
     session_start();
@@ -157,6 +189,9 @@ try {
     date_default_timezone_set('Asia/Colombo');
 
     if ((isset($_POST['inputNic'])) && ($_POST['inputNic'] != NULL) && ($_POST['inputNic'] != "") && ($_POST['inputNic'] != " ")) {
+    // Handle document uploads first
+    $passportNo = $_POST['inputNic'];
+    handleDocumentUploads($passportNo);
         $inputNic = "";
         $inputNic = trim($_POST['inputNic']);
         $inputNic = mysqli_real_escape_string($conn, $inputNic);

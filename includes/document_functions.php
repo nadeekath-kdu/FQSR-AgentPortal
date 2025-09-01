@@ -1,4 +1,6 @@
 <?php
+require_once '../config/dbcon.php';
+
 function getUploadedDocuments($passportNo) {
     $documentsDir = "../uploads/documents/" . $passportNo . "/";
     $documents = array();
@@ -7,17 +9,76 @@ function getUploadedDocuments($passportNo) {
         $files = scandir($documentsDir);
         foreach ($files as $file) {
             if ($file != "." && $file != "..") {
+                $type = getDocumentType($file);
                 $documents[] = array(
-                    'name' => $file,
-                    'path' => $documentsDir . $file,
-                    'size' => filesize($documentsDir . $file),
-                    'type' => pathinfo($documentsDir . $file, PATHINFO_EXTENSION)
+                    'file_name' => $file,
+                    'file_path' => $documentsDir . $file,
+                    'document_type' => $type,
+                    'upload_date' => filemtime($documentsDir . $file)
                 );
             }
         }
     }
     
     return $documents;
+}
+
+function getDocumentType($filename) {
+    // Extract document type from filename pattern
+    // Assuming filenames follow a pattern like: passport_123.pdf, transcript_456.pdf etc.
+    $parts = explode('_', strtolower($filename));
+    return $parts[0];
+}
+
+function getDocumentTypeLabel($type) {
+    $types = array(
+        'passport' => 'Passport',
+        'photo' => 'Photograph',
+        'transcript' => 'Academic Transcript',
+        'degree' => 'Degree Certificate',
+        'birth' => 'Birth Certificate',
+        'recommendation' => 'Recommendation Letter',
+        'cv' => 'Curriculum Vitae',
+        'other' => 'Other Document'
+    );
+    
+    return isset($types[$type]) ? $types[$type] : ucfirst(str_replace('_', ' ', $type));
+}
+
+function recreateDocumentFolder($passportNo) {
+    $documentsDir = "../uploads/documents/" . $passportNo . "/";
+    
+    // First backup existing files if directory exists
+    $existingFiles = array();
+    if (file_exists($documentsDir)) {
+        $files = scandir($documentsDir);
+        foreach ($files as $file) {
+            if ($file != "." && $file != "..") {
+                $existingFiles[$file] = file_get_contents($documentsDir . $file);
+            }
+        }
+        
+        // Remove existing directory and all its contents
+        array_map('unlink', glob($documentsDir . "*.*"));
+        rmdir($documentsDir);
+    }
+    
+    // Create fresh directory
+    mkdir($documentsDir, 0777, true);
+    
+    // Return backup of files if needed
+    return $existingFiles;
+}
+
+function removeDocument($passportNo, $filename) {
+    $documentsDir = "../uploads/documents/" . $passportNo . "/";
+    $filePath = $documentsDir . basename($filename);
+    
+    // Verify file is within the correct directory
+    if (strpos(realpath($filePath), realpath($documentsDir)) === 0 && file_exists($filePath)) {
+        return unlink($filePath);
+    }
+    return false;
 }
 
 function formatFileSize($bytes) {

@@ -685,6 +685,44 @@ $uploadedDocuments = getUploadedDocuments($dec_nic_no);
                             <hr>
 
 
+                            <!-- Documents Section -->
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <i class="fas fa-file-alt me-1"></i>
+                                    Uploaded Documents
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered" id="documentsTable">
+                                            <thead>
+                                                <tr>
+                                                    <th>Document Type</th>
+                                                    <th>File Name</th>
+                                                    <th>Upload Date</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php
+                                                $documents = getUploadedDocuments($dec_nic_no);
+
+                                                foreach ($documents as $doc) {
+                                                    echo '<tr>';
+                                                    echo '<td>' . getDocumentTypeLabel($doc['document_type']) . '</td>';
+                                                    echo '<td>' . htmlspecialchars($doc['file_name']) . '</td>';
+                                                    echo '<td>' . date('Y-m-d', strtotime($doc['upload_date'])) . '</td>';
+                                                    echo '<td>';
+                                                    echo '<a href="' . htmlspecialchars($doc['file_path']) . '" class="btn btn-primary btn-sm" target="_blank" rel="noopener noreferrer">View</a>';
+                                                    echo '</td>';
+                                                    echo '</tr>';
+                                                }
+                                                ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="form-row">
                                 <div class="col-lg-6 col-md-6 col-sm-6">
                                     <div class="form-group mt-4 mb-0"><input name="submit1" type="button" class="btn btn-primary btn-block btn-edit" value="Need to Edit Details" data-nic="<?php echo htmlspecialchars($dec_nic_no); ?>" />
@@ -710,4 +748,3 @@ $uploadedDocuments = getUploadedDocuments($dec_nic_no);
 
 <!-- <script src="../assets/js/managerows.js"></script>-->
 <script src="../assets/js/app/formupdate.js"></script>
-<!-- <script src="../assets/js/view_applicationform.js"></script> -->
