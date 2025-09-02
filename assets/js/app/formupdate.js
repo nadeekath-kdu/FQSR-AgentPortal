@@ -2,7 +2,245 @@
 window.closingDateLoaded = window.closingDateLoaded || false;
 window.availableDegrees = window.availableDegrees || [];
 
-// Helper functions
+
+function initializeDocumentHandling(passportNo) {
+    if (!passportNo) {
+        console.error('Passport number is required for document handling');
+        return;
+    }
+    window.DocumentHandler.initialize(passportNo);
+}
+
+// Document removal handler
+function removeDocument111(filePath, item) {
+    if (!filePath) return;
+
+    const passportNo = $('#dec_nic_no').val() || $('#passportNo').val();
+    if (!passportNo) {
+        toastr.error('Could not determine passport/NIC number');
+        return;
+    }
+
+    $.ajax({
+        url: '../data/remove_document.php',
+        type: 'POST',
+        data: { passportNo, filePath },
+        dataType: 'json',
+        success: function (response) {
+            if (response.success) {
+                item.fadeOut(300, function () { $(this).remove(); });
+                toastr.success('Document removed successfully');
+            } else {
+                toastr.error(response.message || 'Failed to remove document');
+            }
+        },
+        error: function (xhr) {
+            console.error('Remove document error:', xhr.responseText);
+            toastr.error('Error occurred while removing document');
+        }
+    });
+}
+
+
+window.DocumentHandler = window.DocumentHandler || (function (window) {
+    'use strict';
+
+    // Private state
+    const state = {
+        fileUploadArea: null,
+        fileInput: null,
+        filesList: null,
+        selectedFiles: new Set(), // new files (File objects)
+        existingFiles: new Set(), // filenames of already-uploaded files
+        passportNo: null,
+        initialized: false
+    };
+
+    // Private functions
+    function handleFiles(files) {
+        console.log('Handling files:', files);
+        if (!state.filesList || !state.initialized) {
+            console.warn('Document handler not properly initialized');
+            return;
+        }
+        Array.from(files).forEach(file => {
+            console.log('Processing file:', file.name);
+            if (!state.selectedFiles.has(file)) {
+                addFileToList(file);
+            }
+        });
+    }
+
+    function addFileToList(file) {
+        console.log('Adding file to list:', file.name);
+        if (!state.filesList || !state.initialized) {
+            console.warn('Cannot add file, handler not initialized');
+            return;
+        }
+
+        const li = document.createElement('li');
+        li.className = 'list-group-item d-flex justify-content-between align-items-center new-file';
+        // Create a local object URL for the file so it can be viewed
+        const fileUrl = URL.createObjectURL(file);
+        li.innerHTML = `
+            <span class="file-name">${file.name}</span>
+            <div class="btn-group">
+                <a href="${fileUrl}" class="btn btn-sm btn-primary" target="_blank"><i class="fa fa-eye"></i> View</a>
+                <button type="button" class="btn btn-sm btn-danger remove-file">
+                    <i class="fa fa-trash"></i> Remove
+                </button>
+            </div>
+        `;
+
+        const removeBtn = li.querySelector('.remove-file');
+        removeBtn.addEventListener('click', function () {
+            state.selectedFiles.delete(file);
+            li.remove();
+        });
+
+        state.filesList.appendChild(li);
+        state.selectedFiles.add(file);
+    }
+
+    function addExistingFileToList(filename) {
+        if (!state.filesList || !state.initialized) return;
+        const li = document.createElement('li');
+        li.className = 'list-group-item d-flex justify-content-between align-items-center existing-file';
+        li.innerHTML = `
+            <span class="file-name">${filename}</span>
+            <div class="btn-group">
+                <a href="../uploads/documents/${state.passportNo}/${filename}" class="btn btn-sm btn-primary" target="_blank"><i class="fa fa-eye"></i> View</a>
+                <button type="button" class="btn btn-sm btn-danger remove-file">
+                    <i class="fa fa-trash"></i> Remove
+                </button>
+            </div>
+        `;
+        const removeBtn = li.querySelector('.remove-file');
+        removeBtn.addEventListener('click', function () {
+            state.existingFiles.delete(filename);
+            li.remove();
+        });
+        state.filesList.appendChild(li);
+        state.existingFiles.add(filename);
+    }
+
+    function setupEventListeners() {
+        // Drag and drop events
+        state.fileUploadArea.addEventListener('dragenter', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.classList.add('dragover');
+        });
+        state.fileUploadArea.addEventListener('dragleave', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.classList.remove('dragover');
+        });
+        state.fileUploadArea.addEventListener('dragover', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        });
+        state.fileUploadArea.addEventListener('drop', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            this.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
+        // File input change event
+        state.fileInput.addEventListener('change', function (e) {
+            console.log('File input change event triggered', e);
+            if (this.files && this.files.length > 0) {
+                handleFiles(this.files);
+            }
+        });
+        // Prevent default drag behaviors on document
+        document.addEventListener('dragover', function (e) {
+            e.preventDefault();
+        });
+        document.addEventListener('drop', function (e) {
+            e.preventDefault();
+        });
+        // Remove file handler is now handled globally outside the DocumentHandler
+    }
+
+    // Public methods
+    function initialize(passportNo) {
+        if (!passportNo) {
+            console.warn('PassportNo is required for document handling');
+            return;
+        }
+        state.passportNo = passportNo;
+        state.fileUploadArea = document.getElementById('fileUploadArea');
+        state.fileInput = document.getElementById('document') || document.getElementById('documentFile');
+        state.filesList = document.getElementById('filesList');
+        console.log('Initializing with elements:', {
+            fileUploadArea: state.fileUploadArea,
+            fileInput: state.fileInput,
+            filesList: state.filesList
+        });
+        if (!state.fileUploadArea || !state.fileInput || !state.filesList) {
+            console.warn('Document upload elements not found');
+            return;
+        }
+        // Make the upload area clickable to trigger file input
+        state.fileUploadArea.style.cursor = 'pointer';
+        state.fileUploadArea.addEventListener('click', function (e) {
+            state.fileInput.click();
+        });
+        // Load existing files from DOM (if any)
+        $(state.filesList).find('li.existing-file .file-name').each(function () {
+            const filename = $(this).text().trim();
+            if (filename) state.existingFiles.add(filename);
+        });
+        setupEventListeners();
+        state.initialized = true;
+        console.log('Document handler initialized successfully');
+    }
+
+    // Return public interface
+    return {
+        initialize,
+        getState: () => ({ ...state }),
+        getSelectedFiles: () => Array.from(state.selectedFiles),
+        getExistingFiles: () => Array.from(state.existingFiles)
+    };
+})(window);
+
+// Initialize document handling when document is ready
+$(function () {
+    const passportValue = window.passportNumber || $('#passportNo').val() || $('#dec_nic_no').val();
+    if (passportValue) {
+        window.DocumentHandler.initialize(passportValue);
+    }
+});
+
+// Single handler for all document removals
+$(document).on('click', '.remove-file', function (e) {
+    e.preventDefault();
+    const $item = $(this).closest('li');
+    if (!$item.length) return;
+    $item.fadeOut(300, function () { $(this).remove(); });
+});
+
+// Initialize all form handlers when document is ready
+$(document).ready(function () {
+    // Get passport number from all possible sources
+    const passportValue = window.passportNumber || $('#passportNo').val() || $('#dec_nic_no').val();
+
+    if (passportValue) {
+        initializeDocumentHandling(passportValue);
+        console.log('Document handling initialized for passport/NIC:', passportValue);
+    } else {
+        console.warn('No passport number found for document handling initialization');
+    }
+
+    // Initialize validation handlers
+    $('#inputEmailAddress').on('blur', validateEmailField);
+    $('#inputDob, #inputCourse').on('change', validateAge);
+    $('input[name="citizenship_type"]').on('change', updateCitizenshipSections);
+});
+
+// Form validation and helper functions
 function updateCitizenshipSections() {
     var selectedValue = $('input[name="citizenship_type"]:checked').val();
     $('#section1, #section2, #section3').hide();
@@ -173,16 +411,107 @@ function validateForm() {
     return isValid;
 }
 
+// Document handling functions
+function handleDocumentUpload(fileInput, documentType, passportNo) {
+    var formData = new FormData();
+
+    if (fileInput.files.length === 0) {
+        toastr.error('Please select a file to upload');
+        return;
+    }
+
+    formData.append('file', fileInput.files[0]);
+    formData.append('documentType', documentType);
+    formData.append('passportNo', passportNo);
+
+    $.ajax({
+        url: '../data/upload_document.php',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (response) {
+            if (response.success) {
+                location.reload(); // Reload to show updated document list
+            } else {
+                toastr.error(response.message || 'Upload failed');
+            }
+        },
+        error: function () {
+            toastr.error('Upload failed. Please try again.');
+        }
+    });
+}
+
+// Unified document removal function
+function handleDocumentRemoval(documentPath, passportNo, $item = null) {
+    if (!confirm('Are you sure you want to remove this document?')) {
+        return;
+    }
+
+    $.ajax({
+        url: '../data/remove_document.php',
+        type: 'POST',
+        data: {
+            passportNo: passportNo,
+            filePath: documentPath,
+        },
+        success: function (response) {
+            try {
+                const result = typeof response === 'string' ? JSON.parse(response) : response;
+                if (result.success) {
+                    if ($item) {
+                        $item.fadeOut(300, function () { $(this).remove(); });
+                        toastr.success('Document removed successfully');
+                    } else {
+                        location.reload();
+                    }
+                } else {
+                    toastr.error(result.message || 'Failed to remove file');
+                }
+            } catch (e) {
+                console.error('Error parsing response:', e);
+                toastr.error('Failed to process server response');
+            }
+        },
+        error: function (xhr) {
+            console.error('Remove document error:', xhr.responseText);
+            toastr.error('Error occurred while removing file');
+        }
+    });
+}
+
+function clearDocumentsFolder(passportNo) {
+    return new Promise((resolve, reject) => {
+        console.log('[clearDocumentsFolder] Called with passportNo:', passportNo);
+        $.ajax({
+            url: '../data/clear_documents.php',
+            type: 'POST',
+            data: {
+                passportNo: passportNo
+            },
+            success: function (data, textStatus, jqXHR) {
+                console.log('[clearDocumentsFolder] Success:', { data, textStatus, jqXHR });
+                resolve();
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.error('[clearDocumentsFolder] Error:', { jqXHR, textStatus, errorThrown });
+                toastr.error('Failed to clear documents. Please try again.');
+                reject();
+            }
+        });
+    });
+}
+
+
 // Document ready handler
 $(document).ready(function () {
-    // Initialize file upload elements if they haven't been initialized yet
-    if (!fileUploadArea) {
-        fileUploadArea = document.getElementById('fileUploadArea');
-        fileInput = document.getElementById('fileInput');
-        selectedFiles = document.getElementById('selectedFiles');
-        filesList = document.getElementById('filesList');
-        clearAllBtn = document.getElementById('clearAllBtn');
+    const passportValue = $('#passportNo').val() || $('#dec_nic_no').val();
+    if (passportValue) {
+        window.DocumentHandler.initialize(passportValue);
     }
+
+    //window.DocumentHandler.initialize(passportNo);
 
     // Initialize validation handlers
     $('#inputEmailAddress').on('blur', validateEmailField);
@@ -246,9 +575,22 @@ $(document).ready(function () {
     });
 
     // Button handlers
-    $('.btn-update').click(function (e) {
+    $('.btn-update').click(async function (e) {
         e.preventDefault();
         if (!validateForm()) return;
+
+        // Always define state at the top
+        const state = window.DocumentHandler.getState ? window.DocumentHandler.getState() : null;
+
+        // Clear documents folder before update
+        const passportNo = ($('#inputNic').val() || $('#dec_nic_no').val() || $('#passportNo').val() || '').trim();
+        if (passportNo) {
+            try {
+                await clearDocumentsFolder(passportNo);
+            } catch (err) {
+                return;
+            }
+        }
 
         // Trim all text inputs
         $('#my-form input[type="text"], #my-form textarea').each(function () {
@@ -263,7 +605,28 @@ $(document).ready(function () {
             formData.append('Photo', photoInput.files[0]);
         }
 
-        // Add documents if present
+        // Collect all files currently shown in the UI
+        const filesToKeep = [];
+        if (state && state.filesList) {
+            $(state.filesList).find('li.existing-file .file-name').each(function () {
+                const filename = $(this).text().trim();
+                if (filename) filesToKeep.push(filename);
+            });
+        }
+        // Add new files from upload area
+        const newFiles = [];
+        if (state && state.selectedFiles && state.selectedFiles.size > 0) {
+            state.selectedFiles.forEach(file => {
+                formData.append('documents[]', file);
+                newFiles.push(file.name);
+            });
+        }
+        // Add files_to_keep[] to formData
+        filesToKeep.forEach(filename => formData.append('files_to_keep[]', filename));
+        // Debug log
+        console.log('Submitting form. files_to_keep:', filesToKeep, 'new uploads:', newFiles);
+
+        // Add documents from legacy file input if present
         var fileInput = document.getElementById('fileInput');
         if (fileInput && fileInput.files.length > 0) {
             for (var i = 0; i < fileInput.files.length; i++) {
@@ -271,7 +634,7 @@ $(document).ready(function () {
             }
         }
 
-        if (!$('#inputNic').val().trim()) {
+        if (!(($('#inputNic').val() || $('#dec_nic_no').val() || $('#passportNo').val() || '').trim())) {
             toastr.error("NIC/Passport number is required", "Error");
             return;
         }
@@ -387,7 +750,13 @@ function initializeDegreeSelection() {
     const degreeChoices = document.getElementById('degreeChoices');
     const addDegreeBtn = document.getElementById('addDegreeChoice');
 
-    if (!degreeChoices || !addDegreeBtn) return;
+    if (!degreeChoices || !addDegreeBtn) {
+        console.warn('Degree selection elements not found');
+        return;
+    }
+
+    // Maximum number of degree choices allowed
+    const MAX_DEGREE_CHOICES = 3;
 
     // Load available degrees
     $.ajax({
@@ -404,7 +773,7 @@ function initializeDegreeSelection() {
             // Create initial degree choices based on selected degrees
             if (window.selectedDegrees && window.selectedDegrees.length > 0) {
                 console.log('Setting up selected degrees:', window.selectedDegrees);
-                
+
                 // Sort selected degrees by preference order
                 window.selectedDegrees.sort((a, b) => a.preference_order - b.preference_order);
 
@@ -422,7 +791,7 @@ function initializeDegreeSelection() {
                     const choiceItem = document.createElement('div');
                     choiceItem.className = 'degree-choice-item mb-3';
                     // Create options with the correct degree pre-selected
-                    const options = window.availableDegrees.map(degree => 
+                    const options = window.availableDegrees.map(degree =>
                         `<option value="${degree.degree_code}" ${degree.degree_code === selectedDegree.degree_code ? 'selected' : ''}>
                             ${degree.degree_name}
                         </option>`
@@ -469,6 +838,12 @@ function initializeDegreeSelection() {
     // Add new degree choice
     addDegreeBtn.addEventListener('click', function () {
         const choicesCount = degreeChoices.querySelectorAll('.degree-choice-item').length;
+
+        if (choicesCount >= MAX_DEGREE_CHOICES) {
+            toastr.warning(`Maximum ${MAX_DEGREE_CHOICES} degree choices allowed`);
+            return;
+        }
+
         const newChoice = document.createElement('div');
         newChoice.className = 'degree-choice-item mb-3';
         newChoice.innerHTML = `
@@ -476,9 +851,9 @@ function initializeDegreeSelection() {
                 <span class="preference-number">${choicesCount + 1}</span>
                 <select name="courses[]" class="form-select form-select-lg degree-select" required>
                     <option value="">Select a course</option>
-                    ${window.availableDegrees.map(degree => 
-                        `<option value="${degree.degree_code}">${degree.degree_name}</option>`
-                    ).join('')}
+                    ${window.availableDegrees.map(degree =>
+            `<option value="${degree.degree_code}">${degree.degree_name}</option>`
+        ).join('')}
                 </select>
                 <button type="button" class="btn btn-danger remove-degree">
                     <i class="fa fa-times"></i>
@@ -493,8 +868,12 @@ function initializeDegreeSelection() {
     degreeChoices.addEventListener('click', function (e) {
         if (e.target.closest('.remove-degree')) {
             const choiceItem = e.target.closest('.degree-choice-item');
-            choiceItem.remove();
-            updateDegreePreferences();
+            if (choiceItem && degreeChoices.children.length > 1) {
+                choiceItem.remove();
+                updateDegreePreferences();
+            } else {
+                toastr.warning('At least one degree choice must be selected');
+            }
         }
     });
 }
@@ -509,11 +888,29 @@ function getAvailableDegreeOptions(selectedCode = '') {
 // Function to update all degree select options
 function updateDegreeOptions() {
     const selects = document.querySelectorAll('.degree-select');
+    if (!window.availableDegrees) {
+        console.warn('Available degrees not loaded yet');
+        return;
+    }
+
+    const selectedValues = new Set();
+
     selects.forEach(select => {
         const currentValue = select.value;
         select.innerHTML = '<option value="">Select a course</option>' + getAvailableDegreeOptions();
+
         if (currentValue) {
-            select.value = currentValue;
+            // Check if the degree is still available
+            const degreeStillExists = window.availableDegrees.some(d => d.degree_code === currentValue);
+            if (degreeStillExists && !selectedValues.has(currentValue)) {
+                select.value = currentValue;
+                selectedValues.add(currentValue);
+            } else {
+                select.value = '';
+                if (currentValue) {
+                    toastr.warning('A previously selected degree is no longer available');
+                }
+            }
         }
     });
 }

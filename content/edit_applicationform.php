@@ -64,1042 +64,842 @@ $dec_nic_no = $application['nic_no'];
                                 }
                                 ?>
                                 <!-- onsubmit="return validateForm()"  -->
-                                                            <div class="card-body">
-                                <script>
-                                    // Initialize selected degrees data
-                                    window.selectedDegrees = <?php echo json_encode($selected_degrees); ?>;
-                                    console.log('Selected degrees initialized:', window.selectedDegrees);
-                                </script>
-                                <form name="my-form" id="my-form" method="post" enctype="multipart/form-data">
-                                    <input type="hidden" name="application_id" value="<?php echo htmlspecialchars($dec_nic_no); ?>">
+                                <div class="card-body">
+                                    <script>
+                                        // Initialize selected degrees data
+                                        window.selectedDegrees = <?php echo json_encode($selected_degrees); ?>;
+                                        console.log('Selected degrees initialized:', window.selectedDegrees);
+                                    </script>
+                                    <form name="my-form" id="my-form" method="post" enctype="multipart/form-data">
+                                        <input type="hidden" name="application_id" value="<?php echo htmlspecialchars($dec_nic_no); ?>">
 
-                                    <div class="form-row">
-                                        <div class="col-lg-12 col-md-12 mb-4">
-                                            <h5>Selected Degree Preferences</h5>
-                                            <div id="degreeChoices" class="mb-3">
-                                                <?php
-                                                // Display only the structure, let JavaScript handle the content
-                                                foreach ($selected_degrees as $index => $degree) {
-                                                ?>
-                                                    <div class="degree-choice-item mb-3">
-                                                        <div class="d-flex align-items-center gap-2">
-                                                            <span class="preference-number"><?php echo $index + 1; ?></span>
-                                                            <select name="courses[]" class="form-select form-select-lg degree-select" required>
-                                                                <option value="">Select a course</option>
-                                                                <!-- Options will be populated by JavaScript -->
-                                                            </select>
-                                                            <?php if ($index > 0): ?>
-                                                                <button type="button" class="btn btn-danger remove-degree">
-                                                                    <i class="fa fa-times"></i>
-                                                                </button>
-                                                            <?php endif; ?>
+                                        <div class="form-row">
+                                            <div class="col-lg-12 col-md-12 mb-4">
+                                                <h5>Selected Degree Preferences</h5>
+                                                <div id="degreeChoices" class="mb-3">
+                                                    <?php
+                                                    // Display only the structure, let JavaScript handle the content
+                                                    foreach ($selected_degrees as $index => $degree) {
+                                                    ?>
+                                                        <div class="degree-choice-item mb-3">
+                                                            <div class="d-flex align-items-center gap-2">
+                                                                <span class="preference-number"><?php echo $index + 1; ?></span>
+                                                                <select name="courses[]" class="form-select form-select-lg degree-select" required>
+                                                                    <option value="">Select a course</option>
+                                                                    <!-- Options will be populated by JavaScript -->
+                                                                </select>
+                                                                <?php if ($index > 0): ?>
+                                                                    <button type="button" class="btn btn-danger remove-degree">
+                                                                        <i class="fa fa-times"></i>
+                                                                    </button>
+                                                                <?php endif; ?>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                <?php
-                                                }
-                                                ?>
+                                                    <?php
+                                                    }
+                                                    ?>
+                                                </div>
+                                                <button type="button" id="addDegreeChoice" class="btn btn-primary">
+                                                    <i class="fa fa-plus"></i> Add Another Degree Choice
+                                                </button>
                                             </div>
-                                            <button type="button" id="addDegreeChoice" class="btn btn-primary">
-                                                <i class="fa fa-plus"></i> Add Another Degree Choice
-                                            </button>
-                                        </div>
 
-                                        <div class="col-lg- col-md-8 col-sm-12">
-                                            <h5>Applicant Passport No : <?php echo htmlspecialchars($dec_nic_no); ?></h5>
-                                        </div>
-                                        <div class="col-lg- col-md-4 col-sm-12">
-                                            <div class="container">
-                                                <div class="picture-container">
+                                            <div class="col-lg- col-md-8 col-sm-12">
+                                                <h5>Applicant Passport No : <?php echo htmlspecialchars($dec_nic_no); ?></h5>
+                                            </div>
+                                            <div class="col-lg- col-md-4 col-sm-12">
+                                                <div class="container">
                                                     <div class="picture-container">
-                                                        <div class="picture">
-                                                            <?php
-                                                            if ($row_get_personal['Photo'] != '') {
-                                                                $photoUrl = "../profile/" . htmlspecialchars($row_get_personal['Photo']);
-                                                            ?>
-                                                                <img src="<?php echo $photoUrl; ?>" class="picture-src" id="wizardPicturePreview" title="Current Photo">
-                                                            <?php
-                                                            } else {
-                                                            ?>
-                                                                <img src="../assets/img/default-avatar.png" class="picture-src" id="wizardPicturePreview" title="Default Photo">
-                                                            <?php
-                                                            }
-                                                            ?>
-                                                            <input type="file" id="Photo" name="Photo" accept="image/jpeg,image/png" class="form-control">
+                                                        <div class="picture-container">
+                                                            <div class="picture">
+                                                                <?php
+                                                                if ($row_get_personal['Photo'] != '') {
+                                                                    $photoUrl = "../profile/" . htmlspecialchars($row_get_personal['Photo']);
+                                                                ?>
+                                                                    <img src="<?php echo $photoUrl; ?>" class="picture-src" id="wizardPicturePreview" title="Current Photo">
+                                                                <?php
+                                                                } else {
+                                                                ?>
+                                                                    <img src="../assets/img/default-avatar.png" class="picture-src" id="wizardPicturePreview" title="Default Photo">
+                                                                <?php
+                                                                }
+                                                                ?>
+                                                                <input type="file" id="Photo" name="Photo" accept="image/jpeg,image/png" class="form-control">
+                                                            </div>
+                                                            <h6>Choose Photo</h6>
+                                                            <small class="form-text text-muted">Allowed JPG or PNG. Max size of 2MB</small>
                                                         </div>
-                                                        <h6>Choose Photo</h6>
-                                                        <small class="form-text text-muted">Allowed JPG or PNG. Max size of 2MB</small>
-                                                    </div>
 
-                                                    <script>
-                                                        document.getElementById("Photo").onchange = function() {
-                                                            var reader = new FileReader();
-                                                            reader.onload = function(e) {
-                                                                document.getElementById("wizardPicturePreview").src = e.target.result;
+                                                        <script>
+                                                            document.getElementById("Photo").onchange = function() {
+                                                                var reader = new FileReader();
+                                                                reader.onload = function(e) {
+                                                                    document.getElementById("wizardPicturePreview").src = e.target.result;
+                                                                };
+
+                                                                var file = this.files[0];
+                                                                if (file) {
+                                                                    if (file.size > 2 * 1024 * 1024) {
+                                                                        alert("File is too large! Maximum size is 2MB.");
+                                                                        this.value = "";
+                                                                        return;
+                                                                    }
+
+                                                                    if (!file.type.match('image/jpeg') && !file.type.match('image/png')) {
+                                                                        alert("Only JPG and PNG files are allowed!");
+                                                                        this.value = "";
+                                                                        return;
+                                                                    }
+
+                                                                    reader.readAsDataURL(file);
+                                                                }
                                                             };
-
-                                                            var file = this.files[0];
-                                                            if (file) {
-                                                                if (file.size > 2 * 1024 * 1024) {
-                                                                    alert("File is too large! Maximum size is 2MB.");
-                                                                    this.value = "";
-                                                                    return;
-                                                                }
-
-                                                                if (!file.type.match('image/jpeg') && !file.type.match('image/png')) {
-                                                                    alert("Only JPG and PNG files are allowed!");
-                                                                    this.value = "";
-                                                                    return;
-                                                                }
-
-                                                                reader.readAsDataURL(file);
-                                                            }
-                                                        };
-                                                    </script>
+                                                        </script>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <hr>
-                                    <div class="form-row" style="display: none;">
-                                        <div class="form-group">
-                                            <label class="small mb-1" for="inputCourse">Choose a course intending to follow</label>
-                                            <select class="form-control" name="inputCourse" id="inputCourse">
-                                                <option value="<?php echo $row_get_personal['course_code']; ?>"><?php echo $row_get_personal['course_name']; ?></option>
-                                                <?php
-                                                if ($degree_list_cnt > 0) {
-                                                    while ($row_degree = mysqli_fetch_array($res_degree_list)) {
-                                                ?>
-                                                        <option value="<?php echo $row_degree['degree_code']; ?>"><?php echo $row_degree['degree_name']; ?></option>
-                                                <?php
+                                        <hr>
+                                        <div class="form-row" style="display: none;">
+                                            <div class="form-group">
+                                                <label class="small mb-1" for="inputCourse">Choose a course intending to follow</label>
+                                                <select class="form-control" name="inputCourse" id="inputCourse">
+                                                    <option value="<?php echo $row_get_personal['course_code']; ?>"><?php echo $row_get_personal['course_name']; ?></option>
+                                                    <?php
+                                                    if ($degree_list_cnt > 0) {
+                                                        while ($row_degree = mysqli_fetch_array($res_degree_list)) {
+                                                    ?>
+                                                            <option value="<?php echo $row_degree['degree_code']; ?>"><?php echo $row_degree['degree_name']; ?></option>
+                                                    <?php
 
+                                                        }
                                                     }
-                                                }
-                                                ?>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group" style="display: none;">
-                                        <label class="small mb-1" for="inputIntakeYr">Intake year</label>
-                                        <input class="form-control py-4" id="inputAcademicYear" name="inputAcademicYear" type="text" value="<?php echo $academic_year; ?>" />
-                                        <input class="form-control py-4" id="inputIntakeYr" name="inputIntakeYr" type="text" value="<?php echo $intake; ?>" />
-                                        <input class="form-control py-4" id="inputNic" name="inputNic" type="hidden" required value="<?php echo $enc_nic_no; ?>" />
-                                        <input type="hidden" id="closingDate" name="closingDate" value="<?php echo $application_closing_date; ?>">
-                                    </div>
-
-                                    <h5>Personal Details</h5>
-                                    <hr>
-                                    <div class="form-row">
-                                        <div class="col-lg-2 col-md-2 col-sm-12">
-                                            <div class="form-group">
-                                                <label class="small mb-1" for="inputTitle">Title</label>
-                                                <select class="form-control" id="inputTitle" name="inputTitle">
-                                                    <option value="<?php echo $row_get_personal['stu_title']; ?>" readonly><?php echo $row_get_personal['stu_title']; ?></option>
-                                                    <option value="Dr">Dr</option>
-                                                    <option value="Mr">Mr</option>
-                                                    <option value="Mrs">Mrs</option>
-                                                    <option value="Miss">Miss</option>
-                                                    <option value="Ms">MS</option>
+                                                    ?>
                                                 </select>
                                             </div>
                                         </div>
-                                        <div class="col-lg-7 col-md-7 col-sm-12">
-                                            <div class="form-group">
-                                                <label class="small mb-1" for="inputFullname">Full Name <span class="error" style="color: #FF0000;">*</span></label>
-                                                <input class="form-control py-4" id="inputFullname" name="inputFullname" required type="text" placeholder="Enter your Full Name" value="<?php echo $row_get_personal['stu_fullname']; ?>" />
+
+                                        <div class="form-group" style="display: none;">
+                                            <label class="small mb-1" for="inputIntakeYr">Intake year</label>
+                                            <input class="form-control py-4" id="inputAcademicYear" name="inputAcademicYear" type="text" value="<?php echo $academic_year; ?>" />
+                                            <input class="form-control py-4" id="inputIntakeYr" name="inputIntakeYr" type="text" value="<?php echo $intake; ?>" />
+                                            <input class="form-control py-4" id="inputNic" name="inputNic" type="hidden" required value="<?php echo $enc_nic_no; ?>" />
+                                            <input type="hidden" id="closingDate" name="closingDate" value="<?php echo $application_closing_date; ?>">
+                                        </div>
+
+                                        <h5>Personal Details</h5>
+                                        <hr>
+                                        <div class="form-row">
+                                            <div class="col-lg-2 col-md-2 col-sm-12">
+                                                <div class="form-group">
+                                                    <label class="small mb-1" for="inputTitle">Title</label>
+                                                    <select class="form-control" id="inputTitle" name="inputTitle">
+                                                        <option value="<?php echo $row_get_personal['stu_title']; ?>" readonly><?php echo $row_get_personal['stu_title']; ?></option>
+                                                        <option value="Dr">Dr</option>
+                                                        <option value="Mr">Mr</option>
+                                                        <option value="Mrs">Mrs</option>
+                                                        <option value="Miss">Miss</option>
+                                                        <option value="Ms">MS</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-7 col-md-7 col-sm-12">
+                                                <div class="form-group">
+                                                    <label class="small mb-1" for="inputFullname">Full Name <span class="error" style="color: #FF0000;">*</span></label>
+                                                    <input class="form-control py-4" id="inputFullname" name="inputFullname" required type="text" placeholder="Enter your Full Name" value="<?php echo $row_get_personal['stu_fullname']; ?>" />
+                                                </div>
+                                            </div>
+
+                                            <div class="col-lg-3 col-md-3 col-sm-12">
+                                                <div class="form-group">
+                                                    <label class="small mb-1" for="inputNameInitials">Name with initials <span class="error" style="color: #FF0000;">*</span></label>
+                                                    <input class="form-control py-4" id="inputNameInitials" name="inputNameInitials" type="text" required value="<?php echo $row_get_personal['stu_name_initials']; ?>" placeholder="Enter name with initials" />
+                                                </div>
                                             </div>
                                         </div>
 
-                                        <div class="col-lg-3 col-md-3 col-sm-12">
-                                            <div class="form-group">
-                                                <label class="small mb-1" for="inputNameInitials">Name with initials <span class="error" style="color: #FF0000;">*</span></label>
-                                                <input class="form-control py-4" id="inputNameInitials" name="inputNameInitials" type="text" required value="<?php echo $row_get_personal['stu_name_initials']; ?>" placeholder="Enter name with initials" />
+                                        <div class="form-row">
+                                            <div class="col-lg-3 col-md-3 col-sm-12">
+                                                <div class="form-group">
+                                                    <label class="small mb-1" for="inputDob">Date of birth <span class="error" style="color: #FF0000;">*</span></label>
+                                                    <input class="form-control" id="inputDob" name="inputDob" type="date" required value="<?php echo $row_get_personal['stu_dob']; ?>" placeholder="Enter your Date of birth" />
+                                                    <!-- <input class="form-control" id="inputDob" name="inputDob" type="date" onchange="validateDate(this.value)" required placeholder="Enter your Date of birth" /> -->
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-3 col-md-3 col-sm-12">
+                                                <div class="form-group">
+                                                    <label class="small mb-1" for="inputGender">Gender <span class="error" style="color: #FF0000;">*</span></label>
+                                                    <select class="form-control" id="inputGender" name="inputGender">
+                                                        <option value="<?php echo $row_get_personal['stu_gender']; ?>" readonly><?php echo $row_get_personal['stu_gender']; ?></option>
+                                                        <option value="Male">Male</option>
+                                                        <option value="Female">Female</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-3 col-md-3 col-sm-12">
+                                                <div class="form-group">
+                                                    <label class="small mb-1" for="inputCivilSts">Civil Status <span class="error" style="color: #FF0000;">*</span>
+                                                    </label>
+                                                    <select class="form-control" id="inputCivilSts" name="inputCivilSts">
+                                                        <option value="<?php echo $row_get_personal['civil_status']; ?>" readonly><?php echo $row_get_personal['civil_status']; ?> </option>
+                                                        <option value="Single">Single</option>
+                                                        <option value="Married">Married</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-3 col-md-3 col-sm-12">
                                             </div>
                                         </div>
-                                    </div>
+                                        &nbsp;
+                                        <div class="form-row">
+                                            <div class="col-lg-3">
+                                                <label class="small mb-1" for="Citizenship" name="citizenship_t">Citizenship </label>
+                                                <span class="error" style="color: #FF0000;">*</span>
+                                            </div>
+                                            <div class="col-lg-3">
+                                                <input class="small mb-1" type="radio" id="sriLanakan" name="citizenship_type" required value="Sri Lankan Citizenship Only" <?php echo ($row_get_personal['citizenship_type'] == "Sri Lankan Citizenship Only") ? 'checked' : '' ?> />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label class="small mb-1" for="sriLanakan" name="citizenship_ty">Sri Lankan Citizenship Only</label>
 
-                                    <div class="form-row">
-                                        <div class="col-lg-3 col-md-3 col-sm-12">
-                                            <div class="form-group">
-                                                <label class="small mb-1" for="inputDob">Date of birth <span class="error" style="color: #FF0000;">*</span></label>
-                                                <input class="form-control" id="inputDob" name="inputDob" type="date" required value="<?php echo $row_get_personal['stu_dob']; ?>" placeholder="Enter your Date of birth" />
-                                                <!-- <input class="form-control" id="inputDob" name="inputDob" type="date" onchange="validateDate(this.value)" required placeholder="Enter your Date of birth" /> -->
+                                            </div>
+                                            <div class="col-lg-3">
+                                                <input class="small mb-1" type="radio" id="foreign" name="citizenship_type" value="Foreign Citizenship" <?php echo ($row_get_personal['citizenship_type'] == 'Foreign Citizenship') ? 'checked' : '' ?> />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label class="small mb-1" for="foreign" name="citizenship_ty">Foreign Citizenship</label>
+                                            </div>
+                                            <div class="col-lg-3">
+                                                <input class="small mb-1" type="radio" id="dual" name="citizenship_type" value="Dual Citizenship" <?php echo ($row_get_personal['citizenship_type'] == 'Dual Citizenship') ? 'checked' : '' ?> />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label class="small mb-1" for="dual" name="citizenship_ty">Dual Citizenship</label>
                                             </div>
                                         </div>
-                                        <div class="col-lg-3 col-md-3 col-sm-12">
-                                            <div class="form-group">
-                                                <label class="small mb-1" for="inputGender">Gender <span class="error" style="color: #FF0000;">*</span></label>
-                                                <select class="form-control" id="inputGender" name="inputGender">
-                                                    <option value="<?php echo $row_get_personal['stu_gender']; ?>" readonly><?php echo $row_get_personal['stu_gender']; ?></option>
-                                                    <option value="Male">Male</option>
-                                                    <option value="Female">Female</option>
-                                                </select>
-                                            </div>
+                                        &nbsp;
+
+                                        <div class="form-row" id="section1" style="<?php echo ($row_get_personal['citizenship_type'] == 'Foreign Citizenship') ? 'display: block;' : 'display: none;' ?>">
+                                            <label class="small mb-1" for="inputCitizenship">Country of Citizenship </label>
+                                            <input class="form-control py-4" id="inputCitizenship" name="inputCitizenship" type="text" value="<?php echo $row_get_personal['stu_citizenship']; ?>" placeholder="Enter your Country of Citizenship" />
                                         </div>
-                                        <div class="col-lg-3 col-md-3 col-sm-12">
-                                            <div class="form-group">
-                                                <label class="small mb-1" for="inputCivilSts">Civil Status <span class="error" style="color: #FF0000;">*</span>
+                                        &nbsp;
+                                        <div class="form-row" id="section2" style="<?php echo ($row_get_personal['citizenship_type'] == 'Dual Citizenship') ? 'display: block;' : 'display: none;' ?>">
+                                            <label class="small mb-1" for="inputCitizenship1">Mention Your Country of Citizenship 1 </label>
+                                            <input class="form-control py-4" id="inputCitizenship1" name="inputCitizenship1" type="text" value="<?php echo $row_get_personal['citizenship_1']; ?>" placeholder="Enter your 1st Country" />
+                                        </div>
+                                        &nbsp;
+                                        <div class="form-row" id="section3" style="<?php echo ($row_get_personal['citizenship_type'] == 'Dual Citizenship') ? 'display: block;' : 'display: none;' ?>">
+                                            <label class="small mb-1" for="inputCitizenship2">Mention Your Country of Citizenship 2</label>
+                                            <input class="form-control py-4" id="inputCitizenship2" name="inputCitizenship2" type="text" value="<?php echo $row_get_personal['citizenship_2']; ?>" placeholder="Enter your 2nd Country" />
+                                        </div>
+                                        &nbsp;
+                                        <div class="form-group">
+                                            <label class="small mb-1" for="inputCountryAL">What is the country that you have appeared for Advanced Level examination/ High School Diploma</label>
+                                            <input class="form-control py-4" id="inputCountryAL" name="inputCountryAL" type="text" value="<?php echo $row_get_personal['AL_sitting_country']; ?>" placeholder="Enter your Answer" />
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="col-lg-4 col-md-3 col-sm-12">
+                                                <div class="form-group">
+                                                    <label class="small mb-1" for="inputCountryBirth">Country of Birth<span class="error" style="color: #FF0000;">*</span></label>
+                                                    <input class="form-control py-4" id="inputCountryBirth" name="inputCountryBirth" type="text" value="<?php echo $row_get_personal['birth_country']; ?>" required placeholder="Enter your Country of Birth" />
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4 col-md-3 col-sm-12">
+                                                <div class="form-group">
+                                                    <label class="small mb-1" for="periodStudy">Period of Study apart from Sri Lanka <span class="error" style="color: #FF0000;">*</span></label>
+                                                    <input class="form-control py-4" id="periodStudy" name="periodStudy" type="text" value="<?php echo $row_get_personal['period_study_abroad']; ?>" required placeholder="Enter your Period of Study Abroad" />
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4 col-md-3 col-sm-12">
+                                                <label class="small mb-1"><span style="color:blue">(Sri Lanakan expatriates should have studied abroad for a period of not less than three academic years immediately prior to sitting the qualifying examination) </span>
                                                 </label>
-                                                <select class="form-control" id="inputCivilSts" name="inputCivilSts">
-                                                    <option value="<?php echo $row_get_personal['civil_status']; ?>" readonly><?php echo $row_get_personal['civil_status']; ?> </option>
-                                                    <option value="Single">Single</option>
-                                                    <option value="Married">Married</option>
-                                                </select>
                                             </div>
                                         </div>
-                                        <div class="col-lg-3 col-md-3 col-sm-12">
-                                        </div>
-                                    </div>
-                                    &nbsp;
-                                    <div class="form-row">
-                                        <div class="col-lg-3">
-                                            <label class="small mb-1" for="Citizenship" name="citizenship_t">Citizenship </label>
-                                            <span class="error" style="color: #FF0000;">*</span>
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <input class="small mb-1" type="radio" id="sriLanakan" name="citizenship_type" required value="Sri Lankan Citizenship Only" <?php echo ($row_get_personal['citizenship_type'] == "Sri Lankan Citizenship Only") ? 'checked' : '' ?> />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label class="small mb-1" for="sriLanakan" name="citizenship_ty">Sri Lankan Citizenship Only</label>
 
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <input class="small mb-1" type="radio" id="foreign" name="citizenship_type" value="Foreign Citizenship" <?php echo ($row_get_personal['citizenship_type'] == 'Foreign Citizenship') ? 'checked' : '' ?> />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label class="small mb-1" for="foreign" name="citizenship_ty">Foreign Citizenship</label>
-                                        </div>
-                                        <div class="col-lg-3">
-                                            <input class="small mb-1" type="radio" id="dual" name="citizenship_type" value="Dual Citizenship" <?php echo ($row_get_personal['citizenship_type'] == 'Dual Citizenship') ? 'checked' : '' ?> />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<label class="small mb-1" for="dual" name="citizenship_ty">Dual Citizenship</label>
-                                        </div>
-                                    </div>
-                                    &nbsp;
-
-                                    <div class="form-row" id="section1" style="<?php echo ($row_get_personal['citizenship_type'] == 'Foreign Citizenship') ? 'display: block;' : 'display: none;' ?>">
-                                        <label class="small mb-1" for="inputCitizenship">Country of Citizenship </label>
-                                        <input class="form-control py-4" id="inputCitizenship" name="inputCitizenship" type="text" value="<?php echo $row_get_personal['stu_citizenship']; ?>" placeholder="Enter your Country of Citizenship" />
-                                    </div>
-                                    &nbsp;
-                                    <div class="form-row" id="section2" style="<?php echo ($row_get_personal['citizenship_type'] == 'Dual Citizenship') ? 'display: block;' : 'display: none;' ?>">
-                                        <label class="small mb-1" for="inputCitizenship1">Mention Your Country of Citizenship 1 </label>
-                                        <input class="form-control py-4" id="inputCitizenship1" name="inputCitizenship1" type="text" value="<?php echo $row_get_personal['citizenship_1']; ?>" placeholder="Enter your 1st Country" />
-                                    </div>
-                                    &nbsp;
-                                    <div class="form-row" id="section3" style="<?php echo ($row_get_personal['citizenship_type'] == 'Dual Citizenship') ? 'display: block;' : 'display: none;' ?>">
-                                        <label class="small mb-1" for="inputCitizenship2">Mention Your Country of Citizenship 2</label>
-                                        <input class="form-control py-4" id="inputCitizenship2" name="inputCitizenship2" type="text" value="<?php echo $row_get_personal['citizenship_2']; ?>" placeholder="Enter your 2nd Country" />
-                                    </div>
-                                    &nbsp;
-                                    <div class="form-group">
-                                        <label class="small mb-1" for="inputCountryAL">What is the country that you have appeared for Advanced Level examination/ High School Diploma</label>
-                                        <input class="form-control py-4" id="inputCountryAL" name="inputCountryAL" type="text" value="<?php echo $row_get_personal['AL_sitting_country']; ?>" placeholder="Enter your Answer" />
-                                    </div>
-                                    <div class="form-row">
-                                        <div class="col-lg-4 col-md-3 col-sm-12">
-                                            <div class="form-group">
-                                                <label class="small mb-1" for="inputCountryBirth">Country of Birth<span class="error" style="color: #FF0000;">*</span></label>
-                                                <input class="form-control py-4" id="inputCountryBirth" name="inputCountryBirth" type="text" value="<?php echo $row_get_personal['birth_country']; ?>" required placeholder="Enter your Country of Birth" />
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-4 col-md-3 col-sm-12">
-                                            <div class="form-group">
-                                                <label class="small mb-1" for="periodStudy">Period of Study apart from Sri Lanka <span class="error" style="color: #FF0000;">*</span></label>
-                                                <input class="form-control py-4" id="periodStudy" name="periodStudy" type="text" value="<?php echo $row_get_personal['period_study_abroad']; ?>" required placeholder="Enter your Period of Study Abroad" />
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-4 col-md-3 col-sm-12">
-                                            <label class="small mb-1"><span style="color:blue">(Sri Lanakan expatriates should have studied abroad for a period of not less than three academic years immediately prior to sitting the qualifying examination) </span>
-                                            </label>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-row">
-                                        <div class="col-lg-6 col-md-6 col-sm-12">
-                                            <div class="form-group">
-                                                <label class="small mb-1" for="addressPermanent">Permanent Address to which correspondence should be sent<span class="error" style="color: #FF0000;">*</span></label><?php $Address = $row_get_personal['stu_permenant_address']; ?>
-                                                <textarea class="form-control" id="addressPermanent" name="addressPermanent" rows="3" required style="align-content:left;">
+                                        <div class="form-row">
+                                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                                <div class="form-group">
+                                                    <label class="small mb-1" for="addressPermanent">Permanent Address to which correspondence should be sent<span class="error" style="color: #FF0000;">*</span></label><?php $Address = $row_get_personal['stu_permenant_address']; ?>
+                                                    <textarea class="form-control" id="addressPermanent" name="addressPermanent" rows="3" required style="align-content:left;">
                                                             <?php echo $Address; ?>
                                                         </textarea>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
 
-                                    <div class="form-group">
-                                        <label class="small mb-1" for="inputEmailAddress">Email address <span class="error" style="color: #FF0000;">*</span></label>
-                                        <input class="form-control py-4" id="inputEmailAddress" name="inputEmailAddress" type="email" aria-describedby="emailHelp" value="<?php echo $row_get_personal['stu_email']; ?>" required placeholder="Enter email address" />
-                                    </div>
-                                    <h5>Educational Qualifications</h5>
-                                    <hr>
-                                    <h6>Examination equivalent to Advanced Level/ High School</h6>
-                                    <?php
-                                    $sql_edu_qual_al = "SELECT * FROM mst_educational_qualifications WHERE stu_nic = '$dec_nic_no' AND exm_type = 'A/L'";
-                                    $res_edu_qual_al = mysqli_query($db_connection, $sql_edu_qual_al);
-                                    $edu_al = mysqli_fetch_array($res_edu_qual_al);
+                                        <div class="form-group">
+                                            <label class="small mb-1" for="inputEmailAddress">Email address <span class="error" style="color: #FF0000;">*</span></label>
+                                            <input class="form-control py-4" id="inputEmailAddress" name="inputEmailAddress" type="email" aria-describedby="emailHelp" value="<?php echo $row_get_personal['stu_email']; ?>" required placeholder="Enter email address" />
+                                        </div>
+                                        <h5>Educational Qualifications</h5>
+                                        <hr>
+                                        <h6>Examination equivalent to Advanced Level/ High School</h6>
+                                        <?php
+                                        $sql_edu_qual_al = "SELECT * FROM mst_educational_qualifications WHERE stu_nic = '$dec_nic_no' AND exm_type = 'A/L'";
+                                        $res_edu_qual_al = mysqli_query($db_connection, $sql_edu_qual_al);
+                                        $edu_al = mysqli_fetch_array($res_edu_qual_al);
 
-                                    ?>
-                                    <div class="form-group">
-                                        <label class="small mb-1" for="examNameAL">Name of Examination</label>
-                                        <input class="form-control py-4" id="examNameAL" name="examNameAL" value="<?php echo $edu_al['exam_name']; ?>" />
-                                    </div>
-                                    <!-- <div class="form-group">
+                                        ?>
+                                        <div class="form-group">
+                                            <label class="small mb-1" for="examNameAL">Name of Examination</label>
+                                            <input class="form-control py-4" id="examNameAL" name="examNameAL" value="<?php echo $edu_al['exam_name']; ?>" />
+                                        </div>
+                                        <!-- <div class="form-group">
                                                         <label class="small mb-1" for="examYearAL">Year of Examination</label>
                                                         <input class="form-control py-4" id="examYearAL" name="examYearAL"/>
                                                     </div> -->
 
-                                    <div class="form-row">
-                                        <button type="button" class="btn btn-warning" onClick="addtoEducational();"><i class="fa fa-plus"></i></button>&nbsp;<button type="button" onClick="remfromEducational();" class="btn btn-danger"><i class="fa fa-minus"></i></button>
-                                    </div>
-
-                                    <div class="form-row">
-                                        <div class="col-lg-12 col-md-12 col-sm-12">
-                                            <table class="table" id="edutbl">
-                                                <thead>
-                                                    <tr>
-                                                        <th scope="col">Subject</th>
-                                                        <th scope="col">Grade</th>
-                                                        <th scope="col">Year</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <?php
-                                                    //print_r(($edu_al));
-                                                    $sql_edu_qual_al = "SELECT * FROM mst_educational_qualifications WHERE stu_nic = '$dec_nic_no' AND exm_type = 'A/L'";
-                                                    $res_edu_qual_al = mysqli_query($db_connection, $sql_edu_qual_al);
-                                                    $counter_al = 0;
-                                                    while ($row_edu_qual_al = mysqli_fetch_array($res_edu_qual_al)) {
-                                                        $sub_al = 'subject_AL_' . $counter_al;
-                                                        $res_al = 'result_AL_' . $counter_al;
-                                                        $year_al = 'year_AL_' . $counter_al;
-                                                    ?>
-                                                        <tr>
-                                                            <td><input class="form-control" id="<?php echo $sub_al; ?>" type="text" name="<?php echo $sub_al; ?>" value="<?php echo $row_edu_qual_al['subject_grade']; ?>" placeholder="Enter Subject" /></td>
-                                                            <td><input class="form-control" id="<?php echo $res_al; ?>" type="text" name="<?php echo $res_al; ?>" value="<?php echo $row_edu_qual_al['award']; ?>" placeholder="Enter Result" /></td>
-                                                            <td><input class="form-control" id="<?php echo $year_al; ?>" type="text" name="<?php echo $year_al; ?>" value="<?php echo $row_edu_qual_al['exam_year']; ?>" placeholder="Enter Year" /></td>
-                                                        </tr>
-                                                    <?php
-                                                        $counter_al++;
-                                                    }
-                                                    ?>
-                                                </tbody>
-                                            </table>
+                                        <div class="form-row">
+                                            <button type="button" class="btn btn-warning" onClick="addtoEducational();"><i class="fa fa-plus"></i></button>&nbsp;<button type="button" onClick="remfromEducational();" class="btn btn-danger"><i class="fa fa-minus"></i></button>
                                         </div>
-                                    </div>
+
+                                        <div class="form-row">
+                                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                                <table class="table" id="edutbl">
+                                                    <thead>
+                                                        <tr>
+                                                            <th scope="col">Subject</th>
+                                                            <th scope="col">Grade</th>
+                                                            <th scope="col">Year</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <?php
+                                                        //print_r(($edu_al));
+                                                        $sql_edu_qual_al = "SELECT * FROM mst_educational_qualifications WHERE stu_nic = '$dec_nic_no' AND exm_type = 'A/L'";
+                                                        $res_edu_qual_al = mysqli_query($db_connection, $sql_edu_qual_al);
+                                                        $counter_al = 0;
+                                                        while ($row_edu_qual_al = mysqli_fetch_array($res_edu_qual_al)) {
+                                                            $sub_al = 'subject_AL_' . $counter_al;
+                                                            $res_al = 'result_AL_' . $counter_al;
+                                                            $year_al = 'year_AL_' . $counter_al;
+                                                        ?>
+                                                            <tr>
+                                                                <td><input class="form-control" id="<?php echo $sub_al; ?>" type="text" name="<?php echo $sub_al; ?>" value="<?php echo $row_edu_qual_al['subject_grade']; ?>" placeholder="Enter Subject" /></td>
+                                                                <td><input class="form-control" id="<?php echo $res_al; ?>" type="text" name="<?php echo $res_al; ?>" value="<?php echo $row_edu_qual_al['award']; ?>" placeholder="Enter Result" /></td>
+                                                                <td><input class="form-control" id="<?php echo $year_al; ?>" type="text" name="<?php echo $year_al; ?>" value="<?php echo $row_edu_qual_al['exam_year']; ?>" placeholder="Enter Year" /></td>
+                                                            </tr>
+                                                        <?php
+                                                            $counter_al++;
+                                                        }
+                                                        ?>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
 
 
 
-                                    <input class="form-control" id="edurowcnt" type="hidden" name="edurowcnt" value="<?php echo $counter_al; ?>" />
-                                    <hr>
-                                    <h6>Examination equivalent to Ordinary Level/ Secondary Education</h6>
-                                    <?php
-                                    $sql_edu_qual_ol = "SELECT * FROM mst_educational_qualifications WHERE stu_nic = '$dec_nic_no' AND exm_type = 'O/L'";
-                                    $res_edu_qual_ol = mysqli_query($db_connection, $sql_edu_qual_ol);
-                                    $row_edu_qual_ol = mysqli_fetch_array($res_edu_qual_ol);
-                                    ?>
-                                    <div class="form-group">
-                                        <label class="small mb-1" for="examNameOL">Name of Examination</label>
-                                        <input class="form-control py-4" id="examNameOL" name="examNameOL" value="<?php echo $row_edu_qual_ol['exam_name']; ?>" />
-                                    </div>
-                                    <!-- <div class="form-group">
+                                        <input class="form-control" id="edurowcnt" type="hidden" name="edurowcnt" value="<?php echo $counter_al; ?>" />
+                                        <hr>
+                                        <h6>Examination equivalent to Ordinary Level/ Secondary Education</h6>
+                                        <?php
+                                        $sql_edu_qual_ol = "SELECT * FROM mst_educational_qualifications WHERE stu_nic = '$dec_nic_no' AND exm_type = 'O/L'";
+                                        $res_edu_qual_ol = mysqli_query($db_connection, $sql_edu_qual_ol);
+                                        $row_edu_qual_ol = mysqli_fetch_array($res_edu_qual_ol);
+                                        ?>
+                                        <div class="form-group">
+                                            <label class="small mb-1" for="examNameOL">Name of Examination</label>
+                                            <input class="form-control py-4" id="examNameOL" name="examNameOL" value="<?php echo $row_edu_qual_ol['exam_name']; ?>" />
+                                        </div>
+                                        <!-- <div class="form-group">
                                                         <label class="small mb-1" for="examYearOL">Year of Examination</label>
                                                         <input class="form-control py-4" id="examYearOL" name="examYearOL"/>
                                                     </div> -->
 
-                                    <div class="form-row">
-                                        <button type="button" class="btn btn-warning" onClick="addtoEducational_ol();"><i class="fa fa-plus"></i></button>&nbsp;<button type="button" onClick="remfromEducational_ol();" class="btn btn-danger"><i class="fa fa-minus"></i></button>
+                                        <div class="form-row">
+                                            <button type="button" class="btn btn-warning" onClick="addtoEducational_ol();"><i class="fa fa-plus"></i></button>&nbsp;<button type="button" onClick="remfromEducational_ol();" class="btn btn-danger"><i class="fa fa-minus"></i></button>
 
-                                    </div>
-                                    <div class="form-row">
-                                        <div class="col-lg-12 col-md-12 col-sm-12">
-                                            <table class="table" id="edutbl2">
-                                                <thead>
-                                                    <tr>
-                                                        <th scope="col">Subject</th>
-                                                        <th scope="col">Grade</th>
-                                                        <th scope="col">Year</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <?php
-                                                    $sql_edu_qual_ol = "SELECT * FROM mst_educational_qualifications WHERE stu_nic = '$dec_nic_no' AND exm_type = 'O/L'";
-                                                    $res_edu_qual_ol = mysqli_query($db_connection, $sql_edu_qual_ol);
-                                                    //$row_edu_qual_ol = mysqli_fetch_array($res_edu_qual_ol);
-                                                    $counter_ol = 0;
-                                                    while ($row_edu_qual_ol = mysqli_fetch_array($res_edu_qual_ol)) {
-                                                        $sub_ol = 'subject_OL_' . $counter_ol;
-                                                        $res_ol = 'result_OL_' . $counter_ol;
-                                                        $year_ol = 'year_OL_' . $counter_ol;
-                                                    ?>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                                <table class="table" id="edutbl2">
+                                                    <thead>
                                                         <tr>
-                                                            <td><input class="form-control" id="<?php echo $sub_ol; ?>" type="text" name="<?php echo $sub_ol; ?>" value="<?php echo $row_edu_qual_ol['subject_grade']; ?>" placeholder="Enter Subject" /></td>
-                                                            <td><input class="form-control" id="<?php echo $res_ol; ?>" type="text" name="<?php echo $res_ol; ?>" value="<?php echo $row_edu_qual_ol['award']; ?>" placeholder="Enter Result" /></td>
-                                                            <td><input class="form-control" id="<?php echo $year_ol; ?>" type="text" name="<?php echo $year_ol; ?>" value="<?php echo $row_edu_qual_ol['exam_year']; ?>" placeholder="Enter Year" /></td>
+                                                            <th scope="col">Subject</th>
+                                                            <th scope="col">Grade</th>
+                                                            <th scope="col">Year</th>
                                                         </tr>
-                                                    <?php $counter_ol++;
-                                                    } ?>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-
-
-                                    <input class="form-control py-4" id="edurowcnt2" type="hidden" name="edurowcnt2" value="<?php echo $counter_ol; ?>" />
-                                    <hr>
-                                    <div class="form-row">
-                                        <div class="col-lg-4 col-md-4 col-sm-12">
-                                            <div class="form-group">
-                                                <label class="small mb-1" for="elegibleState1">State whether you are eligible for the admission to a state University in your country <span class="error" style="color: #FF0000;">*</span>
-                                                </label>
+                                                    </thead>
+                                                    <tbody>
+                                                        <?php
+                                                        $sql_edu_qual_ol = "SELECT * FROM mst_educational_qualifications WHERE stu_nic = '$dec_nic_no' AND exm_type = 'O/L'";
+                                                        $res_edu_qual_ol = mysqli_query($db_connection, $sql_edu_qual_ol);
+                                                        //$row_edu_qual_ol = mysqli_fetch_array($res_edu_qual_ol);
+                                                        $counter_ol = 0;
+                                                        while ($row_edu_qual_ol = mysqli_fetch_array($res_edu_qual_ol)) {
+                                                            $sub_ol = 'subject_OL_' . $counter_ol;
+                                                            $res_ol = 'result_OL_' . $counter_ol;
+                                                            $year_ol = 'year_OL_' . $counter_ol;
+                                                        ?>
+                                                            <tr>
+                                                                <td><input class="form-control" id="<?php echo $sub_ol; ?>" type="text" name="<?php echo $sub_ol; ?>" value="<?php echo $row_edu_qual_ol['subject_grade']; ?>" placeholder="Enter Subject" /></td>
+                                                                <td><input class="form-control" id="<?php echo $res_ol; ?>" type="text" name="<?php echo $res_ol; ?>" value="<?php echo $row_edu_qual_ol['award']; ?>" placeholder="Enter Result" /></td>
+                                                                <td><input class="form-control" id="<?php echo $year_ol; ?>" type="text" name="<?php echo $year_ol; ?>" value="<?php echo $row_edu_qual_ol['exam_year']; ?>" placeholder="Enter Year" /></td>
+                                                            </tr>
+                                                        <?php $counter_ol++;
+                                                        } ?>
+                                                    </tbody>
+                                                </table>
                                             </div>
                                         </div>
-                                        <div class="col-lg-2 col-md-2 col-sm-12">
-                                            <div class="form-group">
-                                                <label class="small mb-1" for="elegibleState"> </label>
-                                                <select class="form-control" id="elegibleState" name="elegibleState">
-                                                    <option value="<?php echo $row_get_personal['eligibility_uni_admision']; ?>" readonly><?php echo $row_get_personal['eligibility_uni_admision']; ?></option>
-                                                    <option value="Yes">Yes</option>
-                                                    <option value="No">No</option>
-                                                </select>
+
+
+                                        <input class="form-control py-4" id="edurowcnt2" type="hidden" name="edurowcnt2" value="<?php echo $counter_ol; ?>" />
+                                        <hr>
+                                        <div class="form-row">
+                                            <div class="col-lg-4 col-md-4 col-sm-12">
+                                                <div class="form-group">
+                                                    <label class="small mb-1" for="elegibleState1">State whether you are eligible for the admission to a state University in your country <span class="error" style="color: #FF0000;">*</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-2 col-md-2 col-sm-12">
+                                                <div class="form-group">
+                                                    <label class="small mb-1" for="elegibleState"> </label>
+                                                    <select class="form-control" id="elegibleState" name="elegibleState">
+                                                        <option value="<?php echo $row_get_personal['eligibility_uni_admision']; ?>" readonly><?php echo $row_get_personal['eligibility_uni_admision']; ?></option>
+                                                        <option value="Yes">Yes</option>
+                                                        <option value="No">No</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6 col-md-6 col-sm-12">
                                             </div>
                                         </div>
-                                        <div class="col-lg-6 col-md-6 col-sm-12">
+                                        <div class="form-row">
+                                            <label class="small mb-1" for="ele"></label>
                                         </div>
-                                    </div>
-                                    <div class="form-row">
-                                        <label class="small mb-1" for="ele"></label>
-                                    </div>
 
-                                    <div class="form-row"> <!-- 2022-07-20 -->
-                                        <div class="col-lg-4 col-md-4 col-sm-12">
-                                            <div class="form-group">
-                                                <label class="small mb-1" for="eduAgent">Have you been assisted by an education agent <span class="error" style="color: #FF0000; font-size: x-large;">*</span>
-                                                </label>
+                                        <div class="form-row"> <!-- 2022-07-20 -->
+                                            <div class="col-lg-4 col-md-4 col-sm-12">
+                                                <div class="form-group">
+                                                    <label class="small mb-1" for="eduAgent">Have you been assisted by an education agent <span class="error" style="color: #FF0000; font-size: x-large;">*</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-2 col-md-2 col-sm-12">
+                                                <div class="form-group">
+                                                    <label class="small mb-1" for="eduAgent"> </label>
+                                                    <select class="form-control" id="eduAgent" name="eduAgent">
+                                                        <option value="<?php echo $row_get_personal['isEduAgent']; ?>" readonly><?php echo $row_get_personal['isEduAgent']; ?></option>
+                                                        <option value="Yes">Yes</option>
+                                                        <option value="No">No</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6 col-md-6 col-sm-12">
                                             </div>
                                         </div>
-                                        <div class="col-lg-2 col-md-2 col-sm-12">
-                                            <div class="form-group">
-                                                <label class="small mb-1" for="eduAgent"> </label>
-                                                <select class="form-control" id="eduAgent" name="eduAgent">
-                                                    <option value="<?php echo $row_get_personal['isEduAgent']; ?>" readonly><?php echo $row_get_personal['isEduAgent']; ?></option>
-                                                    <option value="Yes">Yes</option>
-                                                    <option value="No">No</option>
-                                                </select>
-                                            </div>
+                                        <div class="form-group" id="section4" style="display: none;">
+                                            <label class="small mb-1" for="nameEduAgent">Name of Agent</label>
+                                            <input class="form-control" id="nameEduAgent" name="nameEduAgent" value="<?php echo $row_get_personal['nameEduAgent']; ?>" />
+                                        </div> <!-- end 2022-07-20 -->
+
+                                        <h5>English Language Proficiency </h5>
+                                        <hr>
+                                        <h6>
+
+                                            Applicants whose primary language is not English or whose previous education has not been in English must provide evidence of proficiency in English (achieve a minimum score of 79 on the TOFEL or achieve a minimum score of 6.5 on IELTS)
+
+                                        </h6>
+                                        <label class="small mb-1" for="el">
+                                            Please list down your English Language Qualifications with results obtained
+                                        </label><br><br>
+                                        <div class="form-row">
+                                            <button type="button" class="btn btn-warning" onClick="addtoEnglish_qualification();"><i class="fa fa-plus"></i></button>&nbsp;<button type="button" onClick="remfromEnglish_qualification();" class="btn btn-danger"><i class="fa fa-minus"></i></button>
                                         </div>
-                                        <div class="col-lg-6 col-md-6 col-sm-12">
-                                        </div>
-                                    </div>
-                                    <div class="form-group" id="section4" style="display: none;">
-                                        <label class="small mb-1" for="nameEduAgent">Name of Agent</label>
-                                        <input class="form-control" id="nameEduAgent" name="nameEduAgent" value="<?php echo $row_get_personal['nameEduAgent']; ?>" />
-                                    </div> <!-- end 2022-07-20 -->
-
-                                    <h5>English Language Proficiency </h5>
-                                    <hr>
-                                    <h6>
-
-                                        Applicants whose primary language is not English or whose previous education has not been in English must provide evidence of proficiency in English (achieve a minimum score of 79 on the TOFEL or achieve a minimum score of 6.5 on IELTS)
-
-                                    </h6>
-                                    <label class="small mb-1" for="el">
-                                        Please list down your English Language Qualifications with results obtained
-                                    </label><br><br>
-                                    <div class="form-row">
-                                        <button type="button" class="btn btn-warning" onClick="addtoEnglish_qualification();"><i class="fa fa-plus"></i></button>&nbsp;<button type="button" onClick="remfromEnglish_qualification();" class="btn btn-danger"><i class="fa fa-minus"></i></button>
-                                    </div>
-                                    <div class="form-row">
-                                        <div class="col-lg-12 col-md-12 col-sm-12">
-                                            <table class="table" id="ep_tbl">
-                                                <thead>
-                                                    <tr>
-                                                        <th scope="col">English Qualifications </th>
-                                                        <th scope="col">Results/Score</th>
-                                                        <th scope="col">Passing Year</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <?php
-                                                    $sql_eng_prof = "SELECT * FROM mst_english_proficiency WHERE stu_passport_id = '$dec_nic_no' AND qualification_type != 'SAT'";
-                                                    $res_eng_prof = mysqli_query($db_connection, $sql_eng_prof);
-                                                    //$row_eng_prof[] = mysqli_fetch_array($res_eng_prof);
-                                                    $counter_ep = 0;
-                                                    while ($eng_prof = mysqli_fetch_array($res_eng_prof)) {
-                                                        $sub_ep = 'name_EP_' . $counter_ep;
-                                                        $res_ep = 'result_EP_' . $counter_ep;
-                                                        $year_ep = 'year_EP_' . $counter_ep;
-                                                    ?>
+                                        <div class="form-row">
+                                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                                <table class="table" id="ep_tbl">
+                                                    <thead>
                                                         <tr>
-                                                            <td><input class="form-control" id="<?php echo $sub_ep; ?>" type="text" name="<?php echo $sub_ep; ?>" value="<?php echo $eng_prof['qualification_type']; ?>" placeholder="Enter Qualification Type" /></td>
-                                                            <td><input class="form-control" id="<?php echo $res_ep; ?>" type="text" name="<?php echo $res_ep; ?>" value="<?php echo $eng_prof['result']; ?>" placeholder="Enter Result" /></td>
-                                                            <td><input class="form-control" id="<?php echo $year_ep; ?>" type="text" name="<?php echo $year_ep; ?>" value="<?php echo $eng_prof['year']; ?>" placeholder="Enter Year" /></td>
+                                                            <th scope="col">English Qualifications </th>
+                                                            <th scope="col">Results/Score</th>
+                                                            <th scope="col">Passing Year</th>
                                                         </tr>
-                                                    <?php $counter_ep++;
-                                                    } ?>
-                                                </tbody>
-                                            </table>
+                                                    </thead>
+                                                    <tbody>
+                                                        <?php
+                                                        $sql_eng_prof = "SELECT * FROM mst_english_proficiency WHERE stu_passport_id = '$dec_nic_no' AND qualification_type != 'SAT'";
+                                                        $res_eng_prof = mysqli_query($db_connection, $sql_eng_prof);
+                                                        //$row_eng_prof[] = mysqli_fetch_array($res_eng_prof);
+                                                        $counter_ep = 0;
+                                                        while ($eng_prof = mysqli_fetch_array($res_eng_prof)) {
+                                                            $sub_ep = 'name_EP_' . $counter_ep;
+                                                            $res_ep = 'result_EP_' . $counter_ep;
+                                                            $year_ep = 'year_EP_' . $counter_ep;
+                                                        ?>
+                                                            <tr>
+                                                                <td><input class="form-control" id="<?php echo $sub_ep; ?>" type="text" name="<?php echo $sub_ep; ?>" value="<?php echo $eng_prof['qualification_type']; ?>" placeholder="Enter Qualification Type" /></td>
+                                                                <td><input class="form-control" id="<?php echo $res_ep; ?>" type="text" name="<?php echo $res_ep; ?>" value="<?php echo $eng_prof['result']; ?>" placeholder="Enter Result" /></td>
+                                                                <td><input class="form-control" id="<?php echo $year_ep; ?>" type="text" name="<?php echo $year_ep; ?>" value="<?php echo $eng_prof['year']; ?>" placeholder="Enter Year" /></td>
+                                                            </tr>
+                                                        <?php $counter_ep++;
+                                                        } ?>
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         </div>
-                                    </div>
 
 
-                                    <input class="form-control py-4" id="edurowcnt3" type="hidden" name="edurowcnt3" value="<?php echo $counter_ep; ?>" />
-                                    <hr>
-                                    <h6>
-                                        For Candidates with High School Diploma
-                                    </h6>
-                                    <label class="small mb-1" for="elegi">
-                                        Candidates with High School Diploma should have passed the scholastic Aptitude Test (SAT)
-                                    </label><br><br>
-                                    <div class="form-row">
-                                        <div class="col-lg-12 col-md-12 col-sm-12">
-                                            <table class="table" id="edutbl2">
-                                                <thead>
-                                                    <tr>
-                                                        <th scope="col">Score of the Scholastic Aptitude Test</th>
-                                                        <th scope="col">Passing Year </th>
+                                        <input class="form-control py-4" id="edurowcnt3" type="hidden" name="edurowcnt3" value="<?php echo $counter_ep; ?>" />
+                                        <hr>
+                                        <h6>
+                                            For Candidates with High School Diploma
+                                        </h6>
+                                        <label class="small mb-1" for="elegi">
+                                            Candidates with High School Diploma should have passed the scholastic Aptitude Test (SAT)
+                                        </label><br><br>
+                                        <div class="form-row">
+                                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                                <table class="table" id="edutbl2">
+                                                    <thead>
+                                                        <tr>
+                                                            <th scope="col">Score of the Scholastic Aptitude Test</th>
+                                                            <th scope="col">Passing Year </th>
 
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td><input class="form-control" id="sat_result" type="text" name="sat_result" value="<?php echo $row_eng_prof_sat['result']; ?>" placeholder="Enter Result" /></td>
-                                                        <td><input class="form-control" id="sat_passing_year" type="text" name="sat_passing_year" value="<?php echo $row_eng_prof_sat['year']; ?>" placeholder="Enter Year" /></td>
-                                                    </tr>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td><input class="form-control" id="sat_result" type="text" name="sat_result" value="<?php echo $row_eng_prof_sat['result']; ?>" placeholder="Enter Result" /></td>
+                                                            <td><input class="form-control" id="sat_passing_year" type="text" name="sat_passing_year" value="<?php echo $row_eng_prof_sat['year']; ?>" placeholder="Enter Year" /></td>
+                                                        </tr>
 
-                                                </tbody>
-                                            </table>
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         </div>
-                                    </div>
 
 
-                                    <h5>Other Qualifications (If Any)</h5>
-                                    <hr>
+                                        <h5>Other Qualifications (If Any)</h5>
+                                        <hr>
 
-                                    <div class="form-row">
-                                        <div class="col-lg-12 col-md-12 col-sm-12">
-                                            <div class="form-group">
-                                                <label class="small mb-1" for="otherQualifications">Enter any other qualification details in below area</label>
-                                                <textarea class="form-control" id="otherQualifications" name="otherQualifications" rows="4" maxlength="250">
+                                        <div class="form-row">
+                                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                                <div class="form-group">
+                                                    <label class="small mb-1" for="otherQualifications">Enter any other qualification details in below area</label>
+                                                    <textarea class="form-control" id="otherQualifications" name="otherQualifications" rows="4" maxlength="250">
                                                             <?php echo $row_get_personal['other_qualification']; ?>
                                                         </textarea>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
 
-                                    <h5>Parent Details </h5>
-                                    <hr>
-                                    Father's Details <span class="error" style="color: #FF0000;">*</span>
+                                        <h5>Parent Details </h5>
+                                        <hr>
+                                        Father's Details <span class="error" style="color: #FF0000;">*</span>
 
-                                    <div class="form-row">
-                                        <div class="col-lg-4 col-md-4 col-sm-12">
-                                            <div class="form-group">
-                                                <label class="small mb-1" for="fatherName">Name</label>
-                                                <input class="form-control py-4" id="fatherName" name="fatherName" type="text" required value="<?php echo $row_family_father['name']; ?>" placeholder="Enter Name" />
+                                        <div class="form-row">
+                                            <div class="col-lg-4 col-md-4 col-sm-12">
+                                                <div class="form-group">
+                                                    <label class="small mb-1" for="fatherName">Name</label>
+                                                    <input class="form-control py-4" id="fatherName" name="fatherName" type="text" required value="<?php echo $row_family_father['name']; ?>" placeholder="Enter Name" />
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4 col-md-4 col-sm-12">
+                                                <div class="form-group">
+                                                    <label class="small mb-1" for="fatherJob">Occupation</label>
+                                                    <input class="form-control py-4" id="fatherJob" name="fatherJob" type="text" value="<?php echo $row_family_father['job']; ?>" placeholder="Enter Occupation" />
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4 col-md-4 col-sm-12">
+                                                <div class="form-group">
+                                                    <label class="small mb-1" for="father_employer">Employer Address</label>
+                                                    <input class="form-control py-4" id="father_employer" name="father_employer" type="text" value="<?php echo $row_family_father['employey_details']; ?>" placeholder="Enter Employer Details" />
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4 col-md-4 col-sm-12">
+                                                <div class="form-group">
+                                                    <label class="small mb-1" for="fatherEmail">Email</label>
+                                                    <input class="form-control py-4" id="fatherEmail" name="fatherEmail" type="text" type="email" aria-describedby="emailHelp" value="<?php echo $row_family_father['email']; ?>" placeholder="Enter Email" />
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4 col-md-4 col-sm-12">
+                                                <div class="form-group">
+                                                    <label class="small mb-1" for="fatherFixedPhone">Tel.(Local)</label>
+                                                    <input class="form-control py-4" id="fatherFixedPhone" name="fatherFixedPhone" type="text" value="<?php echo $row_family_father['fixed_phone']; ?>" placeholder="Enter Tel.No." />
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4 col-md-4 col-sm-12">
+                                                <div class="form-group">
+                                                    <label class="small mb-1" for="fatherMobileNo">Mobile No</label>
+                                                    <input class="form-control py-4" id="fatherMobileNo" name="fatherMobileNo" type="text" value="<?php echo $row_family_father['mobile_no']; ?>" placeholder="Enter Mobile No" />
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="col-lg-4 col-md-4 col-sm-12">
-                                            <div class="form-group">
-                                                <label class="small mb-1" for="fatherJob">Occupation</label>
-                                                <input class="form-control py-4" id="fatherJob" name="fatherJob" type="text" value="<?php echo $row_family_father['job']; ?>" placeholder="Enter Occupation" />
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-4 col-md-4 col-sm-12">
-                                            <div class="form-group">
-                                                <label class="small mb-1" for="father_employer">Employer Address</label>
-                                                <input class="form-control py-4" id="father_employer" name="father_employer" type="text" value="<?php echo $row_family_father['employey_details']; ?>" placeholder="Enter Employer Details" />
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-4 col-md-4 col-sm-12">
-                                            <div class="form-group">
-                                                <label class="small mb-1" for="fatherEmail">Email</label>
-                                                <input class="form-control py-4" id="fatherEmail" name="fatherEmail" type="text" type="email" aria-describedby="emailHelp" value="<?php echo $row_family_father['email']; ?>" placeholder="Enter Email" />
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-4 col-md-4 col-sm-12">
-                                            <div class="form-group">
-                                                <label class="small mb-1" for="fatherFixedPhone">Tel.(Local)</label>
-                                                <input class="form-control py-4" id="fatherFixedPhone" name="fatherFixedPhone" type="text" value="<?php echo $row_family_father['fixed_phone']; ?>" placeholder="Enter Tel.No." />
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-4 col-md-4 col-sm-12">
-                                            <div class="form-group">
-                                                <label class="small mb-1" for="fatherMobileNo">Mobile No</label>
-                                                <input class="form-control py-4" id="fatherMobileNo" name="fatherMobileNo" type="text" value="<?php echo $row_family_father['mobile_no']; ?>" placeholder="Enter Mobile No" />
-                                            </div>
-                                        </div>
-                                    </div>
 
-                                    <hr>
-                                    Mother's Details <span class="error" style="color: #FF0000;">*</span>
+                                        <hr>
+                                        Mother's Details <span class="error" style="color: #FF0000;">*</span>
 
-                                    <div class="form-row">
-                                        <div class="col-lg-4 col-md-4 col-sm-12">
-                                            <div class="form-group">
-                                                <label class="small mb-1" for="motherName">Name</label>
-                                                <input class="form-control py-4" id="motherName" name="motherName" type="text" required value="<?php echo $row_family_mother['name']; ?>" placeholder="Enter Name" />
+                                        <div class="form-row">
+                                            <div class="col-lg-4 col-md-4 col-sm-12">
+                                                <div class="form-group">
+                                                    <label class="small mb-1" for="motherName">Name</label>
+                                                    <input class="form-control py-4" id="motherName" name="motherName" type="text" required value="<?php echo $row_family_mother['name']; ?>" placeholder="Enter Name" />
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4 col-md-4 col-sm-12">
+                                                <div class="form-group">
+                                                    <label class="small mb-1" for="motherJob">Occupation</label>
+                                                    <input class="form-control py-4" id="motherJob" name="motherJob" type="text" value="<?php echo $row_family_mother['job']; ?>" placeholder="Enter Occupation" />
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4 col-md-4 col-sm-12">
+                                                <div class="form-group">
+                                                    <label class="small mb-1" for="mother_employer">Employer Address</label>
+                                                    <input class="form-control py-4" id="mother_employer" name="mother_employer" type="text" value="<?php echo $row_family_mother['employey_details']; ?>" placeholder="Enter Employer Details" />
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4 col-md-4 col-sm-12">
+                                                <div class="form-group">
+                                                    <label class="small mb-1" for="motherEmail">Email</label>
+                                                    <input class="form-control py-4" id="motherEmail" name="motherEmail" type="text" type="email" aria-describedby="emailHelp" value="<?php echo $row_family_mother['email']; ?>" placeholder="Enter Email" />
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4 col-md-4 col-sm-12">
+                                                <div class="form-group">
+                                                    <label class="small mb-1" for="motherFixelPhone">Tel.(Local)</label>
+                                                    <input class="form-control py-4" id="motherFixelPhone" name="motherFixelPhone" type="text" value="<?php echo $row_family_mother['fixed_phone']; ?>" placeholder="Enter Tel.No" />
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4 col-md-4 col-sm-12">
+                                                <div class="form-group">
+                                                    <label class="small mb-1" for="motherMobileNo">Mobile No</label>
+                                                    <input class="form-control py-4" id="motherMobileNo" name="motherMobileNo" type="text" value="<?php echo $row_family_mother['mobile_no']; ?>" placeholder="Enter Mobile No" />
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="col-lg-4 col-md-4 col-sm-12">
-                                            <div class="form-group">
-                                                <label class="small mb-1" for="motherJob">Occupation</label>
-                                                <input class="form-control py-4" id="motherJob" name="motherJob" type="text" value="<?php echo $row_family_mother['job']; ?>" placeholder="Enter Occupation" />
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-4 col-md-4 col-sm-12">
-                                            <div class="form-group">
-                                                <label class="small mb-1" for="mother_employer">Employer Address</label>
-                                                <input class="form-control py-4" id="mother_employer" name="mother_employer" type="text" value="<?php echo $row_family_mother['employey_details']; ?>" placeholder="Enter Employer Details" />
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-4 col-md-4 col-sm-12">
-                                            <div class="form-group">
-                                                <label class="small mb-1" for="motherEmail">Email</label>
-                                                <input class="form-control py-4" id="motherEmail" name="motherEmail" type="text" type="email" aria-describedby="emailHelp" value="<?php echo $row_family_mother['email']; ?>" placeholder="Enter Email" />
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-4 col-md-4 col-sm-12">
-                                            <div class="form-group">
-                                                <label class="small mb-1" for="motherFixelPhone">Tel.(Local)</label>
-                                                <input class="form-control py-4" id="motherFixelPhone" name="motherFixelPhone" type="text" value="<?php echo $row_family_mother['fixed_phone']; ?>" placeholder="Enter Tel.No" />
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-4 col-md-4 col-sm-12">
-                                            <div class="form-group">
-                                                <label class="small mb-1" for="motherMobileNo">Mobile No</label>
-                                                <input class="form-control py-4" id="motherMobileNo" name="motherMobileNo" type="text" value="<?php echo $row_family_mother['mobile_no']; ?>" placeholder="Enter Mobile No" />
-                                            </div>
-                                        </div>
-                                    </div>
 
-                                    <hr>
-                                    Guardian's Details
+                                        <hr>
+                                        Guardian's Details
 
-                                    <div class="form-row">
-                                        <div class="col-lg-4 col-md-4 col-sm-12">
-                                            <div class="form-group">
-                                                <label class="small mb-1" for="guardianName">Name</label>
-                                                <input class="form-control py-4" id="guardianName" name="guardianName" type="text" value="<?php echo $row_family_guardian['name']; ?>" placeholder="Enter Name" />
+                                        <div class="form-row">
+                                            <div class="col-lg-4 col-md-4 col-sm-12">
+                                                <div class="form-group">
+                                                    <label class="small mb-1" for="guardianName">Name</label>
+                                                    <input class="form-control py-4" id="guardianName" name="guardianName" type="text" value="<?php echo $row_family_guardian['name']; ?>" placeholder="Enter Name" />
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4 col-md-4 col-sm-12">
+                                                <div class="form-group">
+                                                    <label class="small mb-1" for="guardianJob">Occupation</label>
+                                                    <input class="form-control py-4" id="guardianJob" name="guardianJob" type="text" value="<?php echo $row_family_guardian['job']; ?>" placeholder="Enter Occupation" />
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4 col-md-4 col-sm-12">
+                                                <div class="form-group">
+                                                    <label class="small mb-1" for="guardian_employer">Employer Address</label>
+                                                    <input class="form-control py-4" id="guardian_employer" name="guardian_employer" type="text" value="<?php echo $row_family_guardian['employey_details']; ?>" placeholder="Enter Employer Details" />
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4 col-md-4 col-sm-12">
+                                                <div class="form-group">
+                                                    <label class="small mb-1" for="guardianEmail">Email</label>
+                                                    <input class="form-control py-4" id="guardianEmail" name="guardianEmail" type="text" type="email" aria-describedby="emailHelp" value="<?php echo $row_family_guardian['email']; ?>" placeholder="Enter Email" />
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4 col-md-4 col-sm-12">
+                                                <div class="form-group">
+                                                    <label class="small mb-1" for="guardianFixelPhone">Tel.(Local)</label>
+                                                    <input class="form-control py-4" id="guardianFixelPhone" name="guardianFixelPhone" type="text" value="<?php echo $row_family_guardian['fixed_phone']; ?>" placeholder="Enter Tel.No" />
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4 col-md-4 col-sm-12">
+                                                <div class="form-group">
+                                                    <label class="small mb-1" for="guardianMobileNo">Mobile No</label>
+                                                    <input class="form-control py-4" id="guardianMobileNo" name="guardianMobileNo" type="text" value="<?php echo $row_family_guardian['mobile_no']; ?>" placeholder="Enter Mobile No" />
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="col-lg-4 col-md-4 col-sm-12">
-                                            <div class="form-group">
-                                                <label class="small mb-1" for="guardianJob">Occupation</label>
-                                                <input class="form-control py-4" id="guardianJob" name="guardianJob" type="text" value="<?php echo $row_family_guardian['job']; ?>" placeholder="Enter Occupation" />
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-4 col-md-4 col-sm-12">
-                                            <div class="form-group">
-                                                <label class="small mb-1" for="guardian_employer">Employer Address</label>
-                                                <input class="form-control py-4" id="guardian_employer" name="guardian_employer" type="text" value="<?php echo $row_family_guardian['employey_details']; ?>" placeholder="Enter Employer Details" />
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-4 col-md-4 col-sm-12">
-                                            <div class="form-group">
-                                                <label class="small mb-1" for="guardianEmail">Email</label>
-                                                <input class="form-control py-4" id="guardianEmail" name="guardianEmail" type="text" type="email" aria-describedby="emailHelp" value="<?php echo $row_family_guardian['email']; ?>" placeholder="Enter Email" />
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-4 col-md-4 col-sm-12">
-                                            <div class="form-group">
-                                                <label class="small mb-1" for="guardianFixelPhone">Tel.(Local)</label>
-                                                <input class="form-control py-4" id="guardianFixelPhone" name="guardianFixelPhone" type="text" value="<?php echo $row_family_guardian['fixed_phone']; ?>" placeholder="Enter Tel.No" />
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-4 col-md-4 col-sm-12">
-                                            <div class="form-group">
-                                                <label class="small mb-1" for="guardianMobileNo">Mobile No</label>
-                                                <input class="form-control py-4" id="guardianMobileNo" name="guardianMobileNo" type="text" value="<?php echo $row_family_guardian['mobile_no']; ?>" placeholder="Enter Mobile No" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <h5>Non-Related Refrees <span class="error" style="color: #FF0000;">*</span></h5>
-                                    <hr>
-                                    <label class="small mb-1" for="refree1">Give the Name & Address of two non-related persons of good standing in your own country who could, from their personal knowledge, attest your character, academic background and capacity to undertake the study</label>
-                                    <div class="form-row">
-                                        <?php
-                                        $sql_refree = "SELECT * FROM refree WHERE stu_passport_id = '$dec_nic_no' AND type = 'FOREIGN'";
-                                        $res_refree = mysqli_query($db_connection, $sql_refree);
+                                        <h5>Non-Related Refrees <span class="error" style="color: #FF0000;">*</span></h5>
+                                        <hr>
+                                        <label class="small mb-1" for="refree1">Give the Name & Address of two non-related persons of good standing in your own country who could, from their personal knowledge, attest your character, academic background and capacity to undertake the study</label>
+                                        <div class="form-row">
+                                            <?php
+                                            $sql_refree = "SELECT * FROM refree WHERE stu_passport_id = '$dec_nic_no' AND type = 'FOREIGN'";
+                                            $res_refree = mysqli_query($db_connection, $sql_refree);
 
-                                        $ref_name_1 = "";
-                                        $ref_contact_1 = "";
-                                        $ref_name_2 = "";
-                                        $ref_contact_2 = "";
-                                        $ref_name = '$ref_name_';
-                                        $ref_contact = '$ref_contact_';
+                                            $ref_name_1 = "";
+                                            $ref_contact_1 = "";
+                                            $ref_name_2 = "";
+                                            $ref_contact_2 = "";
+                                            $ref_name = '$ref_name_';
+                                            $ref_contact = '$ref_contact_';
 
-                                        $num = 0;
-                                        while ($row = mysqli_fetch_assoc($res_refree)) {
-                                            if ($num == 0) {
-                                                $ref_name_1 = $row['refree_details'];
-                                                $ref_contact_1  =   $row['contact_no'];
-                                            } else {
-                                                $ref_name_2 = $row['refree_details'];
-                                                $ref_contact_2  =   $row['contact_no'];
+                                            $num = 0;
+                                            while ($row = mysqli_fetch_assoc($res_refree)) {
+                                                if ($num == 0) {
+                                                    $ref_name_1 = $row['refree_details'];
+                                                    $ref_contact_1  =   $row['contact_no'];
+                                                } else {
+                                                    $ref_name_2 = $row['refree_details'];
+                                                    $ref_contact_2  =   $row['contact_no'];
+                                                }
+
+                                                $num = $num + 1;
                                             }
 
-                                            $num = $num + 1;
-                                        }
-
-                                        //echo $ref_name_1 . "-----------" .$ref_name_2;
-                                        ?>
-                                        <div class="col-lg-6 col-md-6 col-sm-12">
-                                            <div class="form-group">
-                                                <textarea class="form-control" id="refree1_details" name="refree1_details" rows="3">
+                                            //echo $ref_name_1 . "-----------" .$ref_name_2;
+                                            ?>
+                                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                                <div class="form-group">
+                                                    <textarea class="form-control" id="refree1_details" name="refree1_details" rows="3">
                                                             <?php echo $ref_name_1; ?>
                                                         </textarea>
-                                                <div class="form-row">
-                                                    <label class="small mb-1" for="refree1_phone"> Contact No</label>
-                                                    <input class="form-control" id="refree1_phone" name="refree1_phone" type="text" value="<?php echo $ref_contact_1; ?>" placeholder="" />
+                                                    <div class="form-row">
+                                                        <label class="small mb-1" for="refree1_phone"> Contact No</label>
+                                                        <input class="form-control" id="refree1_phone" name="refree1_phone" type="text" value="<?php echo $ref_contact_1; ?>" placeholder="" />
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="col-lg-6 col-md-6 col-sm-12">
-                                            <div class="form-group">
-                                                <textarea class="form-control" id="refree2_details" name="refree2_details" rows="3">
+                                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                                <div class="form-group">
+                                                    <textarea class="form-control" id="refree2_details" name="refree2_details" rows="3">
                                                             <?php echo $ref_name_2; ?>
                                                         </textarea>
-                                                <div class="form-row">
-                                                    <label class="small mb-1" for="refree2_phone"> Contact No</label>
-                                                    <input class="form-control" id="refree2_phone" name="refree2_phone" type="text" value="<?php echo $ref_contact_2; ?>" placeholder="" />
+                                                    <div class="form-row">
+                                                        <label class="small mb-1" for="refree2_phone"> Contact No</label>
+                                                        <input class="form-control" id="refree2_phone" name="refree2_phone" type="text" value="<?php echo $ref_contact_2; ?>" placeholder="" />
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="form-row">
-                                        <div class="col-lg-6 col-md-6 col-sm-12">
-                                            <div class="form-group">
-                                                <label class="small mb-1" for="addressOffice">If you are a non-Sri Lankan and know of any Sri Lanakan citizen permanently residing in Sri Lanaka who could act as your refree, Mention the Nama & Address</label>
+                                        <div class="form-row">
+                                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                                <div class="form-group">
+                                                    <label class="small mb-1" for="addressOffice">If you are a non-Sri Lankan and know of any Sri Lanakan citizen permanently residing in Sri Lanaka who could act as your refree, Mention the Nama & Address</label>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="col-lg-6 col-md-6 col-sm-12">
-                                            <div class="form-group">
-                                                <textarea class="form-control" id="refree_sl_details" name="refree_sl_details" rows="3">
+                                            <div class="col-lg-6 col-md-6 col-sm-12">
+                                                <div class="form-group">
+                                                    <textarea class="form-control" id="refree_sl_details" name="refree_sl_details" rows="3">
                                                             <?php echo $row_refree_sl['refree_details']; ?>
                                                         </textarea>
-                                                <div class="form-row">
-                                                    <label class="small mb-1" for="refree_sl_phone"> Contact No</label>
-                                                    <input class="form-control" id="refree_sl_phone" name="refree_sl_phone" type="text" value="<?php echo $row_refree_sl['contact_no']; ?>" placeholder="" />
+                                                    <div class="form-row">
+                                                        <label class="small mb-1" for="refree_sl_phone"> Contact No</label>
+                                                        <input class="form-control" id="refree_sl_phone" name="refree_sl_phone" type="text" value="<?php echo $row_refree_sl['contact_no']; ?>" placeholder="" />
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
 
-                                    <hr>
+                                        <hr>
 
-                                    <div class="form-row">
-                                        <div class="col-lg-12 col-md-12 col-sm-12">
-                                            <div class="form-group">
-                                                <label class="small mb-1" for="fund">Specify how much fund would be available to you whilst in Sri Lanaka, and the sourse of such funds.</label>
-                                                <input class="form-control py-4" id="fund" type="text" name="fund" value="<?php echo $row_get_personal['fund']; ?>" />
-                                            </div>
-                                        </div>
-                                    </div>
-
-
-                                    <hr>
-
-                                    <!-- Documents Section -->
-                                    <div class="card mb-4">
-                                        <div class="card-header">
-                                            <i class="fas fa-file-alt me-1"></i>
-                                            Documents
-                                        </div>
-                                        <div class="card-body">
-                                            <!-- Document Upload Area -->
-                                            <div class="file-upload-area" id="fileUploadArea">
-                                                <div class="file-upload-text">
-                                                    <i class="fa fa-cloud-upload"></i>
-                                                    <p>Drag & Drop files here or click to browse</p>
+                                        <div class="form-row">
+                                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                                <div class="form-group">
+                                                    <label class="small mb-1" for="fund">Specify how much fund would be available to you whilst in Sri Lanaka, and the sourse of such funds.</label>
+                                                    <input class="form-control py-4" id="fund" type="text" name="fund" value="<?php echo $row_get_personal['fund']; ?>" />
                                                 </div>
-                                                <input type="file" id="document" name="document[]" multiple class="file-input" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
                                             </div>
+                                        </div>
 
-                                            <!-- Selected Files List -->
-                                            <div class="selected-files mt-3">
-                                                <h6>Selected Files:</h6>
-                                                <ul id="filesList" class="list-group">
-                                                    <?php
-                                                    $documents = getUploadedDocuments($dec_nic_no);
-                                                    foreach ($documents as $doc) {
-                                                        echo '<li class="list-group-item d-flex justify-content-between align-items-center existing-file">';
-                                                        echo '<span>' . htmlspecialchars($doc['file_name']) . '</span>';
-                                                        echo '<div class="btn-group">';
-                                                        echo '<a href="' . htmlspecialchars($doc['file_path']) . '" class="btn btn-sm btn-primary" target="_blank">View</a>';
-                                                        echo '<button type="button" class="btn btn-sm btn-danger remove-file" data-file="' . htmlspecialchars($doc['file_path']) . '">Remove</button>';
-                                                        echo '</div>';
-                                                        echo '</li>';
-                                                    }
-                                                    ?>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </div>
 
-                                    <div class="form-row">
-                                        <div class="col-lg-6 col-md-6 col-sm-6">
-                                            <div class="form-group mt-4 mb-0"><input name="submit1" type="button" class="btn btn-primary btn-block btn-update" value="Update Application" data-nic="<?php echo htmlspecialchars($dec_nic_no); ?>" />
+                                        <hr>
+
+                                        <!-- Documents Section -->
+                                        <div class="card mb-4">
+                                            <div class="card-header">
+                                                <i class="fas fa-file-alt me-1"></i>
+                                                Documents
+                                            </div>
+                                            <div class="card-body">
+                                                <!-- Document Upload Area -->
+                                                <div class="file-upload-area mb-3" id="fileUploadArea">
+                                                    <div class="file-upload-text">
+                                                        <i class="fa fa-cloud-upload"></i>
+                                                        <p>Drag & Drop files here or click to browse</p>
+                                                        <p class="small text-muted">Supported formats: PDF, DOC, DOCX, JPG, JPEG, PNG</p>
+                                                    </div>
+                                                    <input type="file" id="document" name="document[]" multiple class="file-input" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                                                </div>
+
+                                                <!-- Documents List -->
+                                                <div class="documents-section">
+                                                    <h6 class="mb-3">Uploaded Documents:</h6>
+                                                    <ul id="filesList" class="list-group">
+                                                        <?php
+                                                        $documents = getUploadedDocuments($dec_nic_no);
+                                                        foreach ($documents as $doc) {
+                                                            echo '<li class="list-group-item d-flex justify-content-between align-items-center existing-file">';
+                                                            echo '<span>' . htmlspecialchars($doc['file_name']) . '</span>';
+                                                            echo '<div class="btn-group">';
+                                                            echo '<a href="' . htmlspecialchars($doc['file_path']) . '" class="btn btn-sm btn-primary" target="_blank"><i class="fa fa-eye"></i> View</a>';
+                                                            echo '<button type="button" class="btn btn-sm btn-danger remove-file" data-file="' . htmlspecialchars($doc['file_path']) . '"><i class="fa fa-trash"></i> Remove</button>';
+                                                            echo '</div>';
+                                                            echo '</li>';
+                                                        }
+                                                        ?>
+                                                    </ul>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="col-lg-6 col-md-6 col-sm-6">
-                                            <div class="form-group mt-4 mb-0">
-                                                <input type="button" class="btn btn-success btn-block btn-checkout" value="No Need to Update, Proceed to Checkout" data-nic="<?php echo htmlspecialchars($dec_nic_no); ?>">
+
+                                        <div class="form-row">
+                                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                                <div class="form-group mt-4 mb-0"><input name="submit1" type="button" class="btn btn-primary btn-block btn-update" value="Update Application" data-nic="<?php echo htmlspecialchars($dec_nic_no); ?>" />
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                                <div class="form-group mt-4 mb-0">
+                                                    <input type="button" class="btn btn-success btn-block btn-checkout" value="No Need to Update, Proceed to Checkout" data-nic="<?php echo htmlspecialchars($dec_nic_no); ?>">
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </form>
+                                    </form>
+                                </div>
+
                             </div>
-
                         </div>
                     </div>
                 </div>
-            </div>
         </main>
     </div>
 
 </div>
 
+<script>
+    // Expose passport number to JavaScript before loading formupdate.js
+    window.passportNumber = '<?php echo htmlspecialchars($dec_nic_no); ?>';
+</script>
+
 <script src="../assets/js/app/managerows.js"></script>
 <script src="../assets/js/app/formupdate.js?v=1.3"></script>
-<script>
-$(document).ready(function() {
-    let fileUploadArea = document.getElementById('fileUploadArea');
-    let fileInput = document.getElementById('document');
-    let filesList = document.getElementById('filesList');
-    let selectedFiles = new Set();
 
-    // Drag and drop functionality
-    if (fileUploadArea && fileInput) {
-        fileUploadArea.addEventListener('click', function() {
-            fileInput.click();
-        });
-
-        fileUploadArea.addEventListener('dragover', function(e) {
-            e.preventDefault();
-            fileUploadArea.classList.add('drag-over');
-        });
-
-        fileUploadArea.addEventListener('dragleave', function(e) {
-            e.preventDefault();
-            fileUploadArea.classList.remove('drag-over');
-        });
-
-        fileUploadArea.addEventListener('drop', function(e) {
-            e.preventDefault();
-            fileUploadArea.classList.remove('drag-over');
-            handleFiles(e.dataTransfer.files);
-        });
-
-        fileInput.addEventListener('change', function() {
-            handleFiles(this.files);
-        });
-    }
-
-    // Handle files selection
-    function handleFiles(files) {
-        Array.from(files).forEach(file => {
-            addFileToList(file);
-        });
-    }
-
-    function addFileToList(file) {
-        const li = document.createElement('li');
-        li.className = 'list-group-item d-flex justify-content-between align-items-center new-file';
-        li.innerHTML = `
-            <span>${file.name}</span>
-            <button type="button" class="btn btn-sm btn-danger remove-file">Remove</button>
-        `;
-        
-        const removeBtn = li.querySelector('.remove-file');
-        removeBtn.addEventListener('click', function() {
-            li.remove();
-            selectedFiles.delete(file);
-        });
-
-        filesList.appendChild(li);
-        selectedFiles.add(file);
-    }
-
-    // Handle removal of existing files
-    $('.remove-file').click(function(e) {
-        e.preventDefault();
-        const item = $(this).closest('li');
-        const filePath = $(this).data('file');
-
-        if (item.hasClass('existing-file') && filePath) {
-            $.ajax({
-                url: '../data/remove_document.php',
-                type: 'POST',
-                data: {
-                    passportNo: '<?php echo htmlspecialchars($dec_nic_no); ?>',
-                    filePath: filePath
-                },
-                success: function(response) {
-                    if (response.success) {
-                        item.remove();
-                    } else {
-                        alert('Failed to remove file');
-                    }
-                },
-                error: function() {
-                    alert('Error occurred while removing file');
-                }
-            });
-        } else {
-            item.remove();
-        }
-    });
-
-    // Intercept form submission to handle files
-    $('.btn-update').click(function(e) {
-        e.preventDefault();
-        const formData = new FormData($('form')[0]);
-        
-        // Add each selected file to formData
-        selectedFiles.forEach(file => {
-            formData.append('documents[]', file);
-        });
-
-        $.ajax({
-            url: '../pages/formupdate.php',
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function(response) {
-                if (response.success) {
-                    window.location.href = response.redirect || 'view_applicationform.php?nic=' + response.nic;
-                } else {
-                    alert(response.message || 'Update failed');
-                }
-            },
-            error: function() {
-                alert('Error occurred while updating');
-            }
-        });
-    });
-});
-</script>
 <style>
-.file-upload-area {
-    border: 2px dashed #ccc;
-    border-radius: 4px;
-    padding: 20px;
-    text-align: center;
-    cursor: pointer;
-    margin-bottom: 20px;
-}
+    .file-upload-area {
+        border: 2px dashed #ccc;
+        border-radius: 4px;
+        padding: 20px;
+        text-align: center;
+        cursor: pointer;
+        margin-bottom: 20px;
+    }
 
-.file-upload-area:hover, .file-upload-area.drag-over {
-    border-color: #666;
-    background-color: #f9f9f9;
-}
+    .file-upload-area:hover,
+    .file-upload-area.drag-over {
+        border-color: #666;
+        background-color: #f9f9f9;
+    }
 
-.file-upload-text {
-    color: #666;
-}
+    .file-upload-text {
+        color: #666;
+    }
 
-.file-upload-text i {
-    font-size: 48px;
-    margin-bottom: 10px;
-}
+    .file-upload-text i {
+        font-size: 48px;
+        margin-bottom: 10px;
+    }
 
-.file-input {
-    display: none;
-}
+    .file-input {
+        display: none;
+    }
 
-.selected-files {
-    margin-top: 20px;
-}
+    .selected-files {
+        margin-top: 20px;
+    }
 
-.selected-files ul {
-    list-style: none;
-    padding: 0;
-}
+    .selected-files ul {
+        list-style: none;
+        padding: 0;
+    }
 
-.btn-group .btn {
-    margin: 0 2px;
-}
+    .btn-group .btn {
+        margin: 0 2px;
+    }
 </style>
-<script>
-$(document).ready(function() {
-    // Handle document upload
-    $('.btn-upload-document').click(function() {
-        var formData = new FormData();
-        var fileInput = $('#documentFile')[0];
-        var documentType = $('#documentType').val();
-        
-        if (fileInput.files.length === 0) {
-            alert('Please select a file to upload');
-            return;
-        }
 
-        formData.append('file', fileInput.files[0]);
-        formData.append('documentType', documentType);
-        formData.append('passportNo', '<?php echo htmlspecialchars($dec_nic_no); ?>');
-
-        $.ajax({
-            url: '../data/upload_document.php',
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function(response) {
-                if (response.success) {
-                    location.reload(); // Reload to show updated document list
-                } else {
-                    alert(response.message || 'Upload failed');
-                }
-            },
-            error: function() {
-                alert('Upload failed. Please try again.');
-            }
-        });
-    });
-
-    // Handle document removal
-    $('.btn-remove-document').click(function() {
-        if (!confirm('Are you sure you want to remove this document?')) {
-            return;
-        }
-
-        var documentPath = $(this).data('document');
-        
-        $.ajax({
-            url: '../data/remove_document.php',
-            type: 'POST',
-            data: {
-                passportNo: '<?php echo htmlspecialchars($dec_nic_no); ?>',
-                documentPath: documentPath
-            },
-            success: function(response) {
-                if (response.success) {
-                    location.reload(); // Reload to update document list
-                } else {
-                    alert(response.message || 'Removal failed');
-                }
-            },
-            error: function() {
-                alert('Removal failed. Please try again.');
-            }
-        });
-    });
-
-    // Update existing form submit handler to handle documents
-    var originalUpdateHandler = $('.btn-update').click;
-    $('.btn-update').click(function(e) {
-        // Clear any existing click handlers
-        $(this).off('click');
-        
-        // First clear the documents folder
-        $.ajax({
-            url: '../data/clear_documents.php',
-            type: 'POST',
-            data: {
-                passportNo: '<?php echo htmlspecialchars($dec_nic_no); ?>'
-            },
-            success: function() {
-                // After clearing documents, proceed with the original update
-                if (originalUpdateHandler) {
-                    originalUpdateHandler.call(this, e);
-                }
-            },
-            error: function() {
-                alert('Failed to clear documents. Please try again.');
-            }
-        });
-    });
-});
-</script>
 <script src="../assets/js/app/resultsvalidation.js"></script>

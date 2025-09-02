@@ -698,7 +698,6 @@ $uploadedDocuments = getUploadedDocuments($dec_nic_no);
                                                 <tr>
                                                     <th>Document Type</th>
                                                     <th>File Name</th>
-                                                    <th>Upload Date</th>
                                                     <th>Actions</th>
                                                 </tr>
                                             </thead>
@@ -710,7 +709,6 @@ $uploadedDocuments = getUploadedDocuments($dec_nic_no);
                                                     echo '<tr>';
                                                     echo '<td>' . getDocumentTypeLabel($doc['document_type']) . '</td>';
                                                     echo '<td>' . htmlspecialchars($doc['file_name']) . '</td>';
-                                                    echo '<td>' . date('Y-m-d', strtotime($doc['upload_date'])) . '</td>';
                                                     echo '<td>';
                                                     echo '<a href="' . htmlspecialchars($doc['file_path']) . '" class="btn btn-primary btn-sm" target="_blank" rel="noopener noreferrer">View</a>';
                                                     echo '</td>';

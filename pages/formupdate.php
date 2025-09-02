@@ -50,35 +50,6 @@ set_exception_handler('handleException');
 
 require_once '../includes/document_functions.php';
 
-// Handle document uploads
-function handleDocumentUploads($passportNo) {
-    if (!isset($_FILES['documents'])) {
-        return true; // No documents to handle
-    }
-
-    // Recreate document folder
-    recreateDocumentFolder($passportNo);
-    
-    $uploadDir = "../uploads/documents/" . $passportNo . "/";
-    $files = $_FILES['documents'];
-    $uploadedFiles = array();
-
-    // Handle multiple file uploads
-    if (is_array($files['name'])) {
-        for ($i = 0; $i < count($files['name']); $i++) {
-            if ($files['error'][$i] === UPLOAD_ERR_OK) {
-                $fileName = basename($files['name'][$i]);
-                $targetPath = $uploadDir . $fileName;
-
-                if (move_uploaded_file($files['tmp_name'][$i], $targetPath)) {
-                    $uploadedFiles[] = $fileName;
-                }
-            }
-        }
-    }
-
-    return !empty($uploadedFiles);
-}
 
 // Start session if not already started
 if (!isset($_SESSION)) {
@@ -109,44 +80,6 @@ try {
         sendJsonResponse('error', 'Database connection failed: ' . mysqli_connect_error());
     }
 
-    // Handle file uploads first
-    if (isset($_FILES['documents'])) {
-        $uploadDir = "../uploads/documents/";
-        if (!file_exists($uploadDir)) {
-            mkdir($uploadDir, 0777, true);
-        }
-
-        $uploadedFiles = array();
-        $uploadErrors = array();
-
-        foreach ($_FILES['documents']['tmp_name'] as $key => $tmpName) {
-            if ($_FILES['documents']['error'][$key] === UPLOAD_ERR_OK) {
-                $fileName = $_FILES['documents']['name'][$key];
-                $fileSize = $_FILES['documents']['size'][$key];
-
-                // Validate file size (5MB limit)
-                if ($fileSize > 5 * 1024 * 1024) {
-                    $uploadErrors[] = array_push($uploadErrors, "File $fileName is too large (max 5MB)");
-                    continue;
-                }
-
-                // Generate unique filename
-                $extension = pathinfo($fileName, PATHINFO_EXTENSION);
-                $newFileName = uniqid() . '_' . time() . '.' . $extension;
-                $destination = $uploadDir . $newFileName;
-
-                if (move_uploaded_file($tmpName, $destination)) {
-                    array_push($uploadedFiles, array(
-                        'originalName' => $fileName,
-                        'storedName' => $newFileName,
-                        'size' => $fileSize
-                    ));
-                } else {
-                    array_push($uploadErrors, "Failed to upload $fileName");
-                }
-            }
-        }
-    }
 
     // Get form data
     $enc_nic_no = isset($_POST['inputNic']) ? trim($_POST['inputNic']) : '';
@@ -189,9 +122,9 @@ try {
     date_default_timezone_set('Asia/Colombo');
 
     if ((isset($_POST['inputNic'])) && ($_POST['inputNic'] != NULL) && ($_POST['inputNic'] != "") && ($_POST['inputNic'] != " ")) {
-    // Handle document uploads first
-    $passportNo = $_POST['inputNic'];
-    handleDocumentUploads($passportNo);
+        // Handle document uploads first
+        $passportNo = $_POST['inputNic'];
+        //handleDocumentUploads($passportNo);
         $inputNic = "";
         $inputNic = trim($_POST['inputNic']);
         $inputNic = mysqli_real_escape_string($conn, $inputNic);
@@ -855,6 +788,10 @@ try {
                     $uploadErrors = array();
                     $deletedFiles = array();
                     if (isset($_FILES['documents'])) {
+                        // Debug: log what files are being kept and what is in the folder
+                        //error_log('--- Document Update Debug ---');
+                        //error_log('files_to_keep: ' . print_r(isset($_POST['files_to_keep']) ? $_POST['files_to_keep'] : [], true));
+
                         $documentsDir = "../uploads/documents/" . $dec_nic_no . "/";
 
                         // Create directory if it doesn't exist
@@ -862,28 +799,47 @@ try {
                             mkdir($documentsDir, 0777, true);
                         }
 
-                        // First, clear existing documents
-                        require_once '../includes/document_functions.php';
-                        $existingDocs = getUploadedDocuments($dec_nic_no);
+                        // Gather the list of files that will be present after this update
+                        $newFiles = array();
+                        if (!empty($_FILES['documents']['name'][0])) {
+                            foreach ($_FILES['documents']['name'] as $key => $filename) {
+                                $safeFilename = basename($filename);
+                                $newFiles[] = $safeFilename;
+                            }
+                        }
 
-                        // Delete all existing files and record their names
-                        foreach ($existingDocs as $doc) {
-                            if (file_exists($doc['path'])) {
-                                if (unlink($doc['path'])) {
-                                    array_push($deletedFiles, $doc['name']);
-                                } else {
-                                    array_push($uploadErrors, "Could not delete existing file: " . $doc['name']);
+                        // Get files to keep from POST (existing files user wants to keep)
+                        $filesToKeep = array();
+                        if (isset($_POST['files_to_keep']) && is_array($_POST['files_to_keep'])) {
+                            foreach ($_POST['files_to_keep'] as $filename) {
+                                $filesToKeep[] = basename($filename);
+                            }
+                        }
+
+                        // Merge new files and files to keep
+                        $allFilesToKeep = array_unique(call_user_func_array('array_merge', array($newFiles, $filesToKeep)));
+
+                        // Delete all files in the folder that are NOT in $allFilesToKeep
+                        if (file_exists($documentsDir)) {
+                            $files = scandir($documentsDir);
+                            error_log('All files in folder: ' . print_r($files, true));
+                            error_log('All files to keep: ' . print_r($allFilesToKeep, true));
+                            foreach ($files as $file) {
+                                if ($file != "." && $file != ".." && !in_array($file, $allFilesToKeep)) {
+                                    $filePath = $documentsDir . $file;
+                                    error_log('Deleting file: ' . $filePath);
+                                    if (is_file($filePath)) {
+                                        if (unlink($filePath)) {
+                                            array_push($deletedFiles, $file);
+                                        } else {
+                                            array_push($uploadErrors, "Could not delete old file: " . $file);
+                                        }
+                                    }
                                 }
                             }
                         }
 
-                        // Clear database records of old files
-                        /*  $sql_delete = "DELETE FROM uploaded_documents WHERE stu_nic = ?";
-                        $stmt_delete = $conn->prepare($sql_delete);
-                        $stmt_delete->bind_param("s", $dec_nic_no);
-                        $stmt_delete->execute(); */
-
-                        // Process new uploads if any files were attached
+                        // Now process new uploads (overwrite if same name)
                         if (!empty($_FILES['documents']['name'][0])) {
                             $allowedTypes = array('application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'image/jpeg', 'image/png', 'image/gif');
                             $maxSize = 5 * 1024 * 1024; // 5MB
@@ -906,26 +862,17 @@ try {
                                         continue;
                                     }
 
-                                    // Generate unique filename
-                                    $extension = pathinfo($filename, PATHINFO_EXTENSION);
-                                    $safeFilename = date('Y-m-d-H-i-s') . '-' . uniqid() . '.' . $extension;
+                                    // Use original filename
+                                    $safeFilename = basename($filename);
                                     $destination = $documentsDir . $safeFilename;
 
-                                    // Move new file
+                                    // Move new file (overwrite if exists)
                                     if (move_uploaded_file($tmpName, $destination)) {
                                         array_push($uploadedFiles, array(
                                             'original_name' => $filename,
                                             'saved_name' => $safeFilename,
                                             'path' => $destination
                                         ));
-
-                                        // Insert new record
-                                        /* $sql_doc = "INSERT INTO uploaded_documents 
-                                                   (stu_nic, original_name, saved_name, file_path, upload_date) 
-                                                   VALUES (?, ?, ?, ?, NOW())";
-                                        $stmt_doc = $conn->prepare($sql_doc);
-                                        $stmt_doc->bind_param("ssss", $dec_nic_no, $filename, $safeFilename, $destination);
-                                        $stmt_doc->execute(); */
                                     } else {
                                         array_push($uploadErrors, "Failed to upload file '$filename'.");
                                     }

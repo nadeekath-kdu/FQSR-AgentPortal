@@ -1,10 +1,11 @@
 <?php
 require_once '../config/dbcon.php';
 
-function getUploadedDocuments($passportNo) {
+function getUploadedDocuments($passportNo)
+{
     $documentsDir = "../uploads/documents/" . $passportNo . "/";
     $documents = array();
-    
+
     if (file_exists($documentsDir)) {
         $files = scandir($documentsDir);
         foreach ($files as $file) {
@@ -14,23 +15,25 @@ function getUploadedDocuments($passportNo) {
                     'file_name' => $file,
                     'file_path' => $documentsDir . $file,
                     'document_type' => $type,
-                    'upload_date' => filemtime($documentsDir . $file)
+                    /* 'upload_date' => filemtime($documentsDir . $file) */
                 );
             }
         }
     }
-    
+
     return $documents;
 }
 
-function getDocumentType($filename) {
+function getDocumentType($filename)
+{
     // Extract document type from filename pattern
     // Assuming filenames follow a pattern like: passport_123.pdf, transcript_456.pdf etc.
     $parts = explode('_', strtolower($filename));
     return $parts[0];
 }
 
-function getDocumentTypeLabel($type) {
+function getDocumentTypeLabel($type)
+{
     $types = array(
         'passport' => 'Passport',
         'photo' => 'Photograph',
@@ -41,13 +44,14 @@ function getDocumentTypeLabel($type) {
         'cv' => 'Curriculum Vitae',
         'other' => 'Other Document'
     );
-    
+
     return isset($types[$type]) ? $types[$type] : ucfirst(str_replace('_', ' ', $type));
 }
 
-function recreateDocumentFolder($passportNo) {
+function recreateDocumentFolder($passportNo)
+{
     $documentsDir = "../uploads/documents/" . $passportNo . "/";
-    
+
     // First backup existing files if directory exists
     $existingFiles = array();
     if (file_exists($documentsDir)) {
@@ -57,23 +61,24 @@ function recreateDocumentFolder($passportNo) {
                 $existingFiles[$file] = file_get_contents($documentsDir . $file);
             }
         }
-        
+
         // Remove existing directory and all its contents
         array_map('unlink', glob($documentsDir . "*.*"));
         rmdir($documentsDir);
     }
-    
+
     // Create fresh directory
     mkdir($documentsDir, 0777, true);
-    
+
     // Return backup of files if needed
     return $existingFiles;
 }
 
-function removeDocument($passportNo, $filename) {
+function removeDocument($passportNo, $filename)
+{
     $documentsDir = "../uploads/documents/" . $passportNo . "/";
     $filePath = $documentsDir . basename($filename);
-    
+
     // Verify file is within the correct directory
     if (strpos(realpath($filePath), realpath($documentsDir)) === 0 && file_exists($filePath)) {
         return unlink($filePath);
@@ -81,7 +86,8 @@ function removeDocument($passportNo, $filename) {
     return false;
 }
 
-function formatFileSize($bytes) {
+function formatFileSize($bytes)
+{
     if ($bytes === 0) return '0 Bytes';
     $k = 1024;
     $sizes = array('Bytes', 'KB', 'MB', 'GB');
@@ -89,7 +95,8 @@ function formatFileSize($bytes) {
     return round($bytes / pow($k, $i), 2) . ' ' . $sizes[$i];
 }
 
-function getFileIcon($extension) {
+function getFileIcon($extension)
+{
     $icons = array(
         'pdf' => '<i class="fa fa-file-pdf-o text-danger"></i>',
         'docx' => '<i class="fa fa-file-word-o text-primary"></i>',
@@ -100,4 +107,3 @@ function getFileIcon($extension) {
     );
     return isset($icons[strtolower($extension)]) ? $icons[strtolower($extension)] : '<i class="fa fa-file-o"></i>';
 }
-?>
