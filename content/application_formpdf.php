@@ -59,6 +59,11 @@ class PDF extends FPDF
 		$res_refree = mysqli_query($conn, $sql_refree);
 		$refree_row_cnt = mysqli_num_rows($res_refree);
 
+		// Fetch all applied degrees with preferences
+		$applied_degrees = array();
+		$sql_applied_degrees = "SELECT ad.preference_order, dc.degree_name FROM appliedDegrees ad JOIN mst_degree_courses dc ON ad.appliedDegreeCode = dc.degree_code WHERE ad.nic = '$dec_nic_no' ORDER BY ad.preference_order";
+		$res_applied_degrees = mysqli_query($conn, $sql_applied_degrees);
+
 
 		$stu_fullname = strtoupper($row_get_personal['stu_fullname']);
 		$name_initials = strtoupper($row_get_personal['stu_title'] . ". " . $row_get_personal['stu_name_initials']);
@@ -70,13 +75,15 @@ class PDF extends FPDF
 		$stu_permenant_address =  trim($stu_permenant_address);
 		$email_addr = $row_get_personal['stu_email'];
 		$stu_nicno = $dec_nic_no;
-		$applied_course = $row_get_personal['course_name'];
+		while ($row_degree = mysqli_fetch_assoc($res_applied_degrees)) {
+			$applied_degrees[] = $row_degree;
+		}
 		$app_submit_dt = $row_get_personal['application_submit_dt'];
-		$applied_course = $row_get_personal['course_name'];
+		//$applied_course = $row_get_personal['course_name'];
 		$other_qualification = $row_get_personal['other_qualification'];
 		$doc_upload_link = $row_get_personal['doc_upload_link'];
 		$birth_country = $row_get_personal['birth_country'];
-		$period_study_abroad = $row_get_personal['period_study_abroad'];
+		$period_study_abroad = trim($row_get_personal['period_study_abroad']);
 		$fund = $row_get_personal['fund'];
 		$citizenship_type = $row_get_personal['citizenship_type'];
 		$citizenship_1 = $row_get_personal['citizenship_1'];
@@ -123,9 +130,20 @@ class PDF extends FPDF
 		$this->Cell(0, 10, ' PERSONAL DETAILS', 0, 1, 'L', true);
 		$this->SetFont('Arial', '', 9);
 
-		$this->Cell(40, 12, 'Applied course', 0, 0, 'L', false);
-		$this->Cell(150, 12, $applied_course, 0, 0, 'L', false);
-		$this->Cell(0, 5, ' ' . '', 0, 1);
+
+		$this->Cell(40, 12, 'Applied Degrees', 0, 0, 'L', false);
+		if (count($applied_degrees) > 0) {
+			$this->Cell(150, 12, '', 0, 0, 'L', false);
+			$this->Cell(0, 5, ' ' . '', 0, 1);
+			foreach ($applied_degrees as $degree) {
+				$this->Cell(40, 10, 'Preference ' . $degree['preference_order'], 0, 0, 'L', false);
+				$this->Cell(150, 10, $degree['degree_name'], 0, 0, 'L', false);
+				$this->Cell(0, 5, ' ' . '', 0, 1);
+			}
+		} else {
+			$this->Cell(150, 12, '-', 0, 0, 'L', false);
+			$this->Cell(0, 5, ' ' . '', 0, 1);
+		}
 
 		$this->Cell(40, 12, 'Application submit date', 0, 0, 'L', false);
 		$this->Cell(150, 12, $app_submit_dt, 0, 0, 'L', false);
@@ -234,11 +252,11 @@ class PDF extends FPDF
 				$this->Cell($width_cell[0], 10, $row_edu_qual['exam_name'], 0, 0, 'L', false);
 				$this->Cell(0, 5, ' ' . '', 0, 1);
 
-				$this->Cell($width_cell[0], 10, 'Subject & Grade', 0, 0, 'L', false);
+				$this->Cell($width_cell[0], 10, 'Subject', 0, 0, 'L', false);
 				$this->Cell($width_cell[0], 10, $row_edu_qual['subject_grade'], 0, 0, 'L', false);
 				$this->Cell(0, 5, ' ' . '', 0, 1);
 
-				$this->Cell($width_cell[0], 10, 'Award', 0, 0, 'L', false);
+				$this->Cell($width_cell[0], 10, 'Grade', 0, 0, 'L', false);
 				$this->Cell($width_cell[0], 10, $row_edu_qual['award'], 0, 0, 'L', false);
 				$this->Cell(0, 5, ' ' . '', 0, 1);
 

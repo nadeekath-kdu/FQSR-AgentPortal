@@ -12,7 +12,7 @@ function initializeDocumentHandling(passportNo) {
 }
 
 // Document removal handler
-function removeDocument111(filePath, item) {
+function removeDocument(filePath, item) {
     if (!filePath) return;
 
     const passportNo = $('#dec_nic_no').val() || $('#passportNo').val();
@@ -211,6 +211,18 @@ $(function () {
     const passportValue = window.passportNumber || $('#passportNo').val() || $('#dec_nic_no').val();
     if (passportValue) {
         window.DocumentHandler.initialize(passportValue);
+        // Always fetch the latest file list from the server
+        $.getJSON('../data/list_documents.php', { nic: passportValue, t: Date.now() }, function(files) {
+            if (Array.isArray(files)) {
+                files.forEach(function(filename) {
+                    if (typeof addExistingFileToList === 'function') {
+                        addExistingFileToList(filename);
+                    } else if (window.DocumentHandler && window.DocumentHandler.addExistingFileToList) {
+                        window.DocumentHandler.addExistingFileToList(filename);
+                    }
+                });
+            }
+        });
     }
 });
 
@@ -219,7 +231,47 @@ $(document).on('click', '.remove-file', function (e) {
     e.preventDefault();
     const $item = $(this).closest('li');
     if (!$item.length) return;
-    $item.fadeOut(300, function () { $(this).remove(); });
+    const fileName = $item.find('.file-name').text().trim();
+    // Remove from DocumentHandler state if possible
+    if (window.DocumentHandler && window.DocumentHandler.getState) {
+        const state = window.DocumentHandler.getState();
+        if ($item.hasClass('existing-file')) {
+            // Call backend to remove the file from server
+            const passportNo = window.passportNumber || $('#passportNo').val() || $('#dec_nic_no').val();
+            if (passportNo && fileName) {
+                $.ajax({
+                    url: '../data/remove_document.php',
+                    type: 'POST',
+                    data: { passportNo: passportNo, filePath: fileName },
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.success) {
+                            state.existingFiles.delete(fileName);
+                            $item.fadeOut(300, function () { $(this).remove(); });
+                            toastr.success('Document removed successfully');
+                        } else {
+                            toastr.error(response.message || 'Failed to remove document');
+                        }
+                    },
+                    error: function (xhr) {
+                        toastr.error('Error occurred while removing document');
+                    }
+                });
+                return;
+            }
+        } else if ($item.hasClass('new-file')) {
+            // Find the File object by name and remove from selectedFiles
+            for (let file of state.selectedFiles) {
+                if (file.name === fileName) {
+                    state.selectedFiles.delete(file);
+                    break;
+                }
+            }
+            $item.fadeOut(300, function () { $(this).remove(); });
+        }
+    } else {
+        $item.fadeOut(300, function () { $(this).remove(); });
+    }
 });
 
 // Initialize all form handlers when document is ready
