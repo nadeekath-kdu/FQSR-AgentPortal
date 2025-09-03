@@ -14,7 +14,7 @@ if (is_dir($dir)) {
         if ($file !== '.' && $file !== '..' && is_file($dir . $file)) {
             $files[] = array(
                 'name' => $file,
-                'url' => "..//uploads/documents/" . $nicSafe . "/" . rawurlencode($file)
+                'url' => "../uploads/documents/" . $nicSafe . "/" . rawurlencode($file)
             );
         }
     }
