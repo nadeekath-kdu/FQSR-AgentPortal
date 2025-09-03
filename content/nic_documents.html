@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Uploaded Documents</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #f8f9fa;
+        }
+
+        .container {
+            max-width: 500px;
+            margin-top: 60px;
+        }
+
+        .card {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .doc-list a {
+            word-break: break-all;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title mb-3">View Uploaded Documents by NIC/Passport</h4>
+                <div class="mb-3">
+                    <label for="nicInput" class="form-label">Enter NIC/Passport</label>
+                    <input type="text" class="form-control" id="nicInput" placeholder="e.g. 123456789V">
+                </div>
+                <button id="loadBtn" class="btn btn-primary w-100 mb-3">Load Documents</button>
+                <div id="result"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('loadBtn').addEventListener('click', function () {
+            const nic = document.getElementById('nicInput').value.trim();
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '';
+            if (!nic) {
+                resultDiv.innerHTML = '<div class="alert alert-warning">Please enter a NIC.</div>';
+                return;
+            }
+            resultDiv.innerHTML = '<div class="text-center text-secondary">Loading...</div>';
+            fetch('../data/load_documents.php?nic=' + encodeURIComponent(nic))
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success === false && data.error) {
+                        resultDiv.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+                    } else if (data.success === true && Array.isArray(data.documents)) {
+                        if (data.documents.length === 0) {
+                            resultDiv.innerHTML = '<div class="alert alert-info">No documents found for this NIC.</div>';
+                        } else {
+                            let html = '<ul class="list-group doc-list">';
+                            data.documents.forEach(doc => {
+                                html += `<li class="list-group-item"><a href="${doc.url}" target="_blank">${doc.name}</a></li>`;
+                            });
+                            html += '</ul>';
+                            resultDiv.innerHTML = html;
+                        }
+                    } else {
+                        resultDiv.innerHTML = '<div class="alert alert-danger">Unexpected error occurred.</div>';
+                    }
+                })
+                .catch(() => {
+                    resultDiv.innerHTML = '<div class="alert alert-danger">Failed to load documents.</div>';
+                });
+        });
+    </script>
+</body>
+
+</html>

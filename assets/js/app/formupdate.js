@@ -212,9 +212,9 @@ $(function () {
     if (passportValue) {
         window.DocumentHandler.initialize(passportValue);
         // Always fetch the latest file list from the server
-        $.getJSON('../data/list_documents.php', { nic: passportValue, t: Date.now() }, function(files) {
+        $.getJSON('../data/list_documents.php', { nic: passportValue, t: Date.now() }, function (files) {
             if (Array.isArray(files)) {
-                files.forEach(function(filename) {
+                files.forEach(function (filename) {
                     if (typeof addExistingFileToList === 'function') {
                         addExistingFileToList(filename);
                     } else if (window.DocumentHandler && window.DocumentHandler.addExistingFileToList) {
@@ -760,8 +760,20 @@ $(document).ready(function () {
             toastr.error("No passport/NIC number found", "Error");
             return;
         }
-        window.open('http://enlistment.kdu.ac.lk/pg_sampath/pgrequest_check_fsr.php?idn=' + nic, '_blank');
-        window.location.href = '../content/application_formpdf.php?nic=' + encodeURIComponent(nic);
+        // Fetch total amount before redirecting
+        $.getJSON('../data/get_total_amount.php', { nic: nic }, function (response) {
+            if (response.success) {
+                var totalAmount = response.total_amount;
+                // Open payment page with amount as query param
+                window.open('http://enlistment.kdu.ac.lk/pg_sampath/pgrequest_check_fsr.php?idn=' + nic + '&amount=' + totalAmount, '_blank');
+                window.location.href = '../content/application_formpdf.php?nic=' + encodeURIComponent(nic);
+            } else {
+                toastr.error('Could not calculate total amount.');
+                window.location.href = '../content/application_formpdf.php?nic=' + encodeURIComponent(nic);
+            }
+        }).fail(function () {
+            toastr.error('Could not fetch total amount.');
+        });
     });
 
     // Edit button handler
