@@ -1,6 +1,7 @@
 <?php
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
+date_default_timezone_set('Asia/Colombo'); // Set your desired timezone
 ?>
 <!DOCTYPE html>
 <html
@@ -41,8 +42,13 @@ ini_set('display_errors', 1);
   <script src="../assets/vendor/js/helpers.js"></script>
 
   <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/app/config.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-components-web/14.0.0/material-components-web.min.css" />
   <link rel="stylesheet" href="https://cdn.datatables.net/2.0.7/css/dataTables.dataTables.css" />
+
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
 
 </head>
 
@@ -108,7 +114,7 @@ ini_set('display_errors', 1);
   <!-- Place this tag in your head or just before your close body tag. -->
   <script async defer src="https://buttons.github.io/buttons.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-  <script src="../assets/js/app/dashboard.js"></script>
+  <script src="../assets/js/app/dashboard.js?v=1.0.2"></script>
   <script src="https://cdn.datatables.net/2.0.7/js/dataTables.js"></script>
 
 </body>

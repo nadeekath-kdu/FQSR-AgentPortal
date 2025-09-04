@@ -462,7 +462,7 @@ $dec_nic_no = $application['nic_no'];
                                             <label class="small mb-1" for="ele"></label>
                                         </div>
 
-                                        <div class="form-row"> <!-- 2022-07-20 -->
+                                        <div class="form-row" style="display: none;"> <!-- 2022-07-20 -->
                                             <div class="col-lg-4 col-md-4 col-sm-12">
                                                 <div class="form-group">
                                                     <label class="small mb-1" for="eduAgent">Have you been assisted by an education agent <span class="error" style="color: #FF0000; font-size: x-large;">*</span>

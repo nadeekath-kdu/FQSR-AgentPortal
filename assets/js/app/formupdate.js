@@ -903,10 +903,10 @@ function initializeDegreeSelection() {
     addDegreeBtn.addEventListener('click', function () {
         const choicesCount = degreeChoices.querySelectorAll('.degree-choice-item').length;
 
-        if (choicesCount >= MAX_DEGREE_CHOICES) {
+        /* if (choicesCount >= MAX_DEGREE_CHOICES) {
             toastr.warning(`Maximum ${MAX_DEGREE_CHOICES} degree choices allowed`);
             return;
-        }
+        } */
 
         const newChoice = document.createElement('div');
         newChoice.className = 'degree-choice-item mb-3';

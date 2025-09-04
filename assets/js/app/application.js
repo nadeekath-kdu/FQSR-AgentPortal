@@ -685,31 +685,80 @@ $(document).ready(function () {
 
         // Add files from the custom file upload area
         if (selectedFilesArray && selectedFilesArray.length > 0) {
-            selectedFilesArray.forEach((file, index) => {
+            const maxFileSize = 5 * 1024 * 1024; // 5MB
+            for (let i = 0; i < selectedFilesArray.length; i++) {
+                const file = selectedFilesArray[i];
+                if (file.size > maxFileSize) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'File Too Large',
+                        text: `File "${file.name}" is larger than 5MB. Please choose a smaller file.`
+                    });
+                    return;
+                }
                 formData.append('documents[]', file);
-            });
-        } $.ajax({
-            url: '../pages/formsave.php',
+            }
+        }         // Show loading indicator
+        Swal.fire({
+            title: 'Saving...',
+            text: 'Please wait while we save your application',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        $.ajax({
+            url: '../pages/formsave.php', // Use relative path
             method: 'POST',
             data: formData,
             processData: false,
             contentType: false,
             success: function (response) {
-                //console.log('Raw AJAX response:', response);
+                Swal.close();
+                
+                // Check if response is a string (error) or JSON object
+                if (typeof response === 'string') {
+                    try {
+                        response = JSON.parse(response);
+                    } catch (e) {
+                        // If it's not valid JSON and contains PHP errors
+                        if (response.includes('<b>Notice</b>') || response.includes('<b>Warning</b>')) {
+                            console.error('PHP Error:', response);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Server Error',
+                                text: 'There was an error processing your application.',
+                                footer: 'Please contact support with error details.'
+                            });
+                            return;
+                        }
+                    }
+                }
+                
+                // Ensure we have a proper object to work with
                 var res = response;
                 if (typeof response === "string") {
                     try {
                         res = JSON.parse(response);
-                        //console.log('Parsed response:', res);
+                        console.log('Parsed response:', res);
                     } catch (e) {
                         console.error('JSON parse error:', e);
-                        res = {};
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Response Error',
+                            text: 'Invalid response from server',
+                            footer: 'Please try again or contact support.'
+                        });
+                        return;
                     }
                 }
+
+                // Handle success response
                 if (res.status === "success") {
-                    toastr.success("Saved successfully", "");
+                    toastr.success(res.message || "Saved successfully", "");
                     if (res.passport_no) {
-                        //console.log('Loading view page with passport:', res.passport_no);
+                        console.log('Loading view page with passport:', res.passport_no);
                         var page = "../content/view_applicationform.php?nic=" + res.passport_no;
                         $("#content").load(page, function (response, status, xhr) {
                             if (status == "error") {
@@ -728,12 +777,28 @@ $(document).ready(function () {
                 }
             },
             error: function (xhr, status, error) {
+                Swal.close();
                 console.error('Error details:', {
                     status: status,
                     error: error,
                     response: xhr.responseText
                 });
-                toastr.error("Something went wrong.", '', { timeOut: 1000 });
+
+                // Show a more informative error message
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Submission Error',
+                    text: 'There was a problem saving your application. Please check your internet connection and try again.',
+                    footer: 'If the problem persists, please contact support.',
+                    confirmButtonText: 'OK'
+                });
+
+                // Also show toastr notification
+                toastr.error("Form submission failed. Please try again.", '', {
+                    timeOut: 3000,
+                    closeButton: true,
+                    progressBar: true
+                });
             }
         });
     });

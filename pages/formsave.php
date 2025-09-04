@@ -2,11 +2,12 @@
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
+header('Content-Type: application/json');
+
 if (!isset($_SESSION)) {
     session_start();
 }
 //$ag_code = $_SESSION['agent_code'];
-header('Content-Type: application/json');
 require_once '../config/iv_key.php';
 require_once '../config/mystore_func.php';
 require_once '../config/dbcon.php';
@@ -23,8 +24,7 @@ if (!$db_connection) {
 }
 
 $form_action = 'save';
-$formStatus = '';
-$domain = $url;
+$formStatus = 'SUBMITTED'; // Set default status
 $passportno = "";
 $enc_nic_no = "";
 $dec_nic_no = "";
@@ -37,6 +37,27 @@ $media_source_name = "Other";
 $sql_personal_data = "";
 date_default_timezone_set('Asia/Colombo');
 
+// Create upload directories if they don't exist with proper permissions
+$upload_dirs = array(
+    "../uploads",
+    "../uploads/documents",
+    "../profile"
+);
+
+foreach ($upload_dirs as $dir) {
+    if (!file_exists($dir)) {
+        if (!@mkdir($dir, 0777, true)) {
+            http_response_code(500);
+            echo json_encode(array(
+                'status' => 'error',
+                'message' => "Failed to create directory: $dir"
+            ));
+            exit;
+        }
+        chmod($dir, 0777); // Ensure proper permissions
+    }
+}
+
 //if( (isset($_POST['passportno'])) && ($_POST['passportno'] != NULL) && ($_POST['passportno'] != "") && ($_POST['passportno'] != " ") ){
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -45,14 +66,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $dec_nic_no = isset($_POST['passportno']) ? trim($_POST['passportno']) : '';
     $apply_course_code = "";
     $apply_course = "";
-    
+
     // Get the first selected degree if available
     if (isset($_POST['selected_degrees'])) {
         $degrees = json_decode($_POST['selected_degrees'], true);
         if (!empty($degrees)) {
             $first_degree = $degrees[0];
             $apply_course_code = $first_degree['degree_code'];
-            
+
             // Get degree name from the database
             $sql_course_name = "SELECT degree_name FROM mst_degree_courses WHERE degree_code = ?";
             $stmt = mysqli_prepare($db_connection, $sql_course_name);
@@ -64,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
     }
-    
+
     $agent_code = isset($_POST['agent_code']) ? trim($_POST['agent_code']) : '';
 
     // Set eduAgent value based on agent_code
@@ -127,13 +148,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Create base directory if it doesn't exist
         if (!file_exists($baseDir)) {
-            mkdir($baseDir, 0777, true);
+            if (!@mkdir($baseDir, 0777, true)) {
+                echo json_encode(array(
+                    'status' => 'error',
+                    'message' => 'Could not create uploads directory'
+                ));
+                exit;
+            }
+            chmod($baseDir, 0777);
         }
 
         // Create applicant-specific directory using NIC/passport number
         $applicantDir = $baseDir . $dec_nic_no . '/';
         if (!file_exists($applicantDir)) {
-            mkdir($applicantDir, 0777, true);
+            if (!@mkdir($applicantDir, 0777, true)) {
+                echo json_encode(array(
+                    'status' => 'error',
+                    'message' => 'Could not create applicant directory'
+                ));
+                exit;
+            }
+            chmod($applicantDir, 0777);
         }
 
         // Handle multiple document uploads
@@ -173,14 +208,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else { */
     $sql_personal_data = "INSERT INTO mst_personal_details (nic_no,course_name,course_code,intake,stu_title,stu_fullname,stu_name_initials,stu_dob,stu_gender,stu_citizenship,civil_status,stu_permenant_address,stu_email,application_submit_dt,media_source_name,birth_country,period_study_abroad,eligibility_uni_admision,other_qualification,fund,citizenship_type,citizenship_1,citizenship_2,AL_sitting_country,photo,isEduAgent,nameEduAgent,formStatus)VALUES ('$dec_nic_no','$apply_course','$apply_course_code','$intake_yr','$stu_title','$stu_fullname','$stu_initialname','$stu_dob','$stu_gender','$stu_citizenship','$stu_civilstats','$stu_permenant_addr','$stu_email','$cur_dt','$media_source_name','$stu_birth_country','$period_study_abroad','$eligibility_uni_admision','$other_qualification','$fund','$citizenship_type','$citizenship1','$citizenship2','$country_AL','$Photo','$eduAgent','$nameEduAgent','$formStatus')";
     //}
-    // Start transaction if supported
-    $transaction_supported = false;
-    if (method_exists($db_connection, 'begin_transaction')) {
-        $transaction_supported = true;
-        $db_connection->begin_transaction();
-    }
-
     try {
+        // Start transaction
+        if (!mysqli_begin_transaction($db_connection)) {
+            throw new Exception("Could not start transaction: " . mysqli_error($db_connection));
+        }
+
         // Insert personal data
         $res_personal_data = mysqli_query($db_connection, $sql_personal_data);
 
@@ -195,18 +228,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $degrees = json_decode($_POST['selected_degrees'], true);
 
                 // First, delete any existing degrees for this student
-                /* $delete_degrees_sql = "DELETE FROM appliedDegrees WHERE student_id = ?";
-                $delete_stmt = mysqli_prepare($db_connection, $delete_degrees_sql);
-                mysqli_stmt_bind_param($delete_stmt, "i", $last_id);
-                mysqli_stmt_execute($delete_stmt); */
-
                 // Prepare the insert statement for degrees
                 $insert_degrees_sql = "INSERT INTO appliedDegrees (student_id, nic, appliedDegreeCode, preference_order) VALUES (?, ?, ?, ?)";
                 $insert_stmt = mysqli_prepare($db_connection, $insert_degrees_sql);
+                
+                if ($insert_stmt === false) {
+                    throw new Exception("Could not prepare statement: " . mysqli_error($db_connection));
+                }
 
                 // Insert each selected degree
                 foreach ($degrees as $degree) {
-                    mysqli_stmt_bind_param(
+                    $bind_result = mysqli_stmt_bind_param(
                         $insert_stmt,
                         "issi",
                         $last_id,
@@ -214,7 +246,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $degree['degree_code'],
                         $degree['preference_order']
                     );
-                    mysqli_stmt_execute($insert_stmt);
+                    
+                    if ($bind_result === false) {
+                        mysqli_stmt_close($insert_stmt);
+                        throw new Exception("Could not bind parameters: " . mysqli_stmt_error($insert_stmt));
+                    }
+                    
+                    $exec_result = mysqli_stmt_execute($insert_stmt);
+                    if ($exec_result === false) {
+                        mysqli_stmt_close($insert_stmt);
+                        throw new Exception("Could not execute statement: " . mysqli_stmt_error($insert_stmt));
+                    }
                 }
             }
             $edu_counter = $_POST['edurowcnt'];
@@ -421,25 +463,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             throw new Exception("Personal details not saved: " . mysqli_error($db_connection));
         }
+        mysqli_commit($db_connection);
+        $response = array(
+            'status' => 'success',
+            'message' => 'Data saved successfully',
+            'passport_no' => $dec_nic_no,
+            'student_id' => $last_id
+        );
     } catch (Exception $e) {
-        // If there's any error, rollback the transaction
-        mysqli_rollback($db_connection);
+        if (isset($db_connection)) {
+            mysqli_rollback($db_connection);
+        }
         $response = array(
             'status' => 'error',
             'message' => $e->getMessage()
         );
     }
 
-    // Send the response back as JSON
-    echo json_encode($response);
-} else {
-    $db_connection->close();
-    // Handle non-POST requests (optional)
-    $response = array(
-        'status' => 'error',
-        'message' => 'Invalid request method'
-    );
+    // Clean up resources
+    if (isset($insert_stmt)) {
+        mysqli_stmt_close($insert_stmt);
+    }
 
     // Send the response back as JSON
     echo json_encode($response);
+} else {
+    // Handle non-POST requests
+    echo json_encode(array(
+        'status' => 'error',
+        'message' => 'Invalid request method'
+    ));
+}
+
+// Close database connection
+if (isset($db_connection)) {
+    mysqli_close($db_connection);
 }

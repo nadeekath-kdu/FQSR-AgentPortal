@@ -3,6 +3,9 @@ if (!isset($_SESSION)) {
     session_start();
 }
 
+// Set timezone
+date_default_timezone_set('Asia/Colombo'); // Using Sri Lanka timezone since this is for KDU
+
 try {
     include '../config/dbcon.php';
     include '../config/global.php';
@@ -16,29 +19,13 @@ try {
     $dateTime = new DateTime($closing_date);
     $closing_date = $dateTime->format('Y-m-d');
 
-    /* $day = $dateTime->format('j'); 
-    $month = $dateTime->format('M'); 
-    $year = $dateTime->format('Y'); 
-    
-    if ($day % 10 == 1 && $day != 11) {
-        $daySuffix = 'st';
-    } elseif ($day % 10 == 2 && $day != 12) {
-        $daySuffix = 'nd';
-    } elseif ($day % 10 == 3 && $day != 13) {
-        $daySuffix = 'rd';
-    } else {
-        $daySuffix = 'th';
-    }
- */
+    header('Content-Type: application/json');
 
-    //$closing_date = $day . '<sup>' . htmlspecialchars($daySuffix) . '</sup> ' . $month . ' ' . $year;
-
-
-    $json = array(
+    $response = array(
         'closing_date' => $closing_date
     );
 
-    echo json_encode($json);
+    echo json_encode($response);
 } catch (Exception $e) {
     // Handle exceptions
     $errorJson = array(

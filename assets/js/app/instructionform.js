@@ -1,20 +1,5 @@
 $(document).ready(function () {
-    // Get academic year
-    $.ajax({
-        url: '../data/get_academic_year.php',
-        type: 'GET',
-        dataType: 'json',
-        success: function (response) {
-            if (response.academic_year) {
-                $('#academicYear').text(response.academic_year);
-            } else {
-                console.error('No academic year received');
-            }
-        },
-        error: function (xhr, status, error) {
-            console.error('Error fetching academic year:', error);
-        }
-    });
+
 
     $("#next").click(function (event) {
         event.preventDefault();
