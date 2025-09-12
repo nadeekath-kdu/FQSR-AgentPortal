@@ -787,16 +787,20 @@ try {
                     $uploadedFiles = array();
                     $uploadErrors = array();
                     $deletedFiles = array();
-                    if (isset($_FILES['documents'])) {
+                    if (isset($_FILES['documents']) || isset($_POST['files_to_keep'])) {
                         // Debug: log what files are being kept and what is in the folder
-                        //error_log('--- Document Update Debug ---');
-                        //error_log('files_to_keep: ' . print_r(isset($_POST['files_to_keep']) ? $_POST['files_to_keep'] : [], true));
+                        error_log('--- Document Update Debug ---');
+                        error_log('files_to_keep: ' . print_r(isset($_POST['files_to_keep']) ? $_POST['files_to_keep'] : [], true));
+                        error_log('new files: ' . print_r(isset($_FILES['documents']) ? $_FILES['documents']['name'] : [], true));
 
                         $documentsDir = "../uploads/documents/" . $dec_nic_no . "/";
 
-                        // Create directory if it doesn't exist
+                        // Create directory if it doesn't exist with proper permissions
                         if (!file_exists($documentsDir)) {
-                            mkdir($documentsDir, 0777, true);
+                            if (!mkdir($documentsDir, 0755, true)) {
+                                throw new Exception("Failed to create documents directory");
+                            }
+                            chmod($documentsDir, 0755);
                         }
 
                         // Gather the list of files that will be present after this update

@@ -1,0 +1,388 @@
+/* KDU Agent Portal Custom Styles - Soft & Calm Theme */
+
+/* Enhanced branding */
+.app-brand-logo.demo img {
+    border-radius: 50%;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
+}
+
+/* Dashboard cards enhancement - Soft colors */
+.card {
+    border-radius: 16px;
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.02);
+    transition: all 0.3s ease;
+    background: #ffffff;
+}
+
+.card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+/* Statistics cards - Softer colors */
+.card-title h3 {
+    font-weight: 600;
+    font-size: 1.8rem;
+    color: #4a5568;
+}
+
+.avatar {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: rgba(99, 179, 237, 0.08);
+}
+
+/* Enhanced sidebar - Soft gradient */
+.layout-menu {
+    background: linear-gradient(135deg, #e8f2f6 0%, #f0f4f8 100%);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.03);
+    border-right: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.menu-inner .menu-item .menu-link {
+    border-radius: 10px;
+    margin: 2px 12px;
+    transition: all 0.3s ease;
+    color: #4a5568;
+}
+
+.menu-inner .menu-item .menu-link:hover,
+.menu-inner .menu-item.active .menu-link {
+    background: rgba(99, 179, 237, 0.12);
+    backdrop-filter: blur(5px);
+    transform: translateX(2px);
+    color: #2d3748;
+}
+
+.menu-header-text {
+    color: #718096;
+    font-weight: 500;
+    font-size: 0.7rem;
+    letter-spacing: 0.3px;
+}
+
+/* Top navbar enhancement - Soft style */
+.layout-navbar {
+    background: #ffffff;
+    box-shadow: 0 1px 10px rgba(0, 0, 0, 0.04);
+    border-radius: 0 0 18px 18px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+}
+
+/* Badge styles - Soft colors */
+.badge {
+    font-size: 0.7rem;
+    font-weight: 500;
+    padding: 0.35em 0.7em;
+    border-radius: 10px;
+}
+
+.bg-label-success {
+    background-color: rgba(72, 187, 120, 0.1) !important;
+    color: #38a169 !important;
+}
+
+.bg-label-warning {
+    background-color: rgba(237, 137, 54, 0.1) !important;
+    color: #dd6b20 !important;
+}
+
+.bg-label-info {
+    background-color: rgba(99, 179, 237, 0.1) !important;
+    color: #3182ce !important;
+}
+
+.bg-label-primary {
+    background-color: rgba(99, 179, 237, 0.1) !important;
+    color: #3182ce !important;
+}
+
+.bg-label-danger {
+    background-color: rgba(245, 101, 101, 0.1) !important;
+    color: #e53e3e !important;
+}
+
+/* Table enhancements - Soft style */
+.table {
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.table thead th {
+    background-color: #f7fafc;
+    border: none;
+    font-weight: 500;
+    font-size: 0.8rem;
+    color: #4a5568;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    padding: 1.2rem;
+}
+
+.table tbody td {
+    border: none;
+    padding: 1.2rem;
+    vertical-align: middle;
+    color: #2d3748;
+}
+
+.table tbody tr {
+    border-bottom: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+.table tbody tr:hover {
+    background-color: #f7fafc;
+    transform: none;
+}
+
+/* Avatar enhancements */
+.avatar-initial {
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+/* Button enhancements - Soft colors */
+.btn {
+    border-radius: 10px;
+    font-weight: 500;
+    padding: 0.6rem 1.5rem;
+    transition: all 0.3s ease;
+    box-shadow: none;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.btn-primary {
+    background: linear-gradient(45deg, #63b3ed, #4299e1);
+    border: none;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(45deg, #4299e1, #3182ce);
+    color: white;
+}
+
+.btn-outline-primary {
+    border-color: #63b3ed;
+    color: #3182ce;
+    background: transparent;
+}
+
+.btn-outline-primary:hover {
+    background: #63b3ed;
+    border-color: #63b3ed;
+    color: white;
+}
+
+/* Timeline styles */
+.timeline-marker {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Notification styles */
+.dropdown-notifications {
+    width: 380px;
+}
+
+.dropdown-notifications-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.dropdown-notifications-item {
+    border: none !important;
+    padding: 1rem;
+    transition: all 0.3s ease;
+}
+
+.dropdown-notifications-item:hover {
+    background-color: #f8f9fa;
+}
+
+/* Search input enhancement - Soft style */
+.form-control {
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+    background-color: #f7fafc;
+    color: #2d3748;
+}
+
+.form-control:focus {
+    border-color: #63b3ed;
+    box-shadow: 0 0 0 3px rgba(99, 179, 237, 0.1);
+    background-color: #ffffff;
+}
+
+/* Content area - Soft background */
+.container-xxl {
+    max-width: 1320px;
+}
+
+.content-wrapper {
+    background-color: #fafafa;
+}
+
+/* Footer enhancement - Soft style */
+.content-footer {
+    background: #f7fafc;
+    border-top: 1px solid #e2e8f0;
+    border-radius: 18px 18px 0 0;
+    margin-top: 40px;
+    color: #4a5568;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .card {
+        margin-bottom: 1rem;
+    }
+
+    .layout-navbar {
+        border-radius: 0;
+        margin-bottom: 10px;
+    }
+
+    .table-responsive {
+        border-radius: 8px;
+    }
+}
+
+/* Loading animation */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(105, 108, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #696cff;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Welcome card gradient - Soft colors */
+.card.h-100:first-child {
+    background: linear-gradient(135deg, #e6fffa 0%, #f0fff4 100%);
+    color: #2d3748;
+    border: 1px solid rgba(99, 179, 237, 0.1);
+}
+
+.card.h-100:first-child .card-title {
+    color: #2d3748 !important;
+}
+
+.card.h-100:first-child .btn-outline-primary {
+    border-color: #63b3ed;
+    color: #3182ce;
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.card.h-100:first-child .btn-outline-primary:hover {
+    background: #63b3ed;
+    color: white;
+}
+
+/* Menu icon colors - Soft style */
+.menu-icon {
+    color: #4a5568;
+}
+
+.menu-item.active .menu-icon {
+    color: #2d3748;
+}
+
+/* Additional soft styling */
+.timeline-marker {
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+/* User profile section spacing fix */
+.navbar-nav .nav-item.lh-1 {
+    margin-right: 0.8rem !important;
+}
+
+/* Reduce gap between profile and agent info */
+.navbar-nav .nav-item.lh-1 .fw-semibold {
+    margin-bottom: 0.1rem;
+}
+
+.navbar-nav .nav-item.lh-1 .text-muted {
+    font-size: 0.75rem;
+}
+
+/* Overall soft theme adjustments */
+body {
+    background-color: #fafafa;
+}
+
+.layout-page {
+    background-color: #fafafa;
+}
+
+/* Soft shadows for all cards */
+.card {
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Soft dropdown menus */
+.dropdown-menu {
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.dropdown-item {
+    color: #4a5568;
+    border-radius: 8px;
+    margin: 2px 6px;
+}
+
+.dropdown-item:hover {
+    background-color: #f7fafc;
+    color: #2d3748;
+}
+
+/* Soft table styling */
+.table tbody tr:last-child {
+    border-bottom: none;
+}
+
+/* Remove harsh transitions */
+* {
+    transition: all 0.2s ease !important;
+}
+
+/* Soft scrollbar for webkit browsers */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a1a1a1;
+}

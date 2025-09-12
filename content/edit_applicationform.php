@@ -68,7 +68,6 @@ $dec_nic_no = $application['nic_no'];
                                     <script>
                                         // Initialize selected degrees data
                                         window.selectedDegrees = <?php echo json_encode($selected_degrees); ?>;
-                                        console.log('Selected degrees initialized:', window.selectedDegrees);
                                     </script>
                                     <form name="my-form" id="my-form" method="post" enctype="multipart/form-data">
                                         <input type="hidden" name="application_id" value="<?php echo htmlspecialchars($dec_nic_no); ?>">
@@ -856,8 +855,9 @@ $dec_nic_no = $application['nic_no'];
     window.passportNumber = '<?php echo htmlspecialchars($dec_nic_no); ?>';
 </script>
 
-<script src="../assets/js/app/managerows.js"></script>
-<script src="../assets/js/app/formupdate.js?v=1.3"></script>
+<script src="../assets/js/app/document-handler.js?v=1.3"></script>
+<script src="../assets/js/app/managerows.js?v=1.1"></script>
+<script src="../assets/js/app/formupdate.js?v=1.9"></script>
 
 <style>
     .file-upload-area {
@@ -902,4 +902,4 @@ $dec_nic_no = $application['nic_no'];
     }
 </style>
 
-<script src="../assets/js/app/resultsvalidation.js"></script>
+<script src="../assets/js/app/resultsvalidation.js?v=1.1"></script>

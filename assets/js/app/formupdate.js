@@ -41,187 +41,24 @@ function removeDocument(filePath, item) {
     });
 }
 
-
-window.DocumentHandler = window.DocumentHandler || (function (window) {
-    'use strict';
-
-    // Private state
-    const state = {
-        fileUploadArea: null,
-        fileInput: null,
-        filesList: null,
-        selectedFiles: new Set(), // new files (File objects)
-        existingFiles: new Set(), // filenames of already-uploaded files
-        passportNo: null,
-        initialized: false
-    };
-
-    // Private functions
-    function handleFiles(files) {
-        console.log('Handling files:', files);
-        if (!state.filesList || !state.initialized) {
-            console.warn('Document handler not properly initialized');
-            return;
-        }
-        Array.from(files).forEach(file => {
-            console.log('Processing file:', file.name);
-            if (!state.selectedFiles.has(file)) {
-                addFileToList(file);
-            }
-        });
-    }
-
-    function addFileToList(file) {
-        console.log('Adding file to list:', file.name);
-        if (!state.filesList || !state.initialized) {
-            console.warn('Cannot add file, handler not initialized');
-            return;
-        }
-
-        const li = document.createElement('li');
-        li.className = 'list-group-item d-flex justify-content-between align-items-center new-file';
-        // Create a local object URL for the file so it can be viewed
-        const fileUrl = URL.createObjectURL(file);
-        li.innerHTML = `
-            <span class="file-name">${file.name}</span>
-            <div class="btn-group">
-                <a href="${fileUrl}" class="btn btn-sm btn-primary" target="_blank"><i class="fa fa-eye"></i> View</a>
-                <button type="button" class="btn btn-sm btn-danger remove-file">
-                    <i class="fa fa-trash"></i> Remove
-                </button>
-            </div>
-        `;
-
-        const removeBtn = li.querySelector('.remove-file');
-        removeBtn.addEventListener('click', function () {
-            state.selectedFiles.delete(file);
-            li.remove();
-        });
-
-        state.filesList.appendChild(li);
-        state.selectedFiles.add(file);
-    }
-
-    function addExistingFileToList(filename) {
-        if (!state.filesList || !state.initialized) return;
-        const li = document.createElement('li');
-        li.className = 'list-group-item d-flex justify-content-between align-items-center existing-file';
-        li.innerHTML = `
-            <span class="file-name">${filename}</span>
-            <div class="btn-group">
-                <a href="../uploads/documents/${state.passportNo}/${filename}" class="btn btn-sm btn-primary" target="_blank"><i class="fa fa-eye"></i> View</a>
-                <button type="button" class="btn btn-sm btn-danger remove-file">
-                    <i class="fa fa-trash"></i> Remove
-                </button>
-            </div>
-        `;
-        const removeBtn = li.querySelector('.remove-file');
-        removeBtn.addEventListener('click', function () {
-            state.existingFiles.delete(filename);
-            li.remove();
-        });
-        state.filesList.appendChild(li);
-        state.existingFiles.add(filename);
-    }
-
-    function setupEventListeners() {
-        // Drag and drop events
-        state.fileUploadArea.addEventListener('dragenter', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            this.classList.add('dragover');
-        });
-        state.fileUploadArea.addEventListener('dragleave', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            this.classList.remove('dragover');
-        });
-        state.fileUploadArea.addEventListener('dragover', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-        });
-        state.fileUploadArea.addEventListener('drop', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            this.classList.remove('dragover');
-            handleFiles(e.dataTransfer.files);
-        });
-        // File input change event
-        state.fileInput.addEventListener('change', function (e) {
-            console.log('File input change event triggered', e);
-            if (this.files && this.files.length > 0) {
-                handleFiles(this.files);
-            }
-        });
-        // Prevent default drag behaviors on document
-        document.addEventListener('dragover', function (e) {
-            e.preventDefault();
-        });
-        document.addEventListener('drop', function (e) {
-            e.preventDefault();
-        });
-        // Remove file handler is now handled globally outside the DocumentHandler
-    }
-
-    // Public methods
-    function initialize(passportNo) {
-        if (!passportNo) {
-            console.warn('PassportNo is required for document handling');
-            return;
-        }
-        state.passportNo = passportNo;
-        state.fileUploadArea = document.getElementById('fileUploadArea');
-        state.fileInput = document.getElementById('document') || document.getElementById('documentFile');
-        state.filesList = document.getElementById('filesList');
-        console.log('Initializing with elements:', {
-            fileUploadArea: state.fileUploadArea,
-            fileInput: state.fileInput,
-            filesList: state.filesList
-        });
-        if (!state.fileUploadArea || !state.fileInput || !state.filesList) {
-            console.warn('Document upload elements not found');
-            return;
-        }
-        // Make the upload area clickable to trigger file input
-        state.fileUploadArea.style.cursor = 'pointer';
-        state.fileUploadArea.addEventListener('click', function (e) {
-            state.fileInput.click();
-        });
-        // Load existing files from DOM (if any)
-        $(state.filesList).find('li.existing-file .file-name').each(function () {
-            const filename = $(this).text().trim();
-            if (filename) state.existingFiles.add(filename);
-        });
-        setupEventListeners();
-        state.initialized = true;
-        console.log('Document handler initialized successfully');
-    }
-
-    // Return public interface
-    return {
-        initialize,
-        getState: () => ({ ...state }),
-        getSelectedFiles: () => Array.from(state.selectedFiles),
-        getExistingFiles: () => Array.from(state.existingFiles)
-    };
-})(window);
-
 // Initialize document handling when document is ready
 $(function () {
     const passportValue = window.passportNumber || $('#passportNo').val() || $('#dec_nic_no').val();
     if (passportValue) {
         window.DocumentHandler.initialize(passportValue);
-        // Always fetch the latest file list from the server
+
+        // Load existing files from server
         $.getJSON('../data/list_documents.php', { nic: passportValue, t: Date.now() }, function (files) {
-            if (Array.isArray(files)) {
+            if (Array.isArray(files) && files.length > 0) {
+                console.log('Loading existing files:', files);
                 files.forEach(function (filename) {
-                    if (typeof addExistingFileToList === 'function') {
-                        addExistingFileToList(filename);
-                    } else if (window.DocumentHandler && window.DocumentHandler.addExistingFileToList) {
+                    if (window.DocumentHandler && window.DocumentHandler.addExistingFileToList) {
                         window.DocumentHandler.addExistingFileToList(filename);
                     }
                 });
             }
+        }).fail(function (xhr, status, error) {
+            console.warn('Could not load existing files:', error);
         });
     }
 });
@@ -558,12 +395,7 @@ function clearDocumentsFolder(passportNo) {
 
 // Document ready handler
 $(document).ready(function () {
-    const passportValue = $('#passportNo').val() || $('#dec_nic_no').val();
-    if (passportValue) {
-        window.DocumentHandler.initialize(passportValue);
-    }
-
-    //window.DocumentHandler.initialize(passportNo);
+    // Note: DocumentHandler is already initialized above
 
     // Initialize validation handlers
     $('#inputEmailAddress').on('blur', validateEmailField);
@@ -631,18 +463,8 @@ $(document).ready(function () {
         e.preventDefault();
         if (!validateForm()) return;
 
-        // Always define state at the top
-        const state = window.DocumentHandler.getState ? window.DocumentHandler.getState() : null;
-
-        // Clear documents folder before update
-        const passportNo = ($('#inputNic').val() || $('#dec_nic_no').val() || $('#passportNo').val() || '').trim();
-        if (passportNo) {
-            try {
-                await clearDocumentsFolder(passportNo);
-            } catch (err) {
-                return;
-            }
-        }
+        // Get DocumentHandler state
+        const state = window.DocumentHandler && window.DocumentHandler.getState ? window.DocumentHandler.getState() : null;
 
         // Trim all text inputs
         $('#my-form input[type="text"], #my-form textarea').each(function () {
@@ -657,26 +479,37 @@ $(document).ready(function () {
             formData.append('Photo', photoInput.files[0]);
         }
 
-        // Collect all files currently shown in the UI
+        // Collect files to keep (existing files that should remain)
         const filesToKeep = [];
-        if (state && state.filesList) {
+        if (state && state.existingFiles && state.existingFiles.size > 0) {
+            // Use the maintained state instead of DOM inspection
+            state.existingFiles.forEach(filename => {
+                filesToKeep.push(filename);
+            });
+        } else if (state && state.filesList) {
+            // Fallback to DOM inspection if state is not available
             $(state.filesList).find('li.existing-file .file-name').each(function () {
                 const filename = $(this).text().trim();
-                if (filename) filesToKeep.push(filename);
+                if (filename) {
+                    filesToKeep.push(filename);
+                }
             });
         }
-        // Add new files from upload area
-        const newFiles = [];
+
+        // Collect new files from DocumentHandler
         if (state && state.selectedFiles && state.selectedFiles.size > 0) {
             state.selectedFiles.forEach(file => {
                 formData.append('documents[]', file);
-                newFiles.push(file.name);
             });
         }
-        // Add files_to_keep[] to formData
-        filesToKeep.forEach(filename => formData.append('files_to_keep[]', filename));
-        // Debug log
-        console.log('Submitting form. files_to_keep:', filesToKeep, 'new uploads:', newFiles);
+
+        // Add files to keep to formData
+        filesToKeep.forEach(filename => {
+            formData.append('files_to_keep[]', filename);
+        });
+
+        console.log('Files to keep:', filesToKeep);
+        console.log('New files count:', state ? state.selectedFiles.size : 0);
 
         // Add documents from legacy file input if present
         var fileInput = document.getElementById('fileInput');

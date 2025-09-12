@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agent Portal - KDU</title>
+  <meta name="description" content="KDU Agent Portal Login" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="../assets/css/login.css" />
+</head>
+
+<body>
+  <div class="container">
+    <!-- Left Side - Image and Branding -->
+    <div class="left-side">
+      <!-- <div class="background-image"></div>
+      <div class="background-overlay"></div>
+ -->
+
+      <div class="background-image"
+        style="background-image: url('https://enlistment.kdu.ac.lk/agent_portal/assets/img/kdu/login-back.webp');">
+      </div>
+      <div class="background-overlay"></div>
+                  <img src="https://enlistment.kdu.ac.lk/agent_portal/assets/img/kdu/login-logo2.webp"
+        style="width: 60%; position: absolute; top: 40px; left: 40px; filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.5));">
+
+      <div class="left-content  mobile-only">
+        <div class="logo-container">
+          <div class="logo">
+            <img src="../assets/img/kdu/kdulogo.jpg" style="width: 100%; height: auto; border-radius: 50%;" />
+          </div>
+          <h1 class="main-title">Agent Portal</h1>
+          <p class="subtitle">General Sir John Kotelawala<br>Defence University</p>
+          <p class="location">Sri Lanka</p>
+        </div>
+
+        <div class="description">
+          <p>Connect with KDU's global network and become part of our prestigious education mission.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Side - Login Form -->
+    <div class="right-side">
+      <div class="form-container">
+        <!-- Mobile Logo -->
+        <div class="mobile-header">
+          <div class="mobile-logo">
+            <img src="../assets/img/kdu/kdulogo.jpg" style="width: 100%; height: auto; border-radius: 50%;" />
+          </div>
+          <h1 class="mobile-title">Agent Portal</h1>
+          <p class="subtitle">General Sir John Kotelawala<br>Defence University</p>
+          <p class="location">Sri Lanka</p>
+          <div class="description">
+            <p>Connect with KDU's global network and become part of our prestigious education mission.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Welcome</h2>
+            <p class="card-subtitle">Sign in to your agent account</p>
+          </div>
+
+          <form class="form" id="loginForm" method="POST" action="../pages/system_login.php">
+            <div class="form-group">
+              <label class="label" for="email">
+                <i class="fas fa-envelope"></i>
+                Email Address
+              </label>
+              <input id="email" name="username" type="email" placeholder="Enter your email" class="input" required />
+            </div>
+
+            <div class="form-group">
+              <label class="label" for="password">
+                <i class="fas fa-lock"></i>
+                Password
+              </label>
+              <input id="password" name="password" type="password" placeholder="Enter your password" class="input"
+                required />
+            </div>
+
+            <!-- <div class="form-footer">
+              <label class="checkbox-container">
+                <input type="checkbox" class="checkbox" />
+                <span>Remember me</span>
+              </label>
+              <a href="#" class="forgot-link">Forgot password?</a>
+            </div> -->
+
+            <button type="submit" class="signin-btn">
+              Sign In
+              <i class="fas fa-arrow-right"></i>
+            </button>
+          </form>
+
+          <div class="divider">
+            <div class="agent-section">
+              <h3 class="agent-title">
+                <i class="fas fa-user-plus"></i>
+                Become an Agent
+              </h3>
+              <!-- <p class="agent-description">
+                Become part of KDU’s trusted network of international representatives and contribute to advancing global
+                education.
+              </p> -->
+
+              <p class="agent-description">
+                Join KDU's global network of educational partners and help shape the future of education.
+              </p>
+              <a href="../includes/register_nav.html" class="agent-btn">
+                Apply to Become an Agent
+                <i class="fas fa-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+          <p class="footer-text">© 2025 KDU. All rights reserved.</p>
+          <div class="social-links">
+            <a href="https://www.kdu.ac.lk/" target="_blank" rel="noopener noreferrer" class="social-link"
+              aria-label="KDU Website">
+              <i class="fas fa-globe"></i>
+            </a>
+            <a href="https://www.facebook.com/KotelawalaDefenceUniversity" target="_blank" rel="noopener noreferrer"
+              class="social-link" aria-label="Facebook">
+              <i class="fab fa-facebook"></i>
+            </a>
+            <a href="https://www.youtube.com/channel/UC3pp0YuDK7eXDJl6VPArYpA" target="_blank" rel="noopener noreferrer"
+              class="social-link" aria-label="YouTube">
+              <i class="fab fa-youtube"></i>
+            </a>
+            <a href="https://twitter.com/Kotelawala_uni" target="_blank" rel="noopener noreferrer" class="social-link"
+              aria-label="Twitter">
+              <i class="fab fa-twitter"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="../assets/js/agent/login.js"></script>
+  <!-- <script>
+    document.getElementById('loginForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      if (!email || !password) {
+        alert('Please fill in all fields');
+        return;
+      }
+
+      console.log('Login attempt:', { email, password });
+
+      alert('Login functionality would be implemented here');
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+      
+      const inputs = document.querySelectorAll('.input');
+      inputs.forEach(input => {
+        input.addEventListener('focus', function () {
+          this.parentElement.style.transform = 'translateY(-2px)';
+        });
+
+        input.addEventListener('blur', function () {
+          this.parentElement.style.transform = 'translateY(0)';
+        });
+      });
+
+   
+      const buttons = document.querySelectorAll('.signin-btn, .agent-btn');
+      buttons.forEach(button => {
+        button.addEventListener('mouseenter', function () {
+          this.style.transform = 'translateY(-2px)';
+        });
+
+        button.addEventListener('mouseleave', function () {
+          this.style.transform = 'translateY(0)';
+        });
+      });
+    });
+
+    
+    function togglePasswordVisibility() {
+      const passwordInput = document.getElementById('password');
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+    }
+
+ 
+    function validateEmail(email) {
+      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return re.test(email);
+    }
+
+    function validateForm() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      if (!validateEmail(email)) {
+        alert('Please enter a valid email address');
+        return false;
+      }
+
+     
+      return true;
+    }
+  </script> -->
+</body>
+
+</html>

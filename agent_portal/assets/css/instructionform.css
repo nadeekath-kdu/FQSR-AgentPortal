@@ -1,0 +1,25 @@
+.custom-card {
+    margin: auto; /* Center the card */
+    width: 100%; /* Set the width to 100% */
+  }
+
+  .custom-card .card-img-top {
+    height: 100px; /* Adjust the height of the image */
+    object-fit: contain; /* Maintain aspect ratio */
+  }
+  .instruction-list {
+    list-style-type: disc;
+    padding-left: 40px;
+    margin-top: 0;
+}
+
+.card-text ul {
+    margin-bottom: 0;
+}
+
+.card-text p {
+    margin-bottom: 0;
+}
+.card-text p strong {
+    color: #007bff; /* Blue color */
+}

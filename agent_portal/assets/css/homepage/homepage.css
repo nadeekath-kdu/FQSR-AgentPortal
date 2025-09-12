@@ -1,0 +1,63 @@
+
+
+  
+ .custom-image {
+    max-width: 100%; /* Ensures the image scales down if it's too large */
+    height: auto; /* Maintains aspect ratio */
+    border-radius: 10px; /* Adds rounded corners */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Optional: adds shadow for depth */
+}
+
+/* General card styling */
+.card {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  
+  /* Adjust the header size and padding */
+  .card-header {
+    font-size: 1.25rem; /* Adjust the font size as needed */
+    padding: 1rem; /* Adjust the padding as needed */
+    background-color: #f8f9fa;
+  }
+  
+  /* Ensure the logo container fills its column */
+  #kdu-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%; /* Make sure it fills the full height of the column */
+  }
+  
+  /* Adjust the video container */
+  .video-container {
+    position: relative;
+    padding-top: 56.25%; /* 16:9 Aspect Ratio (divide 9 by 16 = 0.5625) */
+    height: 0;
+    overflow: hidden;
+  }
+  
+  .video-container video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+  
+/* Responsive adjustments */
+@media (min-width: 768px) { /* For tablets and larger screens */
+   .custom-image {
+        width: 100%;
+        height: 200px; /* Adjusted height for larger screens */
+    }
+}
+
+@media (max-width: 767px) { /* For smaller screens */
+   .custom-image {
+        width: 100%;
+        height: 140px; /* Original height for mobile devices */
+    }
+}
