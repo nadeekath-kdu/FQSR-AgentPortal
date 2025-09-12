@@ -72,18 +72,25 @@ if (!empty($ag_code)) {
 <!-- Dashboard Header -->
 <div class="row">
     <div class="col-lg-12 mb-4 order-0">
-        <div class="card h-100" style="background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%); border: 1px solid rgba(99, 179, 237, 0.1);">
-            <div class="card-body">
-                <h5 class="card-title" style="color: #2d3748; font-weight: 600;">Welcome to KDU Agent Portal 🎓</h5>
-                <p class="mb-4" style="color: #4a5568; line-height: 1.6;">
-                    Effortlessly manage student applications for <span class="fw-semibold" style="color: #3182ce;">Kotelawala Defence University</span>.
-                    Track progress, submit applications, and monitor performance with ease.
-                </p>
-                <p class="mb-3" style="color: #4a5568; font-size: 0.9rem;">
-                    <strong>Agent:</strong> <?php echo isset($_SESSION['agent_name']) ? $_SESSION['agent_name'] : 'Unknown'; ?>
-                    | <strong>Code:</strong> <?php echo $ag_code; ?>
-                </p>
-                <a href="javascript:void(0);" class="btn btn-sm" id="new-app-btn" style="background: #63b3ed; color: white; border: none; border-radius: 10px; padding: 0.5rem 1.5rem;">Create New Application</a>
+        <div class="card h-100 border-0 shadow-lg" style="background: linear-gradient(120deg, #63b3ed 0%, #b2f5ea 100%); border-radius: 2rem; overflow: hidden; position: relative;">
+            <div class="card-body d-flex flex-column flex-md-row align-items-center justify-content-between p-4" style="min-height: 180px;">
+                <div class="d-flex align-items-center mb-3 mb-md-0">
+                    <div style="background: #fff; border-radius: 50%; width: 70px; height: 70px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 24px 0 rgba(99,179,237,0.12); margin-right: 2rem;">
+                        <img src="../assets/img/kdu/Kotelawala_Defence_University_crest.png" alt="KDU Logo" style="width: 48px; height: 48px;">
+                    </div>
+                    <div>
+                        <h2 class="mb-1" style="color: #2d3748; font-weight: 700; letter-spacing: -1px;">Welcome to <span style="color: #3182ce;">KDU Agent Portal</span></h2>
+                        <p class="mb-0" style="color: #234e70; font-size: 1.1rem; font-weight: 500;">Empowering agents to manage student applications for <span class="fw-semibold" style="color: #234e70;">Kotelawala Defence University</span> with ease and confidence.</p>
+                    </div>
+                </div>
+                <div class="text-end">
+                    <div class="mb-2" style="color: #234e70; font-size: 1rem;">
+                        <strong>Agent:</strong> <?php echo isset($_SESSION['agent_name']) ? $_SESSION['agent_name'] : 'Unknown'; ?>
+                        <span style="margin: 0 8px; color: #3182ce;">|</span>
+                        <strong>Code:</strong> <?php echo $ag_code; ?>
+                    </div>
+                    <a href="javascript:void(0);" class="btn btn-lg px-4 py-2" id="new-app-btn" style="background: linear-gradient(90deg, #4299e1 0%, #38b2ac 100%); color: white; border: none; border-radius: 12px; font-weight: 600; box-shadow: 0 2px 8px 0 rgba(66,153,225,0.10);">+ Create New Application</a>
+                </div>
             </div>
         </div>
     </div>
@@ -92,7 +99,7 @@ if (!empty($ag_code)) {
 <!-- Statistics Cards -->
 <div class="row">
     <div class="col-lg-3 col-md-6 col-6 mb-4">
-        <div class="card" style="background: #ffffff; border: 1px solid rgba(99, 179, 237, 0.08);">
+        <div class="card" style="background: linear-gradient(135deg, #e3f0fc 0%, #f7fafc 100%); border: 2px solid #63b3ed; box-shadow: 0 2px 12px 0 rgba(99,179,237,0.07); border-radius: 18px;">
             <div class="card-body">
                 <div class="card-title d-flex align-items-start justify-content-between">
                     <div class="avatar flex-shrink-0" style="background: rgba(99, 179, 237, 0.1); color: #3182ce;">
@@ -107,7 +114,7 @@ if (!empty($ag_code)) {
     </div>
 
     <div class="col-lg-3 col-md-6 col-6 mb-4">
-        <div class="card" style="background: #ffffff; border: 1px solid rgba(72, 187, 120, 0.08);">
+        <div class="card" style="background: linear-gradient(135deg, #e6f9f0 0%, #f7fafc 100%); border: 2px solid #38a169; box-shadow: 0 2px 12px 0 rgba(56,161,105,0.07); border-radius: 18px;">
             <div class="card-body">
                 <div class="card-title d-flex align-items-start justify-content-between">
                     <div class="avatar flex-shrink-0" style="background: rgba(72, 187, 120, 0.1); color: #38a169;">
@@ -122,7 +129,7 @@ if (!empty($ag_code)) {
     </div>
 
     <div class="col-lg-3 col-md-6 col-6 mb-4">
-        <div class="card" style="background: #ffffff; border: 1px solid rgba(237, 137, 54, 0.08);">
+        <div class="card" style="background: linear-gradient(135deg, #fff5e6 0%, #f7fafc 100%); border: 2px solid #ed8936; box-shadow: 0 2px 12px 0 rgba(237,137,54,0.07); border-radius: 18px;">
             <div class="card-body">
                 <div class="card-title d-flex align-items-start justify-content-between">
                     <div class="avatar flex-shrink-0" style="background: rgba(237, 137, 54, 0.1); color: #dd6b20;">
@@ -137,7 +144,7 @@ if (!empty($ag_code)) {
     </div>
 
     <div class="col-lg-3 col-md-6 col-6 mb-4">
-        <div class="card" style="background: #ffffff; border: 1px solid rgba(99, 179, 237, 0.08);">
+        <div class="card" style="background: linear-gradient(135deg, #e3f0fc 0%, #f7fafc 100%); border: 2px solid #3182ce; box-shadow: 0 2px 12px 0 rgba(49,130,206,0.07); border-radius: 18px;">
             <div class="card-body">
                 <div class="card-title d-flex align-items-start justify-content-between">
                     <div class="avatar flex-shrink-0" style="background: rgba(99, 179, 237, 0.1); color: #3182ce;">
@@ -156,10 +163,10 @@ if (!empty($ag_code)) {
 <div class="row">
     <!-- Recent Applications -->
     <div class="col-md-8 col-lg-8 order-2 mb-4">
-        <div class="card h-100" style="background: #ffffff; border: 1px solid rgba(99, 179, 237, 0.08);">
-            <div class="card-header d-flex align-items-center justify-content-between pb-0">
+        <div class="card h-100 border-0 shadow-lg" style="background: linear-gradient(120deg, #f7fafc 0%, #e3f0fc 100%); border-radius: 1.5rem;">
+            <div class="card-header d-flex align-items-center justify-content-between pb-0" style="background: transparent; border-bottom: none;">
                 <div class="card-title mb-0">
-                    <h5 class="m-0 me-2" style="color: #2d3748; font-weight: 600;">Recent Applications</h5>
+                    <h4 class="m-0 me-2" style="color: #234e70; font-weight: 700; letter-spacing: -0.5px;">Recent Applications</h4>
                     <small class="text-muted">Latest submissions from your agency</small>
                 </div>
                 <div class="dropdown">
@@ -172,16 +179,16 @@ if (!empty($ag_code)) {
                     </div>
                 </div>
             </div>
-            <div class="card-body">
+            <div class="card-body p-0">
                 <div class="table-responsive text-nowrap">
-                    <table class="table table-borderless">
-                        <thead>
+                    <table class="table align-middle mb-0" style="border-radius: 1rem; overflow: hidden;">
+                        <thead style="background: linear-gradient(90deg, #e3f0fc 0%, #f7fafc 100%);">
                             <tr>
-                                <th style="color: #4a5568; font-weight: 500;">Student Name</th>
-                                <th style="color: #4a5568; font-weight: 500;">Program</th>
-                                <th style="color: #4a5568; font-weight: 500;">Status</th>
-                                <th style="color: #4a5568; font-weight: 500;">Date</th>
-                                <th style="color: #4a5568; font-weight: 500;">Action</th>
+                                <th style="color: #234e70; font-weight: 600; border: none;">Student Name</th>
+                                <th style="color: #234e70; font-weight: 600; border: none;">Program</th>
+                                <th style="color: #234e70; font-weight: 600; border: none;">Status</th>
+                                <th style="color: #234e70; font-weight: 600; border: none;">Date</th>
+                                <th style="color: #234e70; font-weight: 600; border: none;">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -193,60 +200,73 @@ if (!empty($ag_code)) {
                                 </tr>
                             <?php else: ?>
                                 <?php foreach ($recent_applications as $index => $app): ?>
-                                    <tr>
+                                    <tr style="background: <?php echo $index % 2 == 0 ? '#f7fafc' : '#e3f0fc'; ?>;">
                                         <td>
                                             <div class="d-flex align-items-center">
-                                                <div class="avatar avatar-sm me-3">
+                                                <div class="avatar avatar-sm me-3" style="background: #fff; border-radius: 50%; box-shadow: 0 2px 8px 0 rgba(99,179,237,0.10); width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;">
                                                     <?php
                                                     $initials = '';
                                                     $names = explode(' ', $app['stu_name_initials']);
                                                     foreach ($names as $name) {
                                                         $initials .= strtoupper(substr($name, 0, 1));
                                                     }
-                                                    $colors = array('bg-label-primary', 'bg-label-success', 'bg-label-info', 'bg-label-warning', 'bg-label-danger');
+                                                    $colors = array('#3182ce', '#38a169', '#805ad5', '#ed8936', '#e53e3e');
                                                     $color = $colors[$index % count($colors)];
                                                     ?>
-                                                    <span class="avatar-initial rounded-circle <?php echo $color; ?>"><?php echo substr($initials, 0, 2); ?></span>
+                                                    <span class="avatar-initial rounded-circle" style="background: <?php echo $color; ?>20; color: <?php echo $color; ?>; font-weight: 700; font-size: 1.1rem; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+                                                        <?php echo substr($initials, 0, 2); ?>
+                                                    </span>
                                                 </div>
                                                 <div>
-                                                    <strong style="color: #2d3748;"><?php echo htmlspecialchars($app['stu_name_initials']); ?></strong>
+                                                    <strong style="color: #234e70; font-size: 1rem; font-weight: 600; letter-spacing: -0.5px;"><?php echo htmlspecialchars($app['stu_name_initials']); ?></strong>
                                                     <div class="text-muted small"><?php echo htmlspecialchars($app['nic_no']); ?></div>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td><?php echo htmlspecialchars($app['course_name']); ?></td>
+                                        <td style="color: #234e70; font-weight: 500;"><?php echo htmlspecialchars($app['course_name']); ?></td>
                                         <td>
                                             <?php
                                             $status = strtoupper($app['formStatus']);
-                                            $badge_class = 'bg-label-secondary';
+                                            $badge_class = '';
+                                            $badge_style = '';
                                             switch ($status) {
                                                 case 'APPROVED':
-                                                    $badge_class = 'bg-label-success';
+                                                    $badge_class = 'badge';
+                                                    $badge_style = 'background: #38a169; color: #fff; font-weight:600;';
                                                     break;
                                                 case 'PENDING':
                                                 case 'SUBMITTED':
-                                                    $badge_class = 'bg-label-warning';
+                                                    $badge_class = 'badge';
+                                                    $badge_style = 'background: #ed8936; color: #fff; font-weight:600;';
                                                     break;
                                                 case 'UNDER_REVIEW':
-                                                    $badge_class = 'bg-label-info';
+                                                    $badge_class = 'badge';
+                                                    $badge_style = 'background: #3182ce; color: #fff; font-weight:600;';
                                                     break;
                                                 case 'REJECTED':
-                                                    $badge_class = 'bg-label-danger';
+                                                    $badge_class = 'badge';
+                                                    $badge_style = 'background: #e53e3e; color: #fff; font-weight:600;';
                                                     break;
                                                 case 'UNSUBMITTED':
-                                                    $badge_class = 'bg-label-secondary';
+                                                default:
+                                                    $badge_class = 'badge';
+                                                    $badge_style = 'background: #a0aec0; color: #fff; font-weight:600;';
                                                     break;
                                             }
                                             ?>
-                                            <span class="badge <?php echo $badge_class; ?>"><?php echo $status; ?></span>
+                                            <span class="<?php echo $badge_class; ?>" style="<?php echo $badge_style; ?> border-radius: 8px; font-size: 0.95rem; padding: 0.4em 1em; letter-spacing: 0.5px;">
+                                                <?php echo $status; ?>
+                                            </span>
                                         </td>
                                         <td>
-                                            <div style="color: #2d3748;"><?php echo date('M d, Y', strtotime(isset($app['application_submit_dt']) ? $app['application_submit_dt'] : 'now')); ?></div>
+                                            <div style="color: #234e70; font-weight: 500; font-size: 1rem;">
+                                                <?php echo date('M d, Y', strtotime(isset($app['application_submit_dt']) ? $app['application_submit_dt'] : 'now')); ?>
+                                            </div>
                                             <small class="text-muted"><?php echo date('h:i A', strtotime(isset($app['application_submit_dt']) ? $app['application_submit_dt'] : 'now')); ?></small>
                                         </td>
                                         <td>
                                             <div class="dropdown">
-                                                <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                                                <button type="button" class="btn btn-sm btn-light dropdown-toggle hide-arrow" data-bs-toggle="dropdown" style="border-radius: 8px;">
                                                     <i class="bx bx-dots-vertical-rounded"></i>
                                                 </button>
                                                 <div class="dropdown-menu">
@@ -283,9 +303,9 @@ if (!empty($ag_code)) {
                             <button class="btn" id="quick-view-apps" style="background: #f7fafc; color: #3182ce; border: 1px solid #e2e8f0; border-radius: 10px; padding: 0.7rem 1rem;">
                                 <i class="bx bx-list-ul me-2"></i>View All Applications
                             </button>
-                            <button class="btn" id="quick-reports" style="background: #f7fafc; color: #4a5568; border: 1px solid #e2e8f0; border-radius: 10px; padding: 0.7rem 1rem;">
+                            <!-- <button class="btn" id="quick-reports" style="background: #f7fafc; color: #4a5568; border: 1px solid #e2e8f0; border-radius: 10px; padding: 0.7rem 1rem;">
                                 <i class="bx bx-bar-chart-alt-2 me-2"></i>Generate Report
-                            </button>
+                            </button> -->
                         </div>
                     </div>
                 </div>

@@ -2,7 +2,7 @@
 if (!isset($_SESSION)) {
     session_start();
 }
-include '../../config/dbcon.php';
+include '../../../config/dbcon.php';
 
 $ag_code = isset($_SESSION['agent_code']) ? $_SESSION['agent_code'] : '';
 ?>

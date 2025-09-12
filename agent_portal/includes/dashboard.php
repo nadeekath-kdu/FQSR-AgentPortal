@@ -94,7 +94,7 @@ if (!isset($_SESSION['loggedin'])) {
           <!-- Dashboard -->
           <li class="menu-item active">
             <a href="dashboard.php" class="menu-link">
-              <i class="menu-icon tf-icons bx bx-home-circle"></i>
+              <i class="menu-icon tf-icons bx bx-home-circle" style="color:#3182ce;"></i>
               <div data-i18n="Analytics">Dashboard</div>
             </a>
           </li>
@@ -104,30 +104,30 @@ if (!isset($_SESSION['loggedin'])) {
           </li>
           <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link" id="newapp">
-              <i class="menu-icon tf-icons bx bx-user-plus"></i>
+              <i class="menu-icon tf-icons bx bx-user-plus" style="color:#4299e1;"></i>
               <div data-i18n="Account Settings">New Application</div>
             </a>
           </li>
           <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link" id="viewapp">
-              <i class="menu-icon tf-icons bx bx-list-ul"></i>
+              <i class="menu-icon tf-icons bx bx-list-ul" style="color:#63b3ed;"></i>
               <div data-i18n="Authentications">All Applications</div>
             </a>
           </li>
           <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link" id="pendingapp">
-              <i class="menu-icon tf-icons bx bx-time-five"></i>
+              <i class="menu-icon tf-icons bx bx-time-five" style="color:#ed8936;"></i>
               <div data-i18n="Authentications">Pending Reviews</div>
             </a>
           </li>
           <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link" id="approvedapp">
-              <i class="menu-icon tf-icons bx bx-check-circle"></i>
+              <i class="menu-icon tf-icons bx bx-check-circle" style="color:#38a169;"></i>
               <div data-i18n="Authentications">Approved Applications</div>
             </a>
           </li>
 
-          <li class="menu-header small text-uppercase">
+          <!-- <li class="menu-header small text-uppercase">
             <span class="menu-header-text">Reports & Analytics</span>
           </li>
           <li class="menu-item">
@@ -157,18 +157,18 @@ if (!isset($_SESSION['loggedin'])) {
               <i class="menu-icon tf-icons bx bx-group"></i>
               <div data-i18n="Students">Student Database</div>
             </a>
-          </li>
+          </li> -->
 
           <li class="menu-header small text-uppercase">
             <span class="menu-header-text">Settings</span>
           </li>
           <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link" id="changepw">
-              <i class="menu-icon tf-icons bx bx-key"></i>
+              <i class="menu-icon tf-icons bx bx-key" style="color:#2b6cb0;"></i>
               <div data-i18n="Account Settings">Change Password</div>
             </a>
           </li>
-          <li class="menu-item">
+          <!-- <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link" id="notifications">
               <i class="menu-icon tf-icons bx bx-bell"></i>
               <div data-i18n="Notifications">Notifications</div>
@@ -179,14 +179,14 @@ if (!isset($_SESSION['loggedin'])) {
               <i class="menu-icon tf-icons bx bx-help-circle"></i>
               <div data-i18n="Help">Help & Support</div>
             </a>
-          </li>
+          </li> -->
 
           <li class="menu-header small text-uppercase">
             <span class="menu-header-text">Account</span>
           </li>
           <li class="menu-item">
             <a href="javascript:void(0);" class="menu-link" id="logout">
-              <i class="menu-icon tf-icons bx bx-power-off"></i>
+              <i class="menu-icon tf-icons bx bx-power-off" style="color:#e53e3e;"></i>
               <div data-i18n="Logout">Logout</div>
             </a>
           </li>
@@ -230,8 +230,8 @@ if (!isset($_SESSION['loggedin'])) {
               <!-- User -->
               <li class="nav-item navbar-dropdown dropdown-user dropdown">
                 <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
-                  <div class="avatar avatar-online">
-                    <img src="../assets/img/avatars/1.png" alt class="w-px-40 h-auto rounded-circle" />
+                  <div class="avatar avatar-online" style="background: #e3f0fc; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%;">
+                    <i class="bx bx-user" style="font-size: 1.7rem; color: #3182ce;"></i>
                   </div>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end">
@@ -240,7 +240,9 @@ if (!isset($_SESSION['loggedin'])) {
                       <div class="d-flex">
                         <div class="flex-shrink-0 me-3">
                           <div class="avatar avatar-online">
-                            <img src="../assets/img/avatars/1.png" alt class="w-px-40 h-auto rounded-circle" />
+                            <div class="avatar avatar-online" style="background: #e3f0fc; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%;">
+                              <i class="bx bx-user" style="font-size: 1.7rem; color: #3182ce;"></i>
+                            </div>
                           </div>
                         </div>
                         <div class="flex-grow-1">
