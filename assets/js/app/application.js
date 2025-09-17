@@ -664,142 +664,168 @@ $(document).ready(function () {
         event.preventDefault();
         //console.log('Form submitted');
 
-        const form = $(this)[0];
-        const formData = new FormData(form);
-
-        // Ensure agent_code is included in form submission
-        const agentCode = $('#agent_code').val();
-        if (agentCode) {
-            formData.append('agent_code', agentCode);
+        // Require at least one document on first save
+        if (!selectedFilesArray || selectedFilesArray.length === 0) {
+            toastr.error('Please upload required supporting documents before saving.', '', { timeOut: 2000 });
+            // Optionally scroll to step-8
+            const step8 = document.querySelector('#step-8');
+            if (step8) {
+                $('div.setup-panel div a[href="#step-8"]').removeAttr('disabled').trigger('click');
+            }
+            return;
         }
 
-        // Collect all selected degrees and their preference order
-        const degreeSelects = document.querySelectorAll('#degreeChoices .degree-select');
-        const selectedDegrees = Array.from(degreeSelects).map((select, index) => ({
-            degree_code: select.value,
-            preference_order: index + 1
-        })).filter(deg => deg.degree_code); // Filter out empty selections
-
-        // Add degrees to form data
-        formData.append('selected_degrees', JSON.stringify(selectedDegrees));
-
-        // Add files from the custom file upload area
-        if (selectedFilesArray && selectedFilesArray.length > 0) {
-            const maxFileSize = 5 * 1024 * 1024; // 5MB
-            for (let i = 0; i < selectedFilesArray.length; i++) {
-                const file = selectedFilesArray[i];
-                if (file.size > maxFileSize) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'File Too Large',
-                        text: `File "${file.name}" is larger than 5MB. Please choose a smaller file.`
-                    });
-                    return;
-                }
-                formData.append('documents[]', file);
-            }
-        }         // Show loading indicator
+        // Confirmation prompt to verify documents are correct
         Swal.fire({
-            title: 'Saving...',
-            text: 'Please wait while we save your application',
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
+            title: 'Confirm before saving',
+            html: '<div style="text-align:left">Please review your uploaded documents in Step 8 and ensure they are correct and complete.<br><br><strong>Are all your documents correct?</strong></div>',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, save application',
+            cancelButtonText: 'Go back',
+        }).then((result) => {
+            if (!result.isConfirmed) {
+                // User chose to review again
+                return;
             }
-        });
 
-        $.ajax({
-            url: '../pages/formsave.php', // Use relative path
-            method: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function (response) {
-                Swal.close();
-                
-                // Check if response is a string (error) or JSON object
-                if (typeof response === 'string') {
-                    try {
-                        response = JSON.parse(response);
-                    } catch (e) {
-                        // If it's not valid JSON and contains PHP errors
-                        if (response.includes('<b>Notice</b>') || response.includes('<b>Warning</b>')) {
-                            console.error('PHP Error:', response);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Server Error',
-                                text: 'There was an error processing your application.',
-                                footer: 'Please contact support with error details.'
-                            });
-                            return;
-                        }
-                    }
-                }
-                
-                // Ensure we have a proper object to work with
-                var res = response;
-                if (typeof response === "string") {
-                    try {
-                        res = JSON.parse(response);
-                        console.log('Parsed response:', res);
-                    } catch (e) {
-                        console.error('JSON parse error:', e);
+            const form = $("#my-form")[0];
+            const formData = new FormData(form);
+
+            // Ensure agent_code is included in form submission
+            const agentCode = $('#agent_code').val();
+            if (agentCode) {
+                formData.append('agent_code', agentCode);
+            }
+
+            // Collect all selected degrees and their preference order
+            const degreeSelects = document.querySelectorAll('#degreeChoices .degree-select');
+            const selectedDegrees = Array.from(degreeSelects).map((select, index) => ({
+                degree_code: select.value,
+                preference_order: index + 1
+            })).filter(deg => deg.degree_code); // Filter out empty selections
+
+            // Add degrees to form data
+            formData.append('selected_degrees', JSON.stringify(selectedDegrees));
+
+            // Add files from the custom file upload area
+            if (selectedFilesArray && selectedFilesArray.length > 0) {
+                const maxFileSize = 5 * 1024 * 1024; // 5MB
+                for (let i = 0; i < selectedFilesArray.length; i++) {
+                    const file = selectedFilesArray[i];
+                    if (file.size > maxFileSize) {
                         Swal.fire({
                             icon: 'error',
-                            title: 'Response Error',
-                            text: 'Invalid response from server',
-                            footer: 'Please try again or contact support.'
+                            title: 'File Too Large',
+                            text: `File "${file.name}" is larger than 5MB. Please choose a smaller file.`
                         });
                         return;
                     }
+                    formData.append('documents[]', file);
                 }
-
-                // Handle success response
-                if (res.status === "success") {
-                    toastr.success(res.message || "Saved successfully", "");
-                    if (res.passport_no) {
-                        console.log('Loading view page with passport:', res.passport_no);
-                        var page = "../content/view_applicationform.php?nic=" + res.passport_no;
-                        $("#content").load(page, function (response, status, xhr) {
-                            if (status == "error") {
-                                //console.error("Error loading view page:", xhr.status, xhr.statusText);
-                                toastr.error("Error loading view page: " + xhr.statusText, "", { timeOut: 1000 });
-                            } else {
-                                console.log('View page loaded successfully');
-                            }
-                        });
-                    } else {
-                        //console.error('No passport number in response');
-                        toastr.error("Error loading application view", "", { timeOut: 1000 });
-                    }
-                } else {
-                    toastr.error(res.message || "Data not saved.", "", { timeOut: 1000 });
-                }
-            },
-            error: function (xhr, status, error) {
-                Swal.close();
-                console.error('Error details:', {
-                    status: status,
-                    error: error,
-                    response: xhr.responseText
-                });
-
-                // Show a more informative error message
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Submission Error',
-                    text: 'There was a problem saving your application. Please check your internet connection and try again.',
-                    footer: 'If the problem persists, please contact support.',
-                    confirmButtonText: 'OK'
-                });
-
-                // Also show toastr notification
-                toastr.error("Form submission failed. Please try again.", '', {
-                    timeOut: 3000,
-                    closeButton: true,
-                    progressBar: true
-                });
             }
+
+            // Show loading indicator
+            /* Swal.fire({
+                title: 'Saving...',
+                text: 'Please wait while we save your application',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            }); */
+
+            $.ajax({
+                url: '../pages/formsave.php', // Use relative path
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    Swal.close();
+
+                    // Check if response is a string (error) or JSON object
+                    /*  if (typeof response === 'string') {
+                         try {
+                             response = JSON.parse(response);
+                         } catch (e) {
+                             // If it's not valid JSON and contains PHP errors
+                             if (response.includes('<b>Notice</b>') || response.includes('<b>Warning</b>')) {
+                                 console.error('PHP Error:', response);
+                                 Swal.fire({
+                                     icon: 'error',
+                                     title: 'Server Error',
+                                     text: 'There was an error processing your application.',
+                                     footer: 'Please contact support with error details.'
+                                 });
+                                 return;
+                             }
+                         }
+                     } */
+
+                    // Ensure we have a proper object to work with
+                    var res = response;
+                    /* if (typeof response === "string") {
+                        try {
+                            res = JSON.parse(response);
+                            console.log('Parsed response:', res);
+                        } catch (e) {
+                            console.error('JSON parse error:', e);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Response Error',
+                                text: 'Invalid response from server',
+                                footer: 'Please try again or contact support.'
+                            });
+                            return;
+                        }
+                    } */
+
+                    // Handle success response
+                    if (res.status === "success") {
+                        toastr.success(res.message || "Saved successfully", "");
+                        if (res.passport_no) {
+                            console.log('Loading view page with passport:', res.passport_no);
+                            var page = "../content/view_applicationform.php?nic=" + res.passport_no;
+                            $("#content").load(page, function (response, status, xhr) {
+                                if (status == "error") {
+                                    toastr.error("Error loading view page: " + xhr.statusText, "", { timeOut: 1000 });
+                                } else {
+                                    console.log('View page loaded successfully');
+                                }
+                            });
+                        } else {
+                            toastr.error("Error loading application view", "", { timeOut: 1000 });
+                        }
+                    } else {
+                        toastr.error(res.message || "Data not saved.", "", { timeOut: 1000 });
+                    }
+                },
+                error: function (xhr, status, error) {
+                    Swal.close();
+                    console.error('Error details:', {
+                        status: status,
+                        error: error,
+                        response: xhr.responseText
+                    });
+
+                    // Show a more informative error message
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Submission Error',
+                        text: 'There was a problem saving your application. Please check your internet connection and try again.',
+                        footer: 'If the problem persists, please contact support.',
+                        confirmButtonText: 'OK'
+                    });
+
+                    // Also show toastr notification
+                    toastr.error("Form submission failed. Please try again.", '', {
+                        timeOut: 3000,
+                        closeButton: true,
+                        progressBar: true
+                    });
+                }
+            });
         });
     });
 
@@ -1065,7 +1091,7 @@ function validateStep(step) {
         }
 
         // Validate educational results
-        //isValid = validateEducationalResults();// uncomment
+        isValid = validateEducationalResults();
         if (!isValid) {
             return false;
         }

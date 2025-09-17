@@ -789,41 +789,42 @@ $dec_nic_no = $application['nic_no'];
 
                                         <hr>
 
-                                        <!-- Documents Section -->
+                                        <!-- Documents Section (Read-only in Edit) -->
                                         <div class="card mb-4">
                                             <div class="card-header">
                                                 <i class="fas fa-file-alt me-1"></i>
-                                                Documents
+                                                Uploaded Documents
                                             </div>
-                                            <div class="card-body">
-                                                <!-- Document Upload Area -->
-                                                <div class="file-upload-area mb-3" id="fileUploadArea">
-                                                    <div class="file-upload-text">
-                                                        <i class="fa fa-cloud-upload"></i>
-                                                        <p>Drag & Drop files here or click to browse</p>
-                                                        <p class="small text-muted">Supported formats: PDF, DOC, DOCX, JPG, JPEG, PNG</p>
-                                                    </div>
-                                                    <input type="file" id="document" name="document[]" multiple class="file-input" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
-                                                </div>
 
-                                                <!-- Documents List -->
-                                                <div class="documents-section">
-                                                    <h6 class="mb-3">Uploaded Documents:</h6>
-                                                    <ul id="filesList" class="list-group">
-                                                        <?php
-                                                        $documents = getUploadedDocuments($dec_nic_no);
-                                                        foreach ($documents as $doc) {
-                                                            echo '<li class="list-group-item d-flex justify-content-between align-items-center existing-file">';
-                                                            echo '<span>' . htmlspecialchars($doc['file_name']) . '</span>';
-                                                            echo '<div class="btn-group">';
-                                                            echo '<a href="' . htmlspecialchars($doc['file_path']) . '" class="btn btn-sm btn-primary" target="_blank"><i class="fa fa-eye"></i> View</a>';
-                                                            echo '<button type="button" class="btn btn-sm btn-danger remove-file" data-file="' . htmlspecialchars($doc['file_path']) . '"><i class="fa fa-trash"></i> Remove</button>';
-                                                            echo '</div>';
-                                                            echo '</li>';
-                                                        }
-                                                        ?>
-                                                    </ul>
+                                            <div class="card-body">
+                                                <div class="table-responsive">
+                                                    <table class="table table-bordered" id="documentsTable">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Document Type</th>
+                                                                <th>File Name</th>
+                                                                <th>Actions</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <?php
+                                                            $documents = getUploadedDocuments($dec_nic_no);
+                                                            foreach ($documents as $doc) {
+                                                                echo '<tr>';
+                                                                echo '<td>' . getDocumentTypeLabel($doc['document_type']) . '</td>';
+                                                                echo '<td>' . htmlspecialchars($doc['file_name']) . '</td>';
+                                                                echo '<td>';
+                                                                echo '<a href="' . htmlspecialchars($doc['file_path']) . '" class="btn btn-primary btn-sm" target="_blank" rel="noopener noreferrer">View</a>';
+                                                                echo '</td>';
+                                                                echo '</tr>';
+                                                            }
+                                                            ?>
+                                                        </tbody>
+                                                    </table>
                                                 </div>
+                                                <!-- <div class="alert alert-info mt-3" role="alert">
+                                                    Document uploads are disabled when editing the application. If you need to change a document, please contact support.
+                                                </div> -->
                                             </div>
                                         </div>
 
@@ -855,9 +856,10 @@ $dec_nic_no = $application['nic_no'];
     window.passportNumber = '<?php echo htmlspecialchars($dec_nic_no); ?>';
 </script>
 
-<script src="../assets/js/app/document-handler.js?v=1.3"></script>
+
 <script src="../assets/js/app/managerows.js?v=1.1"></script>
-<script src="../assets/js/app/formupdate.js?v=1.9"></script>
+<script src="../assets/js/app/formupdate.js?v=1.20"></script>
+<!-- <script src="../assets/js/app/document-handler.js?v=1.3"></script> -->
 
 <style>
     .file-upload-area {

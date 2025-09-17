@@ -14,10 +14,37 @@ class PDF extends FPDF
 
 	function Header()
 	{
-		//$this->Image('https://enlistment.kdu.ac.lk/agent_portal/assets/img/kdu/Kotelawala_Defence_University_crest.png',10,6,30);
+		// Use JPEG (no alpha channel) to avoid FPDF "Alpha channel not supported" error on PNGs
+		$imgPath = '../assets/img/kdu/logo.jpg';
+		$topY = 6; // mm from top
+
+		// Determine a larger width based on usable page width
+		$usableWidth = $this->w - $this->lMargin - $this->rMargin; // page width minus margins
+		$scalePercent = 0.4; // 40% of usable width
+		$minWidth = 35; // mm
+		$maxWidth = 80; // mm (keep reasonable for A4)
+		$imgWidth = max($minWidth, min($maxWidth, $usableWidth * $scalePercent));
+
+		// Compute image height to position text below the image reliably
+		$imgHeight = 0;
+		if (file_exists($imgPath)) {
+			$imgInfo = @getimagesize($imgPath);
+			if ($imgInfo && isset($imgInfo[0]) && $imgInfo[0] > 0) {
+				$imgHeight = ($imgInfo[1] / $imgInfo[0]) * $imgWidth; // maintain aspect ratio
+			}
+		}
+
+		// Center the image horizontally within margins
+		$imgX = $this->lMargin + ($usableWidth - $imgWidth) / 2;
+		$this->Image($imgPath, $imgX, $topY, $imgWidth);
+
+		// Move cursor below the image with a little padding
+		$afterImageY = $topY + ($imgHeight > 0 ? $imgHeight : $imgWidth) + 6; // fallback to width if height unknown
+		$this->SetY($afterImageY);
+
 		$this->SetFont('Arial', 'B', 9);
 		$this->Cell(0, 5, ' ' . '', 0, 1);
-		$this->Cell(0, 5, 'GENERAL SIR JOHN KOTELAWALA DEFENCE UNIVERSITY APPLICATION FOR FOREIGN STUDENTS DEGREE PROGRAMS', 0, 1);
+		$this->Cell(0, 5, 'GENERAL SIR JOHN KOTELAWALA DEFENCE UNIVERSITY APPLICATION FOR FOREIGN STUDENTS DEGREE PROGRAMS', 0, 1, 'C');
 
 		//$this->Cell(50);
 		//$this->Ln(20);

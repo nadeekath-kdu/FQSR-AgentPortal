@@ -141,7 +141,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // Handle document uploads
+    // Handle document uploads (MANDATORY on first save)
     $uploadedDocuments = array();
     if (isset($_FILES['documents'])) {
         $baseDir = "../uploads/documents/";
@@ -189,8 +189,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-
-    move_uploaded_file($_FILES["inputPhoto"]["tmp_name"], $targetFilePath);
+    // Enforce at least one document uploaded on first save
+    if (empty($uploadedDocuments)) {
+        http_response_code(400);
+        echo json_encode(array(
+            'status' => 'error',
+            'message' => 'Please upload at least one supporting document before saving your application.'
+        ));
+        exit;
+    }
 
     /* $sql_cousr_name = "SELECT degree_name FROM mst_degree_courses WHERE degree_code = '$apply_course_code' ";
     $res_course_name = mysqli_query($db_connection, $sql_cousr_name);
@@ -209,9 +216,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $sql_personal_data = "INSERT INTO mst_personal_details (nic_no,course_name,course_code,intake,stu_title,stu_fullname,stu_name_initials,stu_dob,stu_gender,stu_citizenship,civil_status,stu_permenant_address,stu_email,application_submit_dt,media_source_name,birth_country,period_study_abroad,eligibility_uni_admision,other_qualification,fund,citizenship_type,citizenship_1,citizenship_2,AL_sitting_country,photo,isEduAgent,nameEduAgent,formStatus)VALUES ('$dec_nic_no','$apply_course','$apply_course_code','$intake_yr','$stu_title','$stu_fullname','$stu_initialname','$stu_dob','$stu_gender','$stu_citizenship','$stu_civilstats','$stu_permenant_addr','$stu_email','$cur_dt','$media_source_name','$stu_birth_country','$period_study_abroad','$eligibility_uni_admision','$other_qualification','$fund','$citizenship_type','$citizenship1','$citizenship2','$country_AL','$Photo','$eduAgent','$nameEduAgent','$formStatus')";
     //}
     try {
-        // Start transaction
-        if (!mysqli_begin_transaction($db_connection)) {
-            throw new Exception("Could not start transaction: " . mysqli_error($db_connection));
+        // Start transaction (compat with older PHP/MariaDB)
+        if (!mysqli_autocommit($db_connection, false)) {
+            throw new Exception("Could not disable autocommit: " . mysqli_error($db_connection));
         }
 
         // Insert personal data
@@ -231,7 +238,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Prepare the insert statement for degrees
                 $insert_degrees_sql = "INSERT INTO appliedDegrees (student_id, nic, appliedDegreeCode, preference_order) VALUES (?, ?, ?, ?)";
                 $insert_stmt = mysqli_prepare($db_connection, $insert_degrees_sql);
-                
+
                 if ($insert_stmt === false) {
                     throw new Exception("Could not prepare statement: " . mysqli_error($db_connection));
                 }
@@ -246,12 +253,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $degree['degree_code'],
                         $degree['preference_order']
                     );
-                    
+
                     if ($bind_result === false) {
                         mysqli_stmt_close($insert_stmt);
                         throw new Exception("Could not bind parameters: " . mysqli_stmt_error($insert_stmt));
                     }
-                    
+
                     $exec_result = mysqli_stmt_execute($insert_stmt);
                     if ($exec_result === false) {
                         mysqli_stmt_close($insert_stmt);
@@ -463,13 +470,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             throw new Exception("Personal details not saved: " . mysqli_error($db_connection));
         }
-        mysqli_commit($db_connection);
-        $response = array(
-            'status' => 'success',
-            'message' => 'Data saved successfully',
-            'passport_no' => $dec_nic_no,
-            'student_id' => $last_id
-        );
+        // No extra commit here; response already set above on success
     } catch (Exception $e) {
         if (isset($db_connection)) {
             mysqli_rollback($db_connection);
@@ -485,6 +486,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         mysqli_stmt_close($insert_stmt);
     }
 
+    // Restore autocommit before sending response
+    if (isset($db_connection)) {
+        @mysqli_autocommit($db_connection, true);
+    }
     // Send the response back as JSON
     echo json_encode($response);
 } else {

@@ -790,8 +790,8 @@ try {
                     if (isset($_FILES['documents']) || isset($_POST['files_to_keep'])) {
                         // Debug: log what files are being kept and what is in the folder
                         error_log('--- Document Update Debug ---');
-                        error_log('files_to_keep: ' . print_r(isset($_POST['files_to_keep']) ? $_POST['files_to_keep'] : [], true));
-                        error_log('new files: ' . print_r(isset($_FILES['documents']) ? $_FILES['documents']['name'] : [], true));
+                        error_log('files_to_keep: ' . print_r(isset($_POST['files_to_keep']) ? $_POST['files_to_keep'] : array(), true));
+                        error_log('new files: ' . print_r(isset($_FILES['documents']) ? $_FILES['documents']['name'] : array(), true));
 
                         $documentsDir = "../uploads/documents/" . $dec_nic_no . "/";
 

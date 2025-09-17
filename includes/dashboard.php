@@ -77,7 +77,7 @@ date_default_timezone_set('Asia/Colombo'); // Set your desired timezone
       <footer class="footer bg-transparent mt-auto">
         <div class="text-center py-3">
           <div class="mb-2">
-            <a href="https://www.kdu.ac.lk" target="_blank" class="footer-link fw-bolder">Kotelawala Defence University</a>
+            <a href="https://www.kdu.ac.lk" target="_blank" class="footer-link fw-bolder">General Sir John Kotelawala Defence University</a>
           </div>
           <div class="text-muted">
             © <?php echo date('Y'); ?> Foreign Student Registration Portal
