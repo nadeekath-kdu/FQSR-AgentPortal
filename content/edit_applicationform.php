@@ -83,7 +83,7 @@ $dec_nic_no = $application['nic_no'];
                                                         <div class="degree-choice-item mb-3">
                                                             <div class="d-flex align-items-center gap-2">
                                                                 <span class="preference-number"><?php echo $index + 1; ?></span>
-                                                                <select name="courses[]" class="form-select form-select-lg degree-select" required>
+                                                                <select name="courses[]" class="form-select form-select-lg degree-select" required disabled data-selected="<?php echo htmlspecialchars(isset($degree['degree_code']) ? $degree['degree_code'] : (isset($degree['course_code']) ? $degree['course_code'] : '')); ?>">
                                                                     <option value="">Select a course</option>
                                                                     <!-- Options will be populated by JavaScript -->
                                                                 </select>
@@ -801,7 +801,7 @@ $dec_nic_no = $application['nic_no'];
                                                     <table class="table table-bordered" id="documentsTable">
                                                         <thead>
                                                             <tr>
-                                                                <th>Document Type</th>
+                                                                <!--  <th>Document Type</th> -->
                                                                 <th>File Name</th>
                                                                 <th>Actions</th>
                                                             </tr>
@@ -811,7 +811,7 @@ $dec_nic_no = $application['nic_no'];
                                                             $documents = getUploadedDocuments($dec_nic_no);
                                                             foreach ($documents as $doc) {
                                                                 echo '<tr>';
-                                                                echo '<td>' . getDocumentTypeLabel($doc['document_type']) . '</td>';
+                                                                /* echo '<td>' . getDocumentTypeLabel($doc['document_type']) . '</td>'; */
                                                                 echo '<td>' . htmlspecialchars($doc['file_name']) . '</td>';
                                                                 echo '<td>';
                                                                 echo '<a href="' . htmlspecialchars($doc['file_path']) . '" class="btn btn-primary btn-sm" target="_blank" rel="noopener noreferrer">View</a>';
@@ -858,7 +858,7 @@ $dec_nic_no = $application['nic_no'];
 
 
 <script src="../assets/js/app/managerows.js?v=1.1"></script>
-<script src="../assets/js/app/formupdate.js?v=1.20"></script>
+<script src="../assets/js/app/formupdate.js?v=1.21"></script>
 <!-- <script src="../assets/js/app/document-handler.js?v=1.3"></script> -->
 
 <style>

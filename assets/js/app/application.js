@@ -12,46 +12,6 @@ $('<style>')
 
 var closingDateLoaded = false;
 
-function validateAge() {
-    const dob = new Date($('#inputDob').val());
-    const today = new Date();
-    let age = today.getFullYear() - dob.getFullYear();
-    const m = today.getMonth() - dob.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
-        age--;
-    }
-
-    const degreeCode = $('#inputCourse').val();
-
-    // Check if medicine program (MED)
-    if (degreeCode === 'MED') {
-        if (age < 16 || age > 29) {
-            toastr.error("For medicine programs, age must be between 16 and 29 years", '', { timeOut: 2000 });
-            return false;
-        }
-    } else {
-        if (age < 16 || age > 25) {
-            toastr.error("Age must be between 16 and 25 years", '', { timeOut: 2000 });
-            return false;
-        }
-    }
-
-    return true;
-}
-
-function validateEmailField() {
-    var email = $('#inputEmailAddress').val().trim();
-    var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email) {
-        toastr.error("Please enter an Email address", '', { timeOut: 1000 });
-        return false;
-    } else if (!emailPattern.test(email)) {
-        toastr.error("Please enter a valid Email address", '', { timeOut: 1000 });
-        return false;
-    }
-    return true;
-}
-
 // File Upload Variables (moved outside to be globally accessible)
 let selectedFilesArray = [];
 let fileUploadArea, fileInput, selectedFiles, filesList, clearAllBtn;
@@ -179,6 +139,152 @@ function getFileIcon(extension) {
     return icons[extension] || icons.default;
 }
 
+// Degree selection (application form - Step 2)
+function initializeDegreeSelectionApp() {
+    const degreeChoices = document.getElementById('degreeChoices');
+    const addBtn = document.getElementById('addDegreeChoice');
+    if (!degreeChoices || !addBtn) return;
+
+    let availableDegreesApp = [];
+    const originalAddHtml = addBtn.innerHTML;
+    addBtn.disabled = true;
+    addBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Loading degrees...';
+
+    function buildOptionsUnique(excludeSet = new Set(), keepCode = '') {
+        if (!Array.isArray(availableDegreesApp)) return '';
+        const out = [];
+        let keepInjected = false;
+        if (keepCode && !availableDegreesApp.some(d => String(d.degree_code) === String(keepCode))) {
+            out.push(`<option value="${keepCode}" selected>${keepCode}</option>`);
+            keepInjected = true;
+        }
+        availableDegreesApp.forEach(d => {
+            const code = String(d.degree_code);
+            if (excludeSet.has(code) && code !== String(keepCode)) return;
+            const sel = code === String(keepCode) && !keepInjected ? ' selected' : '';
+            const label = (d.degree_name && String(d.degree_name).trim().length > 0) ? d.degree_name : code;
+            out.push(`<option value="${code}"${sel}>${label}</option>`);
+        });
+        return out.join('');
+    }
+
+    function refreshAll(changed = null) {
+        const selects = Array.from(degreeChoices.querySelectorAll('select.degree-select'));
+        const current = new Map();
+        selects.forEach(sel => current.set(sel, sel.value || ''));
+        selects.forEach(sel => {
+            const keep = current.get(sel);
+            const exclude = new Set();
+            current.forEach((val, other) => { if (other !== sel && val) exclude.add(String(val)); });
+            sel.innerHTML = '<option value="">Select a course</option>' + buildOptionsUnique(exclude, keep);
+            if (keep) sel.value = keep;
+        });
+    }
+
+    function wireChanges() {
+        degreeChoices.querySelectorAll('select.degree-select').forEach(sel => {
+            if (!sel._wired) {
+                sel.addEventListener('change', function () { refreshAll(this); });
+                sel._wired = true;
+            }
+        });
+    }
+
+    // Load degrees
+    $.getJSON('../data/get_degree_list.php', { t: Date.now() })
+        .done(function (data) {
+            if (Array.isArray(data)) availableDegreesApp = data; else availableDegreesApp = [];
+            // Populate first select
+            const first = degreeChoices.querySelector('select.degree-select');
+            if (first) {
+                first.innerHTML = '<option value="">Select a course</option>' + buildOptionsUnique(new Set());
+            }
+            wireChanges();
+        })
+        .fail(function () {
+            console.warn('Failed to load degree list');
+        })
+        .always(function () {
+            addBtn.disabled = false;
+            addBtn.innerHTML = originalAddHtml;
+        });
+
+    // Add another degree choice
+    addBtn.addEventListener('click', function () {
+        if (!Array.isArray(availableDegreesApp) || availableDegreesApp.length === 0) {
+            toastr.info('Loading degree options, please wait...');
+            return;
+        }
+        const count = degreeChoices.querySelectorAll('.degree-choice-item').length;
+        const selectedSet = new Set();
+        degreeChoices.querySelectorAll('select.degree-select').forEach(sel => { if (sel.value) selectedSet.add(sel.value); });
+
+        const wrap = document.createElement('div');
+        wrap.className = 'degree-choice-item mb-3';
+        wrap.innerHTML = `
+            <div class="d-flex align-items-center gap-2">
+                <span class="preference-number">${count + 1}</span>
+                <select name="courses[]" class="form-select form-select-lg degree-select">
+                    <option value="">Select a course</option>
+                    ${buildOptionsUnique(selectedSet)}
+                </select>
+                <button type="button" class="btn btn-danger remove-degree" ${count === 0 ? 'style="display:none;"' : ''}>
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>`;
+        degreeChoices.appendChild(wrap);
+
+        // Update numbering and buttons visibility
+        degreeChoices.querySelectorAll('.degree-choice-item').forEach((item, idx) => {
+            const pref = item.querySelector('.preference-number');
+            if (pref) pref.textContent = String(idx + 1);
+            const rm = item.querySelector('.remove-degree');
+            if (rm) rm.style.display = idx === 0 ? 'none' : '';
+        });
+        wireChanges();
+        refreshAll();
+
+        // Auto-focus and open the newly added dropdown to avoid “double click to open”
+        const newSelect = wrap.querySelector('select.degree-select');
+        if (newSelect) {
+            setTimeout(() => {
+                try {
+                    newSelect.focus({ preventScroll: true });
+                    // Try to open the native select dropdown
+                    const ev = new MouseEvent('mousedown', { bubbles: true, cancelable: true, view: window });
+                    const opened = newSelect.dispatchEvent(ev);
+                    if (!opened) {
+                        // Fallback to a programmatic click if needed
+                        newSelect.click();
+                    }
+                } catch (e) {
+                    // As a last resort, at least focus the element
+                    newSelect.focus({ preventScroll: true });
+                }
+            }, 50);
+        }
+    });
+
+    // Remove degree handler
+    degreeChoices.addEventListener('click', function (e) {
+        const btn = e.target.closest('.remove-degree');
+        if (!btn) return;
+        const item = btn.closest('.degree-choice-item');
+        if (item && degreeChoices.children.length > 1) {
+            item.remove();
+        } else {
+            toastr.warning('At least one degree choice must be selected');
+        }
+        degreeChoices.querySelectorAll('.degree-choice-item').forEach((it, idx) => {
+            const pref = it.querySelector('.preference-number');
+            if (pref) pref.textContent = String(idx + 1);
+            const rm = it.querySelector('.remove-degree');
+            if (rm) rm.style.display = idx === 0 ? 'none' : '';
+        });
+        refreshAll();
+    });
+}
+
 $(document).ready(function () {
     //console.log('application.js loaded');
     var serverUrl;
@@ -235,6 +341,9 @@ $(document).ready(function () {
     $(document).on('click', 'a[href="#step-8"]', function () {
         setTimeout(initializeFileUpload, 100); // Short delay to ensure DOM is ready
     });
+
+    // Initialize degree selection (Step 2)
+    initializeDegreeSelectionApp();
 
     // Get academic year
     $.ajax({
@@ -361,256 +470,7 @@ $(document).ready(function () {
 
 
 
-    // Degree selection functionality
-    function initializeDegreeSelection() {
-        const degreeChoices = document.getElementById('degreeChoices');
-        const addDegreeBtn = document.getElementById('addDegreeChoice');
-
-        if (!degreeChoices || !addDegreeBtn) {
-            return; // Elements not found, skip initialization
-        }
-
-        // Event handler for adding new degree choice
-        addDegreeBtn.addEventListener('click', function () {
-            const choicesCount = degreeChoices.querySelectorAll('.degree-choice-item').length;
-            const newChoice = document.createElement('div');
-            newChoice.className = 'degree-choice-item mb-3';
-            newChoice.innerHTML = `
-                <div class="d-flex align-items-center gap-2">
-                    <span class="preference-number">${choicesCount + 1}</span>
-                    <select name="courses[]" class="form-select form-select-lg degree-select">
-                        <option value="">Select a course</option>
-                    </select>
-                    <button type="button" class="btn btn-danger remove-degree" ${choicesCount === 0 ? 'style="display: none;"' : ''}>
-                        <i class="fa fa-times"></i>
-                    </button>
-                </div>
-            `;
-            degreeChoices.appendChild(newChoice);
-
-            // Update the new select with available degrees
-            const newSelect = newChoice.querySelector('select');
-            populateSelect(newSelect);
-        });
-
-        // Event delegation for remove buttons
-        degreeChoices.addEventListener('click', function (e) {
-            if (e.target.closest('.remove-degree')) {
-                const choiceItem = e.target.closest('.degree-choice-item');
-                choiceItem.remove();
-                updatePreferenceNumbers();
-                updateRemoveButtons();
-            }
-        });
-
-        // Update preference numbers
-        function updatePreferenceNumbers() {
-            const items = degreeChoices.querySelectorAll('.degree-choice-item');
-            items.forEach((item, index) => {
-                const numberSpan = item.querySelector('.preference-number');
-                if (numberSpan) {
-                    numberSpan.textContent = index + 1;
-                }
-            });
-        }
-
-        // Update visibility of remove buttons
-        function updateRemoveButtons() {
-            const items = degreeChoices.querySelectorAll('.degree-choice-item');
-            items.forEach(item => {
-                const removeBtn = item.querySelector('.remove-degree');
-                if (removeBtn) {
-                    removeBtn.style.display = items.length > 1 ? '' : 'none';
-                }
-            });
-        }
-
-        // Populate select with available degrees
-        function populateSelect(select) {
-            if (!select) return;
-
-            const currentValue = select.value;
-            select.innerHTML = '<option value="">Select a course</option>';
-
-            if (window.availableDegrees && window.availableDegrees.length) {
-                window.availableDegrees.forEach(degree => {
-                    const option = document.createElement('option');
-                    option.value = degree.id;
-                    option.textContent = degree.name;
-                    if (degree.id === currentValue) {
-                        option.selected = true;
-                    }
-                    select.appendChild(option);
-                });
-            }
-        }
-    }
-
-    // Call initialization function
-    initializeDegreeSelection();
-
-    // Initialize Sortable for drag and drop reordering
-    if (typeof Sortable !== 'undefined') {
-        new Sortable(degreeChoices, {
-            animation: 150,
-            handle: '.preference-number',
-            draggable: '.degree-choice-item',
-            onEnd: updatePreferenceNumbers
-        });
-    }
-
-    // Add new degree choice
-    /* addDegreeBtn.addEventListener('click', () => {
-        const choicesCount = degreeChoices.children.length;
-        const newChoice = document.createElement('div');
-        newChoice.className = 'degree-choice-item mb-3';
-        newChoice.innerHTML = `
-            <div class="d-flex align-items-center gap-2">
-                <span class="preference-number">${choicesCount + 1}</span>
-                <select name="courses[]" class="form-select form-select-lg degree-select">
-                    <option value="">Select a course</option>
-                    ${getAvailableOptionsHtml()}
-                </select>
-                <button type="button" class="btn btn-danger remove-degree">
-                    <i class="fa fa-times"></i>
-                </button>
-            </div>
-        `;
-
-        degreeChoices.appendChild(newChoice);
-        updateRemoveButtons();
-    }); */
-
-    // Handle degree removal
-    degreeChoices.addEventListener('click', (e) => {
-        if (e.target.closest('.remove-degree')) {
-            const choiceItem = e.target.closest('.degree-choice-item');
-            choiceItem.remove();
-            updatePreferenceNumbers();
-            updateRemoveButtons();
-            updateAvailableDegrees();
-        }
-    });
-
-    // Handle degree selection changes
-    degreeChoices.addEventListener('change', (e) => {
-        if (e.target.classList.contains('degree-select')) {
-            updateAvailableDegrees();
-        }
-    });
-
-    // Update the numbers showing preference order
-    function updatePreferenceNumbers() {
-        const choices = degreeChoices.querySelectorAll('.degree-choice-item');
-        choices.forEach((choice, index) => {
-            const number = choice.querySelector('.preference-number');
-            number.textContent = index + 1;
-        });
-    }
-
-    // Update visibility of remove buttons
-    function updateRemoveButtons() {
-        const choices = degreeChoices.querySelectorAll('.degree-choice-item');
-        choices.forEach((choice, index) => {
-            const removeBtn = choice.querySelector('.remove-degree');
-            removeBtn.style.display = choices.length > 1 ? 'block' : 'none';
-        });
-        addDegreeBtn.style.display = choices.length < availableDegrees.length ? 'block' : 'none';
-    }
-
-    // Get HTML for available degree options
-    function getAvailableOptionsHtml() {
-        return availableDegrees.map(degree =>
-            `<option value="${degree.degree_code}">${degree.degree_name}</option>`
-        ).join('');
-    }
-
-    // Update available degrees in each dropdown
-    function updateAvailableDegrees() {
-        const selects = degreeChoices.querySelectorAll('.degree-select');
-        const selectedValues = Array.from(selects).map(select => select.value).filter(Boolean);
-
-        selects.forEach(select => {
-            const currentValue = select.value;
-            const options = availableDegrees.filter(degree =>
-                degree.degree_code === currentValue || !selectedValues.includes(degree.degree_code)
-            );
-
-            const currentSelection = select.value;
-            select.innerHTML = '<option value="">Select a course</option>' +
-                options.map(degree =>
-                    `<option value="${degree.degree_code}" ${degree.degree_code === currentSelection ? 'selected' : ''}>${degree.degree_name}</option>`
-                ).join('');
-        });
-    }
-
-    // Override the validateStep function for step 2
-    const originalValidateStep = window.validateStep || function () { return true; };
-    window.validateStep = function (step) {
-        if (step === 2) {
-            const selects = document.querySelectorAll('#degreeChoices .degree-select');
-            if (!selects[0].value) {
-                toastr.error('Please select at least one degree choice');
-                return false;
-            }
-            return true;
-        }
-        return originalValidateStep(step);
-    };
-
-    // Load degree list
-    $.ajax({
-        url: '../data/get_degree_list.php',
-        type: 'GET',
-        dataType: 'json',
-        success: function (data) {
-            console.log('Degree data received:', data); // Debug log
-            window.availableDegrees = data;
-
-            // Initialize existing selects with the degrees
-            const degreeChoices = document.getElementById('degreeChoices');
-            if (degreeChoices && degreeChoices.children.length === 0) {
-                // Add initial degree choice if none exists
-                const initialChoice = document.createElement('div');
-                initialChoice.className = 'degree-choice-item mb-3';
-                initialChoice.innerHTML = `
-                    <div class="d-flex align-items-center gap-2">
-                        <span class="preference-number">1</span>
-                        <select name="courses[]" class="form-select form-select-lg degree-select">
-                            <option value="">Select a course</option>
-                            ${data.map(degree => `<option value="${degree.degree_code}">${degree.degree_name}</option>`).join('')}
-                        </select>
-                        <button type="button" class="btn btn-danger remove-degree" style="display: none;">
-                            <i class="fa fa-times"></i>
-                        </button>
-                    </div>
-                `;
-                degreeChoices.appendChild(initialChoice);
-            }
-
-            // Update all existing selects with the degrees
-            const degreeSelects = document.querySelectorAll('.degree-select');
-            degreeSelects.forEach(select => {
-                const currentValue = select.value;
-                if (select.options.length <= 1) { // Only update if not already populated
-                    select.innerHTML = '<option value="">Select a course</option>';
-                    data.forEach(degree => {
-                        const option = document.createElement('option');
-                        option.value = degree.degree_code;
-                        option.textContent = degree.degree_name;
-                        if (degree.degree_code === currentValue) {
-                            option.selected = true;
-                        }
-                        select.appendChild(option);
-                    });
-                }
-            });
-        },
-        error: function (xhr, status, error) {
-            console.error('Error fetching degree options:', error);
-            toastr.error('Failed to load degree options. Please try again.');
-        }
-    });
+    // Removed legacy degree selection logic and duplicate loaders. Using initializeDegreeSelectionApp() instead.
 
     $("#foreign").click(function () {
         //alert(document.forms["my-form"]["citizenship_type"].value);
@@ -726,14 +586,14 @@ $(document).ready(function () {
             }
 
             // Show loading indicator
-            /* Swal.fire({
+            Swal.fire({
                 title: 'Saving...',
                 text: 'Please wait while we save your application',
                 allowOutsideClick: false,
                 didOpen: () => {
                     Swal.showLoading();
                 }
-            }); */
+            });
 
             $.ajax({
                 url: '../pages/formsave.php', // Use relative path
@@ -961,8 +821,9 @@ function validateStep(step) {
 
         }
     } else if (step === 2) {
-        if ($('#inputCourse').val() === "select degree") {
-            toastr.error("Please select a degree", '', { timeOut: 1000, });
+        const firstDegree = document.querySelector('#degreeChoices .degree-select');
+        if (!firstDegree || !firstDegree.value) {
+            toastr.error('Please select at least one degree choice', '', { timeOut: 1000 });
             isValid = false;
             return;
         }

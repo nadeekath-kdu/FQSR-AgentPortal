@@ -688,6 +688,13 @@ function initializeDegreeSelection() {
     // Maximum number of degree choices allowed
     const MAX_DEGREE_CHOICES = 3;
 
+    // Prevent first-click race: disable Add button until degrees are loaded
+    let originalAddBtnHTML = addDegreeBtn ? addDegreeBtn.innerHTML : '';
+    if (addDegreeBtn) {
+        addDegreeBtn.disabled = true;
+        addDegreeBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Loading degrees...';
+    }
+
     // Load available degrees
     $.ajax({
         url: '../data/get_degree_list.php',
@@ -707,30 +714,20 @@ function initializeDegreeSelection() {
                 // Sort selected degrees by preference order
                 window.selectedDegrees.sort((a, b) => a.preference_order - b.preference_order);
 
+                // Build selects while ensuring uniqueness across rows
+                const used = new Set();
                 window.selectedDegrees.forEach((selectedDegree, index) => {
-                    // Find matching degree before creating the element
-                    const degree = window.availableDegrees.find(d => {
-                        const matchByCode = d.degree_code === selectedDegree.degree_code;
-                        const matchByName = d.degree_name === selectedDegree.degree_name;
-                        if (matchByCode || matchByName) {
-                            console.log('Found match for:', selectedDegree, 'Match:', d);
-                        }
-                        return matchByCode || matchByName;
-                    });
+                    // Build option list excluding already-used codes, but always include this row's current selection
+                    const selectedCode = selectedDegree.degree_code;
+                    const options = getAvailableDegreeOptionsUnique(used, selectedCode);
 
                     const choiceItem = document.createElement('div');
                     choiceItem.className = 'degree-choice-item mb-3';
-                    // Create options with the correct degree pre-selected
-                    const options = window.availableDegrees.map(degree =>
-                        `<option value="${degree.degree_code}" ${degree.degree_code === selectedDegree.degree_code ? 'selected' : ''}>
-                            ${degree.degree_name}
-                        </option>`
-                    ).join('');
-
                     choiceItem.innerHTML = `
                         <div class="d-flex align-items-center gap-2">
                             <span class="preference-number">${index + 1}</span>
                             <select name="courses[]" class="form-select form-select-lg degree-select" required>
+                                <option value="">Select a course</option>
                                 ${options}
                             </select>
                             ${index > 0 ? `
@@ -741,7 +738,14 @@ function initializeDegreeSelection() {
                         </div>
                     `;
                     degreeChoices.appendChild(choiceItem);
-                    console.log('Added degree choice:', selectedDegree.degree_code);
+
+                    // Set the selected value explicitly
+                    const sel = choiceItem.querySelector('select.degree-select');
+                    if (sel) sel.value = selectedCode || '';
+
+                    // Track used after placing this row
+                    if (selectedCode) used.add(selectedCode);
+                    console.log('Added degree choice:', selectedCode);
                 });
             } else {
                 // If no degrees selected, create one empty choice
@@ -752,27 +756,50 @@ function initializeDegreeSelection() {
                         <span class="preference-number">1</span>
                         <select name="courses[]" class="form-select form-select-lg degree-select" required>
                             <option value="">Select a course</option>
-                            ${getAvailableDegreeOptions()}
+                            ${getAvailableDegreeOptionsUnique(new Set())}
                         </select>
                     </div>
                 `;
                 degreeChoices.appendChild(newChoice);
             }
+
+            // Mark as loaded and enable Add button
+            window.degreesLoaded = true;
+            if (addDegreeBtn) {
+                addDegreeBtn.disabled = false;
+                addDegreeBtn.innerHTML = originalAddBtnHTML;
+            }
         },
         error: function (xhr, status, error) {
             console.error('Error fetching degrees:', error);
             toastr.error('Failed to load degree options');
+            // Even on error, re-enable button to avoid blocking user, but keep guard on click
+            if (addDegreeBtn) {
+                addDegreeBtn.disabled = false;
+                addDegreeBtn.innerHTML = originalAddBtnHTML;
+            }
         }
     });
 
     // Add new degree choice
     addDegreeBtn.addEventListener('click', function () {
+        // If degrees not yet loaded, avoid adding an empty dropdown
+        if (!window.degreesLoaded || !Array.isArray(window.availableDegrees) || window.availableDegrees.length === 0) {
+            toastr.info('Loading degree options, please wait...');
+            return;
+        }
         const choicesCount = degreeChoices.querySelectorAll('.degree-choice-item').length;
 
         /* if (choicesCount >= MAX_DEGREE_CHOICES) {
             toastr.warning(`Maximum ${MAX_DEGREE_CHOICES} degree choices allowed`);
             return;
         } */
+
+        // Build exclusion set from currently selected values
+        const currentSelected = new Set();
+        degreeChoices.querySelectorAll('select.degree-select').forEach(sel => {
+            if (sel.value) currentSelected.add(sel.value);
+        });
 
         const newChoice = document.createElement('div');
         newChoice.className = 'degree-choice-item mb-3';
@@ -781,9 +808,7 @@ function initializeDegreeSelection() {
                 <span class="preference-number">${choicesCount + 1}</span>
                 <select name="courses[]" class="form-select form-select-lg degree-select" required>
                     <option value="">Select a course</option>
-                    ${window.availableDegrees.map(degree =>
-            `<option value="${degree.degree_code}">${degree.degree_name}</option>`
-        ).join('')}
+                    ${getAvailableDegreeOptionsUnique(currentSelected)}
                 </select>
                 <button type="button" class="btn btn-danger remove-degree">
                     <i class="fa fa-times"></i>
@@ -792,6 +817,8 @@ function initializeDegreeSelection() {
         `;
         degreeChoices.appendChild(newChoice);
         updateDegreePreferences();
+        // After adding, wire change handlers to keep options unique
+        wireDegreeChangeHandlers();
     });
 
     // Handle degree removal
@@ -801,46 +828,72 @@ function initializeDegreeSelection() {
             if (choiceItem && degreeChoices.children.length > 1) {
                 choiceItem.remove();
                 updateDegreePreferences();
+                // Rebuild options to reflect freed choice
+                refreshAllDegreeOptions();
             } else {
                 toastr.warning('At least one degree choice must be selected');
             }
         }
     });
+
+    // Ensure change on any select updates others to maintain uniqueness
+    function wireDegreeChangeHandlers() {
+        degreeChoices.querySelectorAll('select.degree-select').forEach(sel => {
+            if (!sel._uniqueWired) {
+                sel.addEventListener('change', function () {
+                    refreshAllDegreeOptions(this);
+                });
+                sel._uniqueWired = true;
+            }
+        });
+    }
+    wireDegreeChangeHandlers();
 }
 
-// Function to get HTML options for available degrees
-function getAvailableDegreeOptions(selectedCode = '') {
-    return window.availableDegrees.map(degree =>
-        `<option value="${degree.degree_code}" ${degree.degree_code === selectedCode ? 'selected' : ''}>${degree.degree_name}</option>`
-    ).join('');
+// Build options excluding already-selected codes, but keep current if provided
+function getAvailableDegreeOptionsUnique(excludeSet = new Set(), keepCode = '') {
+    if (!Array.isArray(window.availableDegrees)) return '';
+    const list = [];
+    // If keepCode is not in available list (edge case), inject a synthetic option so value doesn't disappear
+    let keepInjected = false;
+    if (keepCode && !window.availableDegrees.some(d => d.degree_code === keepCode)) {
+        list.push(`<option value="${keepCode}" selected>${keepCode}</option>`);
+        keepInjected = true;
+    }
+    window.availableDegrees.forEach(degree => {
+        const code = String(degree.degree_code);
+        if (excludeSet.has(code) && code !== String(keepCode)) return;
+        const sel = code === String(keepCode) && !keepInjected ? ' selected' : '';
+        list.push(`<option value="${code}"${sel}>${degree.degree_name}</option>`);
+    });
+    return list.join('');
 }
 
 // Function to update all degree select options
-function updateDegreeOptions() {
-    const selects = document.querySelectorAll('.degree-select');
-    if (!window.availableDegrees) {
-        console.warn('Available degrees not loaded yet');
-        return;
-    }
+function refreshAllDegreeOptions(changedSelect = null) {
+    const selects = Array.from(document.querySelectorAll('#degreeChoices select.degree-select'));
+    if (!selects.length || !Array.isArray(window.availableDegrees)) return;
 
-    const selectedValues = new Set();
+    // Build a map of current selections
+    const currentSelections = new Map();
+    selects.forEach(sel => {
+        currentSelections.set(sel, sel.value || '');
+    });
 
-    selects.forEach(select => {
-        const currentValue = select.value;
-        select.innerHTML = '<option value="">Select a course</option>' + getAvailableDegreeOptions();
-
-        if (currentValue) {
-            // Check if the degree is still available
-            const degreeStillExists = window.availableDegrees.some(d => d.degree_code === currentValue);
-            if (degreeStillExists && !selectedValues.has(currentValue)) {
-                select.value = currentValue;
-                selectedValues.add(currentValue);
-            } else {
-                select.value = '';
-                if (currentValue) {
-                    toastr.warning('A previously selected degree is no longer available');
-                }
-            }
+    // For each select, exclude all other selected values but keep its own
+    selects.forEach(sel => {
+        const keepCode = currentSelections.get(sel) || '';
+        const exclude = new Set();
+        currentSelections.forEach((val, otherSel) => {
+            if (otherSel !== sel && val) exclude.add(String(val));
+        });
+        const prev = sel.value;
+        sel.innerHTML = '<option value="">Select a course</option>' + getAvailableDegreeOptionsUnique(exclude, keepCode);
+        // restore value if still valid
+        if (keepCode) sel.value = keepCode;
+        // If a previous selection was invalidated, notify once
+        if (prev && sel.value !== prev) {
+            toastr.warning('Selection adjusted due to duplicate choices');
         }
     });
 }

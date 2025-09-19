@@ -177,13 +177,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         for ($i = 0; $i < $fileCount; $i++) {
             if ($files['error'][$i] === 0) {
-                $fileName = $files['name'][$i];
-                $fileExt = pathinfo($fileName, PATHINFO_EXTENSION);
-                $safeFileName = 'doc_' . ($i + 1) . '.' . $fileExt;
-                $targetPath = $applicantDir . $safeFileName;
+                // Preserve the original filename (with minimal sanitization)
+                $originalName = basename($files['name'][$i]);
+                // Remove null bytes and replace risky characters to prevent path issues
+                $originalName = str_replace("\0", '', $originalName);
+                $safeFileName = preg_replace('/[\\\\\/:*?"<>|]+/', '_', $originalName);
+
+                // Ensure we don't overwrite existing files: append numeric suffix if needed
+                $pathInfo = pathinfo($safeFileName);
+                $base = isset($pathInfo['filename']) ? $pathInfo['filename'] : 'file';
+                $ext = isset($pathInfo['extension']) && $pathInfo['extension'] !== '' ? '.' . $pathInfo['extension'] : '';
+                $finalFileName = $safeFileName;
+                $counter = 1;
+                while (file_exists($applicantDir . $finalFileName)) {
+                    $finalFileName = $base . ' (' . $counter . ')' . $ext;
+                    $counter++;
+                }
+
+                $targetPath = $applicantDir . $finalFileName;
 
                 if (move_uploaded_file($files['tmp_name'][$i], $targetPath)) {
-                    $uploadedDocuments[] = $dec_nic_no . '/' . $safeFileName;
+                    $uploadedDocuments[] = $dec_nic_no . '/' . $finalFileName;
                 }
             }
         }

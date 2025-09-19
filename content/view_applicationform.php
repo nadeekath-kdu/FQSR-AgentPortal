@@ -696,7 +696,7 @@ $uploadedDocuments = getUploadedDocuments($dec_nic_no);
                                         <table class="table table-bordered" id="documentsTable">
                                             <thead>
                                                 <tr>
-                                                    <th>Document Type</th>
+                                                    <!-- <th>Document Type</th> -->
                                                     <th>File Name</th>
                                                     <th>Actions</th>
                                                 </tr>
@@ -707,7 +707,7 @@ $uploadedDocuments = getUploadedDocuments($dec_nic_no);
 
                                                 foreach ($documents as $doc) {
                                                     echo '<tr>';
-                                                    echo '<td>' . getDocumentTypeLabel($doc['document_type']) . '</td>';
+                                                    /*  echo '<td>' . getDocumentTypeLabel($doc['document_type']) . '</td>'; */
                                                     echo '<td>' . htmlspecialchars($doc['file_name']) . '</td>';
                                                     echo '<td>';
                                                     echo '<a href="' . htmlspecialchars($doc['file_path']) . '" class="btn btn-primary btn-sm" target="_blank" rel="noopener noreferrer">View</a>';

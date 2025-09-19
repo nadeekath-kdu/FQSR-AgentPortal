@@ -20,7 +20,7 @@ class PDF extends FPDF
 
 		// Determine a larger width based on usable page width
 		$usableWidth = $this->w - $this->lMargin - $this->rMargin; // page width minus margins
-		$scalePercent = 0.4; // 40% of usable width
+		$scalePercent = 0.9; // 90% of usable width
 		$minWidth = 35; // mm
 		$maxWidth = 80; // mm (keep reasonable for A4)
 		$imgWidth = max($minWidth, min($maxWidth, $usableWidth * $scalePercent));
@@ -44,7 +44,7 @@ class PDF extends FPDF
 
 		$this->SetFont('Arial', 'B', 9);
 		$this->Cell(0, 5, ' ' . '', 0, 1);
-		$this->Cell(0, 5, 'GENERAL SIR JOHN KOTELAWALA DEFENCE UNIVERSITY APPLICATION FOR FOREIGN STUDENTS DEGREE PROGRAMS', 0, 1, 'C');
+		$this->Cell(0, 5, 'APPLICATION FOR FOREIGN STUDENTS DEGREE PROGRAMS', 0, 1, 'C');
 
 		//$this->Cell(50);
 		//$this->Ln(20);
@@ -157,175 +157,207 @@ class PDF extends FPDF
 		$this->Cell(0, 10, ' PERSONAL DETAILS', 0, 1, 'L', true);
 		$this->SetFont('Arial', '', 9);
 
+		// Consistent label/value widths
+		$labelW = 60;  // mm
+		$valueW = 130; // mm (label + value = 190)
 
-		$this->Cell(40, 12, 'Applied Degrees', 0, 0, 'L', false);
-		if (count($applied_degrees) > 0) {
-			$this->Cell(150, 12, '', 0, 0, 'L', false);
-			$this->Cell(0, 5, ' ' . '', 0, 1);
-			foreach ($applied_degrees as $degree) {
-				$this->Cell(40, 10, 'Preference ' . $degree['preference_order'], 0, 0, 'L', false);
-				$this->Cell(150, 10, $degree['degree_name'], 0, 0, 'L', false);
-				$this->Cell(0, 5, ' ' . '', 0, 1);
-			}
-		} else {
-			$this->Cell(150, 12, '-', 0, 0, 'L', false);
-			$this->Cell(0, 5, ' ' . '', 0, 1);
+		$this->Cell($labelW, 12, 'Full Name', 0, 0, 'L', false);
+		$this->Cell($valueW, 12, $stu_fullname, 0, 0, 'L', false);
+		$this->Cell(0, 5, ' ' . '', 0, 1);
+
+		$this->Cell($labelW, 10, 'Name with Initials', 0, 0, 'L', false);
+		$this->Cell($valueW, 10, $name_initials, 0, 0, 'L', false);
+		$this->Cell(0, 5, ' ' . '', 0, 1);
+
+		$this->Cell($labelW, 10, 'Date of Birth', 0, 0, 'L', false);
+		$this->Cell($valueW, 10, $stu_dob, 0, 0, 'L', false);
+		$this->Cell(0, 5, ' ' . '', 0, 1);
+
+		$this->Cell($labelW, 10, 'Gender', 0, 0, 'L', false);
+		$this->Cell($valueW, 10, $stu_gender, 0, 0, 'L', false);
+		$this->Cell(0, 5, ' ' . '', 0, 1);
+
+		$this->Cell($labelW, 10, 'Civil Status', 0, 0, 'L', false);
+		$this->Cell($valueW, 10, $stu_civil_status, 0, 0, 'L', false);
+		$this->Cell(0, 5, ' ' . '', 0, 1);
+
+		if (trim($stu_permenant_address) !== '') {
+			$this->Cell($labelW, 10, 'Permanent Address', 0, 0, 'L', false);
+			$this->MultiCell($valueW, 10, $stu_permenant_address, 0, 'L', false);
 		}
 
-		$this->Cell(40, 12, 'Application submit date', 0, 0, 'L', false);
-		$this->Cell(150, 12, $app_submit_dt, 0, 0, 'L', false);
+		$this->Cell($labelW, 10, 'Email Address', 0, 0, 'L', false);
+		$this->Cell($valueW, 10, $email_addr, 0, 0, 'L', false);
 		$this->Cell(0, 5, ' ' . '', 0, 1);
 
-		$this->Cell(40, 12, 'Full Name', 0, 0, 'L', false);
-		$this->Cell(150, 12, $stu_fullname, 0, 0, 'L', false);
+		$this->Cell($labelW, 10, 'NIC No', 0, 0, 'L', false);
+		$this->Cell($valueW, 10, $stu_nicno, 0, 0, 'L', false);
 		$this->Cell(0, 5, ' ' . '', 0, 1);
 
-
-		$this->Cell(40, 10, 'Name with initials', 0, 0, 'L', false);
-		$this->Cell(150, 10, $name_initials, 0, 0, 'L', false);
-		$this->Cell(0, 5, ' ' . '', 0, 1);
-
-
-		$this->Cell(40, 10, 'Date of birth', 0, 0, 'L', false);
-		$this->Cell(150, 10, $stu_dob, 0, 0, 'L', false);
-		$this->Cell(0, 5, ' ' . '', 0, 1);
-
-		$this->Cell(40, 10, 'Gender', 0, 0, 'L', false);
-		$this->Cell(150, 10, $stu_gender, 0, 0, 'L', false);
-		$this->Cell(0, 5, ' ' . '', 0, 1);
-
-		$this->Cell(40, 10, 'Civil status', 0, 0, 'L', false);
-		$this->Cell(150, 10, $stu_civil_status, 0, 0, 'L', false);
-		$this->Cell(0, 5, ' ' . '', 0, 1);
-
-
-		$this->Cell(40, 10, 'Permenant Address', 0, 0, 'L', false);
-
-		$this->MultiCell(150, 10, $stu_permenant_address, '0', 'L', false);
-		$this->Cell(0, 5, ' ' . '', 0, 1);
-
-		$this->Cell(40, 10, 'Email Address', 0, 0, 'L', false);
-		$this->Cell(150, 10, $email_addr, 0, 0, 'L', false);
-		$this->Cell(0, 5, ' ' . '', 0, 1);
-
-		$this->Cell(40, 10, 'NIC No', 0, 0, 'L', false);
-		$this->Cell(150, 10, $stu_nicno, 0, 0, 'L', false);
-		$this->Cell(0, 5, ' ' . '', 0, 1);
-
-		$this->Cell(40, 10, 'Citizenship', 0, 0, 'L', false);
-		$this->Cell(150, 10, $citizenship_type, 0, 0, 'L', false);
+		$this->Cell($labelW, 10, 'Citizenship', 0, 0, 'L', false);
+		$this->Cell($valueW, 10, $citizenship_type, 0, 0, 'L', false);
 		$this->Cell(0, 5, ' ' . '', 0, 1);
 
 		if ($citizenship_type == 'Foreign Citizenship') {
 
-			$this->Cell(40, 10, 'Contry of Citizenship', 0, 0, 'L', false);
-			$this->Cell(150, 10, $citizenship, 0, 0, 'L', false);
+			$this->Cell($labelW, 10, 'Country of Citizenship', 0, 0, 'L', false);
+			$this->Cell($valueW, 10, $citizenship, 0, 0, 'L', false);
 			$this->Cell(0, 5, ' ' . '', 0, 1);
 		}
 		if ($citizenship_type == 'Dual Citizenship') {
 
-			$this->Cell(40, 10, '1st Contry of Citizenship', 0, 0, 'L', false);
-			$this->Cell(150, 10, $citizenship_1, 0, 0, 'L', false);
+			$this->Cell($labelW, 10, '1st Country of Citizenship', 0, 0, 'L', false);
+			$this->Cell($valueW, 10, $citizenship_1, 0, 0, 'L', false);
 			$this->Cell(0, 5, ' ' . '', 0, 1);
 
-			$this->Cell(40, 10, '2st Contry of Citizenship', 0, 0, 'L', false);
-			$this->Cell(150, 10, $citizenship_2, 0, 0, 'L', false);
+			$this->Cell($labelW, 10, '2nd Country of Citizenship', 0, 0, 'L', false);
+			$this->Cell($valueW, 10, $citizenship_2, 0, 0, 'L', false);
 			$this->Cell(0, 5, ' ' . '', 0, 1);
 		}
 
 
-		$this->Cell(40, 10, 'Country of Birth', 0, 0, 'L', false);
-		$this->Cell(150, 10, $birth_country, 0, 0, 'L', false);
+		$this->Cell($labelW, 10, 'Country of Birth', 0, 0, 'L', false);
+		$this->Cell($valueW, 10, $birth_country, 0, 0, 'L', false);
 		$this->Cell(0, 5, ' ' . '', 0, 1);
 
 
 
-		$this->Cell(40, 10, 'Funds', 0, 0, 'L', false);
-
-		$this->MultiCell(150, 10, $fund, '0', 'L', false);
-		$this->Cell(0, 5, ' ' . '', 0, 1);
-
-		$this->Cell(80, 10, 'Country appeared for A/L(High School Diploma)', 0, 0, 'L', false);
-
-		$this->MultiCell(150, 10, $AL_sitting_country, '0', 'L', false);
-		$this->Cell(0, 5, ' ' . '', 0, 1);
-
-		$this->Cell(80, 10, 'Period of study apart from Sri Lanka', 0, 0, 'L', false);
-		$this->Cell(150, 10, $period_study_abroad, 0, 0, 'L', false);
-		$this->Cell(0, 5, ' ' . '', 0, 1);
-
-		$this->Cell(80, 10, 'Downloadable Link of uploaded documents', 0, 0, 'L', false);
-
-		$this->MultiCell(150, 10, $doc_upload_link, '0', 'L', false);
-		$this->Cell(0, 5, ' ' . '', 0, 1);
-
-		$this->Cell(0, 5, ' ', 0, 1);
-		$this->SetFont('Arial', 'B', 10);
-		$this->Cell(0, 10, '  EDUCATIONAL QUALIFICATIONS', 0, 1, 'L', true);
-		$this->SetFont('Arial', 'B', 9);
-
-
-
-		if ($edu_row_cnt > 0) {
-
-			$this->SetFont('Arial', '', 9);
-			while ($row_edu_qual = mysqli_fetch_array($res_edu_qual)) {
-
-				$this->Cell($width_cell[0], 10, 'Year of exam', 0, 0, 'L', false);
-				$this->Cell($width_cell[0], 10, $row_edu_qual['exam_year'], 0, 0, 'L', false);
-				$this->Cell(0, 5, ' ' . '', 0, 1);
-
-				$this->Cell($width_cell[0], 10, 'Name of the Exam', 0, 0, 'L', false);
-				$this->Cell($width_cell[0], 10, $row_edu_qual['exam_name'], 0, 0, 'L', false);
-				$this->Cell(0, 5, ' ' . '', 0, 1);
-
-				$this->Cell($width_cell[0], 10, 'Subject', 0, 0, 'L', false);
-				$this->Cell($width_cell[0], 10, $row_edu_qual['subject_grade'], 0, 0, 'L', false);
-				$this->Cell(0, 5, ' ' . '', 0, 1);
-
-				$this->Cell($width_cell[0], 10, 'Grade', 0, 0, 'L', false);
-				$this->Cell($width_cell[0], 10, $row_edu_qual['award'], 0, 0, 'L', false);
-				$this->Cell(0, 5, ' ' . '', 0, 1);
-
-				$this->Cell(0, 5, ' ' . '', 0, 1);
-				$this->Cell(0, 5, ' ' . '', 0, 1);
-			}
+		if (trim($fund) !== '') {
+			$this->Cell($labelW, 10, 'Funds', 0, 0, 'L', false);
+			$this->MultiCell($valueW, 10, $fund, 0, 'L', false);
 		}
 
+		if (trim($AL_sitting_country) !== '') {
+			$this->Cell($labelW, 10, 'Country appeared for A/L (High School Diploma)', 0, 0, 'L', false);
+			$this->MultiCell($valueW, 10, $AL_sitting_country, 0, 'L', false);
+		}
+
+		$this->Cell($labelW, 10, 'Period of Study Apart from Sri Lanka', 0, 0, 'L', false);
+		$this->Cell($valueW, 10, $period_study_abroad, 0, 0, 'L', false);
+		$this->Cell(0, 5, ' ' . '', 0, 1);
+
+		$this->Cell($labelW, 10, 'Application Submit Date', 0, 0, 'L', false);
+		$this->Cell($valueW, 10, $app_submit_dt, 0, 0, 'L', false);
+		$this->Cell(0, 5, ' ' . '', 0, 1);
+
+		// Applied Degrees as a table
 		$this->Cell(0, 5, ' ', 0, 1);
 		$this->SetFont('Arial', 'B', 10);
-		$this->Cell(0, 10, '  ENGLISH PROFICIENCY', 0, 1, 'L', true);
-		$this->SetFont('Arial', 'B', 9);
+		$this->SetFillColor(193, 229, 252);
+		$this->Cell(0, 10, '  APPLIED DEGREES', 0, 1, 'L', true);
+		$this->Cell(0, 5, ' ', 0, 1);
 
-		if ($edu_row_cnt > 0) {
-			$this->Cell(0, 5, ' ' . '', 0, 1);
-			$this->Cell($width_cell[0], 10, 'Qualification Type', 0, 0, 'L', false);
-			$this->Cell($width_cell[1], 10, 'Result', 0, 0, 'L', false);
-			$this->Cell($width_cell[2], 10, 'Year', 0, 0, 'L', false);
+		$colPref = 30;
+		$colDeg = 160; // total 190 to fit within default margins
+		if (count($applied_degrees) > 0) {
+			// Header
+			$this->SetFont('Arial', 'B', 9);
+			$this->SetDrawColor(180, 180, 180);
+			$this->SetLineWidth(0.3);
+			$this->SetFillColor(230, 240, 255);
+			$this->Cell($colPref, 8, 'Preference', 1, 0, 'C', true);
+			$this->Cell($colDeg, 8, 'Degree Name', 1, 1, 'C', true);
 
-			$this->Cell(0, 10, ' ' . '', 0, 1);
-
+			// Rows
 			$this->SetFont('Arial', '', 9);
-
-			while ($row_eng_prof = mysqli_fetch_array($res_eng_prof)) {
-				$this->Cell(0, 5, ' ' . '', 0, 1);
-				$this->Cell($width_cell[0], 10, $row_eng_prof['qualification_type'], 0, 0, 'L', false);
-				$this->Cell($width_cell[1], 10, $row_eng_prof['result'], 0, 0, 'L', false);
-				$this->Cell($width_cell[2], 10, $row_eng_prof['year'], 0, 0, 'L', false);
-
-				$this->Cell(0, 10, ' ' . '', 0, 1);
+			$this->SetFillColor(248, 248, 248);
+			$fill = false;
+			foreach ($applied_degrees as $degree) {
+				$this->Cell($colPref, 7, (string)$degree['preference_order'], 1, 0, 'C', $fill);
+				$this->Cell($colDeg, 7, $degree['degree_name'], 1, 1, 'L', $fill);
+				$fill = !$fill;
 			}
 		} else {
-			$this->Cell(0, 5, ' ', 0, 1);
-			$this->SetFont('Arial', 'B', 10);
-			$this->Cell(0, 10, '-', 0, 1, 'L', true);
-			$this->SetFont('Arial', 'B', 9);
+			$this->SetFont('Arial', '', 9);
+			$this->Cell($colPref + $colDeg, 8, 'No degrees selected', 1, 1, 'C');
+		}
+
+
+		$this->Cell(0, 5, ' ', 0, 1);
+		$this->SetFont('Arial', 'B', 10);
+		$this->SetFillColor(193, 229, 252);
+		$this->Cell(0, 10, '  EDUCATIONAL QUALIFICATIONS', 0, 1, 'L', true);
+		$this->Cell(0, 5, ' ', 0, 1);
+		// Table styling
+		$this->SetDrawColor(180, 180, 180);
+		$this->SetLineWidth(0.3);
+		$this->SetFont('Arial', 'B', 9);
+
+		// Define table column widths (sum ~190mm for A4 with default margins)
+		$colYear = 25;  // Year
+		$colExam = 75;  // Exam Name
+		$colSubject = 70; // Subject(s)
+		$colGrade = 20; // Grade
+
+		// Header row
+		$this->SetFillColor(230, 240, 255);
+		$this->Cell($colYear, 8, 'Year', 1, 0, 'C', true);
+		$this->Cell($colExam, 8, 'Exam Name', 1, 0, 'C', true);
+		$this->Cell($colSubject, 8, 'Subject(s)', 1, 0, 'C', true);
+		$this->Cell($colGrade, 8, 'Grade', 1, 1, 'C', true);
+
+		$this->SetFont('Arial', '', 9);
+		$this->SetFillColor(248, 248, 248);
+		$fill = false; // zebra rows
+
+		if ($edu_row_cnt > 0) {
+			while ($row_edu_qual = mysqli_fetch_array($res_edu_qual)) {
+				$year = isset($row_edu_qual['exam_year']) ? $row_edu_qual['exam_year'] : '';
+				$exam = isset($row_edu_qual['exam_name']) ? $row_edu_qual['exam_name'] : '';
+				$subject = isset($row_edu_qual['subject_grade']) ? $row_edu_qual['subject_grade'] : '';
+				$grade = isset($row_edu_qual['award']) ? $row_edu_qual['award'] : '';
+
+				$this->Cell($colYear, 7, $year, 1, 0, 'C', $fill);
+				$this->Cell($colExam, 7, $exam, 1, 0, 'L', $fill);
+				$this->Cell($colSubject, 7, $subject, 1, 0, 'L', $fill);
+				$this->Cell($colGrade, 7, $grade, 1, 1, 'C', $fill);
+
+				$fill = !$fill;
+			}
+		} else {
+			$this->Cell($colYear + $colExam + $colSubject + $colGrade, 8, 'No educational qualifications provided', 1, 1, 'C');
+		}
+
+		$this->Cell(0, 5, ' ', 0, 1);
+		$this->SetFont('Arial', 'B', 10);
+		$this->SetFillColor(193, 229, 252);
+		$this->Cell(0, 10, '  ENGLISH PROFICIENCY', 0, 1, 'L', true);
+		$this->SetFont('Arial', 'B', 9);
+		$this->Cell(0, 5, ' ', 0, 1);
+
+		// English Proficiency as a table
+		$colQual = 90; // Qualification Type
+		$colRes = 60;  // Result
+		$colYear = 40; // Year
+
+		if ($eng_row_cnt > 0) {
+			// Header
+			$this->SetDrawColor(180, 180, 180);
+			$this->SetLineWidth(0.3);
+			$this->SetFillColor(230, 240, 255);
+			$this->Cell($colQual, 8, 'Qualification Type', 1, 0, 'C', true);
+			$this->Cell($colRes, 8, 'Result', 1, 0, 'C', true);
+			$this->Cell($colYear, 8, 'Year', 1, 1, 'C', true);
+
+			// Rows
+			$this->SetFont('Arial', '', 9);
+			$this->SetFillColor(248, 248, 248);
+			$fill = false;
+			while ($row_eng_prof = mysqli_fetch_array($res_eng_prof)) {
+				$this->Cell($colQual, 7, $row_eng_prof['qualification_type'], 1, 0, 'L', $fill);
+				$this->Cell($colRes, 7, $row_eng_prof['result'], 1, 0, 'L', $fill);
+				$this->Cell($colYear, 7, $row_eng_prof['year'], 1, 1, 'C', $fill);
+				$fill = !$fill;
+			}
+		} else {
+			$this->SetFont('Arial', '', 9);
+			$this->Cell($colQual + $colRes + $colYear, 8, 'No English qualifications provided', 1, 1, 'C');
 		}
 
 		$this->SetFont('Arial', 'B', 10);
 		$this->Cell(0, 5, ' ' . '', 0, 1);
 		$this->SetFillColor(193, 229, 252);
-		$this->Cell(0, 10, ' OTHER QUALIFICATION', 0, 1, 'L', true);
+		$this->Cell(0, 10, ' OTHER QUALIFICATIONS', 0, 1, 'L', true);
 		$this->SetFont('Arial', '', 9);
 
 		$this->Cell(40, 12, $other_qualification, 0, 0, 'L', false);
@@ -337,24 +369,22 @@ class PDF extends FPDF
 		$this->Cell(0, 10, ' FATHER DETAILS', 0, 1, 'L', true);
 		$this->SetFont('Arial', '', 9);
 
-		$this->Cell(40, 12, 'Name', 0, 0, 'L', false);
-		$this->Cell(40, 12, $row_get_father['name'], 0, 0, 'L', false);
-		$this->Cell(0, 5, ' ' . '', 0, 1);
-		$this->Cell(40, 12, 'Occupation', 0, 0, 'L', false);
-		$this->Cell(40, 12, $row_get_father['job'], 0, 0, 'L', false);
-		$this->Cell(0, 5, ' ' . '', 0, 1);
-		$this->Cell(40, 12, 'Employer Address', 0, 0, 'L', false);
-		$this->Cell(40, 12, $row_get_father['employey_details'], 0, 0, 'L', false);
-		$this->Cell(0, 5, ' ' . '', 0, 1);
-		$this->Cell(40, 12, 'Email', 0, 0, 'L', false);
-		$this->Cell(40, 12, $row_get_father['email'], 0, 0, 'L', false);
-		$this->Cell(0, 5, ' ' . '', 0, 1);
-		$this->Cell(40, 12, 'Fixed Phone', 0, 0, 'L', false);
-		$this->Cell(40, 12, $row_get_father['fixed_phone'], 0, 0, 'L', false);
-		$this->Cell(0, 5, ' ' . '', 0, 1);
-		$this->Cell(40, 12, 'Mobile', 0, 0, 'L', false);
-		$this->Cell(40, 12, $row_get_father['mobile_no'], 0, 0, 'L', false);
-		$this->Cell(0, 5, ' ' . '', 0, 1);
+		// Conditionally render Father details only when values are present
+		$fatherFields = array(
+			'Name' => isset($row_get_father['name']) ? trim($row_get_father['name']) : '',
+			'Occupation' => isset($row_get_father['job']) ? trim($row_get_father['job']) : '',
+			'Employer Address' => isset($row_get_father['employey_details']) ? trim($row_get_father['employey_details']) : '',
+			'Email' => isset($row_get_father['email']) ? trim($row_get_father['email']) : '',
+			'Fixed Phone' => isset($row_get_father['fixed_phone']) ? trim($row_get_father['fixed_phone']) : '',
+			'Mobile' => isset($row_get_father['mobile_no']) ? trim($row_get_father['mobile_no']) : ''
+		);
+		foreach ($fatherFields as $label => $value) {
+			if ($value !== '') {
+				$this->Cell(40, 12, $label, 0, 0, 'L', false);
+				$this->Cell(40, 12, $value, 0, 0, 'L', false);
+				$this->Cell(0, 5, ' ' . '', 0, 1);
+			}
+		}
 
 		$this->SetFont('Arial', 'B', 10);
 		$this->Cell(0, 5, ' ' . '', 0, 1);
@@ -362,54 +392,49 @@ class PDF extends FPDF
 		$this->Cell(0, 10, ' MOTHER DETAILS', 0, 1, 'L', true);
 		$this->SetFont('Arial', '', 9);
 
-		$this->Cell(40, 12, 'Name', 0, 0, 'L', false);
-		$this->Cell(40, 12, $row_get_mother['name'], 0, 0, 'L', false);
-		$this->Cell(0, 5, ' ' . '', 0, 1);
-		$this->Cell(40, 12, 'Occupation', 0, 0, 'L', false);
-		$this->Cell(40, 12, $row_get_mother['job'], 0, 0, 'L', false);
-		$this->Cell(0, 5, ' ' . '', 0, 1);
-		$this->Cell(40, 12, 'Employer Address', 0, 0, 'L', false);
-		$this->Cell(40, 12, $row_get_mother['employey_details'], 0, 0, 'L', false);
-		$this->Cell(0, 5, ' ' . '', 0, 1);
-		$this->Cell(40, 12, 'Email', 0, 0, 'L', false);
-		$this->Cell(40, 12, $row_get_mother['email'], 0, 0, 'L', false);
-		$this->Cell(0, 5, ' ' . '', 0, 1);
-		$this->Cell(40, 12, 'Fixed Phone', 0, 0, 'L', false);
-		$this->Cell(40, 12, $row_get_mother['fixed_phone'], 0, 0, 'L', false);
-		$this->Cell(0, 5, ' ' . '', 0, 1);
-		$this->Cell(40, 12, 'Mobile', 0, 0, 'L', false);
-		$this->Cell(40, 12, $row_get_mother['mobile_no'], 0, 0, 'L', false);
-		$this->Cell(0, 5, ' ' . '', 0, 1);
+		// Conditionally render Mother details only when values are present
+		$motherFields = array(
+			'Name' => isset($row_get_mother['name']) ? trim($row_get_mother['name']) : '',
+			'Occupation' => isset($row_get_mother['job']) ? trim($row_get_mother['job']) : '',
+			'Employer Address' => isset($row_get_mother['employey_details']) ? trim($row_get_mother['employey_details']) : '',
+			'Email' => isset($row_get_mother['email']) ? trim($row_get_mother['email']) : '',
+			'Fixed Phone' => isset($row_get_mother['fixed_phone']) ? trim($row_get_mother['fixed_phone']) : '',
+			'Mobile' => isset($row_get_mother['mobile_no']) ? trim($row_get_mother['mobile_no']) : ''
+		);
+		foreach ($motherFields as $label => $value) {
+			if ($value !== '') {
+				$this->Cell(40, 12, $label, 0, 0, 'L', false);
+				$this->Cell(40, 12, $value, 0, 0, 'L', false);
+				$this->Cell(0, 5, ' ' . '', 0, 1);
+			}
+		}
 
 		$this->SetFont('Arial', 'B', 10);
 		$this->Cell(0, 5, ' ' . '', 0, 1);
 		$this->SetFillColor(193, 229, 252);
 		$this->Cell(0, 10, ' GUARDIAN DETAILS', 0, 1, 'L', true);
 		$this->SetFont('Arial', '', 9);
-		// First row of data 
-		$this->Cell(40, 12, 'Name', 0, 0, 'L', false);
-		$this->Cell(40, 12, $row_get_guardian['name'], 0, 0, 'L', false);
-		$this->Cell(0, 5, ' ' . '', 0, 1);
-		$this->Cell(40, 12, 'Occupation', 0, 0, 'L', false);
-		$this->Cell(40, 12, $row_get_guardian['job'], 0, 0, 'L', false);
-		$this->Cell(0, 5, ' ' . '', 0, 1);
-		$this->Cell(40, 12, 'Employer Address', 0, 0, 'L', false);
-		$this->Cell(40, 12, $row_get_guardian['employey_details'], 0, 0, 'L', false);
-		$this->Cell(0, 5, ' ' . '', 0, 1);
-		$this->Cell(40, 12, 'Email', 0, 0, 'L', false);
-		$this->Cell(40, 12, $row_get_guardian['email'], 0, 0, 'L', false);
-		$this->Cell(0, 5, ' ' . '', 0, 1);
-		$this->Cell(40, 12, 'Fixed Phone', 0, 0, 'L', false);
-		$this->Cell(40, 12, $row_get_guardian['fixed_phone'], 0, 0, 'L', false);
-		$this->Cell(0, 5, ' ' . '', 0, 1);
-		$this->Cell(40, 12, 'Mobile', 0, 0, 'L', false);
-		$this->Cell(40, 12, $row_get_guardian['mobile_no'], 0, 0, 'L', false);
-		$this->Cell(0, 5, ' ' . '', 0, 1);
+		// Conditionally render Guardian details only when values are present
+		$guardianFields = array(
+			'Name' => isset($row_get_guardian['name']) ? trim($row_get_guardian['name']) : '',
+			'Occupation' => isset($row_get_guardian['job']) ? trim($row_get_guardian['job']) : '',
+			'Employer Address' => isset($row_get_guardian['employey_details']) ? trim($row_get_guardian['employey_details']) : '',
+			'Email' => isset($row_get_guardian['email']) ? trim($row_get_guardian['email']) : '',
+			'Fixed Phone' => isset($row_get_guardian['fixed_phone']) ? trim($row_get_guardian['fixed_phone']) : '',
+			'Mobile' => isset($row_get_guardian['mobile_no']) ? trim($row_get_guardian['mobile_no']) : ''
+		);
+		foreach ($guardianFields as $label => $value) {
+			if ($value !== '') {
+				$this->Cell(40, 12, $label, 0, 0, 'L', false);
+				$this->Cell(40, 12, $value, 0, 0, 'L', false);
+				$this->Cell(0, 5, ' ' . '', 0, 1);
+			}
+		}
 
 
 		$this->Cell(0, 5, ' ', 0, 1);
 		$this->SetFont('Arial', 'B', 10);
-		$this->Cell(0, 10, '  REFREE DETAILS', 0, 1, 'L', true);
+		$this->Cell(0, 10, '  REFEREE DETAILS', 0, 1, 'L', true);
 		$this->SetFont('Arial', 'B', 9);
 
 
@@ -419,7 +444,7 @@ class PDF extends FPDF
 			$this->SetFont('Arial', '', 9);
 			while ($row_get_refree = mysqli_fetch_array($res_refree)) {
 
-				$this->Cell($width_cell[0], 10, 'Refree Name', 0, 0, 'L', false);
+				$this->Cell($width_cell[0], 10, 'Referee Name', 0, 0, 'L', false);
 				$this->Cell($width_cell[0], 10, $row_get_refree['refree_details'], 0, 0, 'L', false);
 				$this->Cell(0, 5, ' ' . '', 0, 1);
 
