@@ -46,6 +46,9 @@ if (!isset($_SESSION['loggedin'])) {
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-components-web/14.0.0/material-components-web.min.css" />
   <link rel="stylesheet" href="https://cdn.datatables.net/2.0.7/css/dataTables.dataTables.css" />
 
+  <!-- Enhanced Professional Dashboard CSS -->
+  <link rel="stylesheet" href="../assets/css/admin-dashboard.css" />
+
 </head>
 
 <body>
@@ -65,10 +68,17 @@ if (!isset($_SESSION['loggedin'])) {
             </div>
           </a>
 
-          <!-- Menu Toggle Icon -->
-          <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large d-xl-none">
-            <i class="bx bx-chevron-left bx-sm align-middle text-dark"></i>
-          </a>
+          <!-- Menu Toggle Icons -->
+          <div class="d-flex align-items-center gap-2">
+            <!-- Collapse/Expand (desktop + mobile) -->
+            <button type="button" id="sidebarCollapseBtn" class="btn btn-sm btn-outline-secondary" title="Collapse/Expand menu" aria-label="Toggle sidebar" aria-expanded="true">
+              <i class="bx bx-chevrons-left"></i>
+            </button>
+            <!-- Default template toggle for overlay on small screens -->
+            <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large d-xl-none" title="Toggle menu">
+              <i class="bx bx-chevron-left bx-sm align-middle text-dark"></i>
+            </a>
+          </div>
         </div>
 
 
@@ -130,10 +140,13 @@ if (!isset($_SESSION['loggedin'])) {
       <!-- Layout container -->
       <div class="layout-page">
         <!-- Content wrapper -->
-        <div class="content-wrapper" style="background-image: url('../../assets/img/backgrounds/bgimg.svg'); background-size: cover; background-position: center;">
+        <div class="content-wrapper" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; position: relative;">
+          <!-- Background overlay -->
+          <!-- <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: url('../../assets/img/backgrounds/bgimg.svg') center/cover; opacity: 0.1; z-index: 0;"></div>
+ -->
           <!-- Content -->
-
-          <div class="container-xxl flex-grow-1 container-p-y background-image" id="content">
+          <div class="container-xxl flex-grow-1 container-p-y" id="content" style="position: relative; z-index: 1; background: rgba(255, 255, 255, 0.95); margin: 4px; border-radius: 4px; padding: 4px; box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2);">
+            <!-- Content will be loaded here dynamically -->
           </div>
 
           <!-- / Content -->
@@ -166,6 +179,11 @@ if (!isset($_SESSION['loggedin'])) {
   </div>
   <!-- / Layout wrapper -->
 
+  <!-- Floating toggle button for collapsed state -->
+  <button type="button" id="sidebarToggleFab" class="sidebar-toggle-fab" title="Expand menu" aria-label="Toggle sidebar" aria-expanded="false">
+    <i class="bx bx-chevrons-right"></i>
+  </button>
+
 
   <!-- Core JS -->
   <!-- build:js assets/vendor/js/core.js -->
@@ -195,6 +213,70 @@ if (!isset($_SESSION['loggedin'])) {
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
   <script src="../../assets/js/admin/dashboard.js"></script>
   <script src="https://cdn.datatables.net/2.0.7/js/dataTables.js"></script>
+
+  <!-- Enhanced Professional Dashboard JS -->
+  <!-- <script src="../assets/js/admin-dashboard-enhanced.js"></script> -->
+
+  <script>
+    // Sidebar collapse toggle with persistence using Sneat's standard class
+    (function() {
+      const htmlEl = document.documentElement;
+      const STORAGE_KEY = 'kdu_admin_menu_collapsed';
+      const btn = document.getElementById('sidebarCollapseBtn');
+      const btnFab = document.getElementById('sidebarToggleFab');
+
+      function setCollapsedState(isCollapsed) {
+        if (isCollapsed) {
+          htmlEl.classList.add('layout-menu-collapsed');
+          if (btn) {
+            btn.setAttribute('aria-expanded', 'false');
+            btn.setAttribute('title', 'Expand menu');
+            btn.innerHTML = '<i class="bx bx-chevrons-right"></i>';
+          }
+          if (btnFab) {
+            btnFab.setAttribute('aria-expanded', 'false');
+            btnFab.setAttribute('title', 'Expand menu');
+            btnFab.innerHTML = '<i class="bx bx-chevrons-right"></i>';
+          }
+        } else {
+          htmlEl.classList.remove('layout-menu-collapsed');
+          if (btn) {
+            btn.setAttribute('aria-expanded', 'true');
+            btn.setAttribute('title', 'Collapse menu');
+            btn.innerHTML = '<i class="bx bx-chevrons-left"></i>';
+          }
+          if (btnFab) {
+            btnFab.setAttribute('aria-expanded', 'true');
+            btnFab.setAttribute('title', 'Collapse menu');
+            btnFab.innerHTML = '<i class="bx bx-chevrons-left"></i>';
+          }
+        }
+        try {
+          localStorage.setItem(STORAGE_KEY, isCollapsed ? '1' : '0');
+        } catch (e) {}
+      }
+
+      // Initialize from storage
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved === '1') setCollapsedState(true);
+      } catch (e) {}
+
+      // Click handler
+      if (btn) {
+        btn.addEventListener('click', function() {
+          const isCollapsed = htmlEl.classList.contains('layout-menu-collapsed');
+          setCollapsedState(!isCollapsed);
+        });
+      }
+      if (btnFab) {
+        btnFab.addEventListener('click', function() {
+          const isCollapsed = htmlEl.classList.contains('layout-menu-collapsed');
+          setCollapsedState(!isCollapsed);
+        });
+      }
+    })();
+  </script>
 
 </body>
 
